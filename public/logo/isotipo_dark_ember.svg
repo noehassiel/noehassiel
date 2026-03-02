@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480">
+  <rect x="0" y="0" width="480" height="480" rx="64.0" fill="#0A0A0A"/>
+  
+  <!-- Letter n -->
+  <text x="40.0" y="312.0" fill="#FAFAF9" 
+        font-family="'Cabinet Grotesk', 'Arial Black', 'Helvetica Neue', sans-serif" 
+        font-size="208.0" font-weight="800">n</text>
+  
+  <!-- Slash separator -->
+  <line x1="224.0" y1="112.0" x2="240.0" y2="368.0" 
+        stroke="#FF420B" stroke-width="14.0" stroke-linecap="round"/>
+  
+  <!-- Letter h -->
+  <text x="256.0" y="312.0" fill="#FAFAF9" 
+        font-family="'Cabinet Grotesk', 'Arial Black', 'Helvetica Neue', sans-serif" 
+        font-size="208.0" font-weight="800">h</text>
+  
+  <!-- Static cursor -->
+  <rect x="416.0" y="200.0" width="28.0" height="120.0" rx="4.0" fill="#FF420B"/>
+</svg>

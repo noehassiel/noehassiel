@@ -22,6 +22,23 @@
                             wire:navigate
                         />
                     </x-ui.navlist.group>
+
+                    <x-ui.navlist.group label="{{ __('Business') }}">
+                        <x-ui.navlist.item
+                            icon="user-group"
+                            :href="route('clients.index')"
+                            :active="request()->routeIs('clients.*')"
+                            label="{{ __('Clientes') }}"
+                            wire:navigate
+                        />
+                        <x-ui.navlist.item
+                            icon="document-text"
+                            :href="route('proposals.index')"
+                            :active="request()->routeIs('proposals.*')"
+                            label="{{ __('Proposals') }}"
+                            wire:navigate
+                        />
+                    </x-ui.navlist.group>
                 </x-ui.navlist>
 
                 <div class="mt-auto p-2">

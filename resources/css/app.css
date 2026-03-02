@@ -1,5 +1,6 @@
 @import './theme.css'; /* By Sheaf.dev */
 @import 'tailwindcss';
+@import './cabinet-grotesk.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
