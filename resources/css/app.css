@@ -45,3 +45,55 @@
         border-color: var(--color-gray-200, currentColor);
     }
 }
+
+body {
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.loader {
+    background: #C4123D;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    z-index: 999;
+    top: 0;
+    left: 0;
+}
+
+#wrap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+}
+
+#wrap canvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 500px;
+    height: 500px;
+    margin: -250px 0 0 -250px;
+    -outline: 1px solid #fff;
+}
+
+.info {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 12px;
+    color: #ccc;
+    line-height: 2em;
+    text-align: center;
+}
