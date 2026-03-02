@@ -90,53 +90,61 @@
             </div>
         </div>
 
-        {{-- Proposals list --}}
-        <div class="space-y-4 lg:col-span-2">
-            <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">Proposals</h2>
+        {{-- Proposals & Invoices --}}
+        <div class="space-y-8 lg:col-span-2">
 
-            @if ($client->proposals->isEmpty())
-                <div
-                    class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 py-12 dark:border-neutral-700">
-                    <x-ui.icon name="document-text" class="mb-2 size-8 text-neutral-300 dark:text-neutral-600" />
-                    <p class="text-sm text-neutral-400">Sin proposals aún</p>
-                    <x-ui.button variant="outline" size="sm" :href="route('proposals.create')" wire:navigate class="mt-3">
-                        Crear proposal
-                    </x-ui.button>
-                </div>
-            @else
-                <div class="space-y-3">
-                    @foreach ($client->proposals->sortByDesc('created_at') as $proposal)
-                        @php
-                            $statusColors = [
-                                'zinc' => 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300',
-                                'blue' => 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-                                'green' => 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-                                'red' => 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300',
-                                'amber' => 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
-                            ];
-                        @endphp
-                        <a href="{{ route('proposals.show', $proposal) }}" wire:navigate
-                            class="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-4 transition-colors hover:border-[#FF420B]/30 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800/50">
-                            <div>
-                                <p class="font-mono text-xs text-[#FF420B]">{{ $proposal->number }}</p>
-                                <p class="mt-0.5 font-semibold text-neutral-800 dark:text-neutral-200">
-                                    {{ $proposal->title }}</p>
-                                <p class="mt-0.5 text-xs text-neutral-400">{{ $proposal->project_type->label() }} ·
-                                    {{ $proposal->created_at->format('d/m/Y') }}</p>
-                            </div>
-                            <div class="text-right">
-                                <span
-                                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $statusColors[$proposal->status->color()] ?? $statusColors['zinc'] }}">
-                                    {{ $proposal->status->label() }}
-                                </span>
-                                <p class="mt-2 font-mono text-sm font-bold text-neutral-900 dark:text-neutral-50">
-                                    {{ $proposal->currency }} {{ number_format($proposal->total, 2) }}
-                                </p>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-            @endif
+            {{-- Proposals section --}}
+            <div class="space-y-4">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">Proposals</h2>
+
+                @if ($client->proposals->isEmpty())
+                    <div
+                        class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 py-12 dark:border-neutral-700">
+                        <x-ui.icon name="document-text" class="mb-2 size-8 text-neutral-300 dark:text-neutral-600" />
+                        <p class="text-sm text-neutral-400">Sin proposals aún</p>
+                        <x-ui.button variant="outline" size="sm" :href="route('proposals.create')" wire:navigate class="mt-3">
+                            Crear proposal
+                        </x-ui.button>
+                    </div>
+                @else
+                    <div class="space-y-3">
+                        @foreach ($client->proposals->sortByDesc('created_at') as $proposal)
+                            @php
+                                $statusColors = [
+                                    'zinc' => 'bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300',
+                                    'blue' => 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+                                    'green' => 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+                                    'red' => 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+                                    'amber' => 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+                                ];
+                            @endphp
+                            <a href="{{ route('proposals.show', $proposal) }}" wire:navigate
+                                class="flex items-center justify-between rounded-xl border border-neutral-200 bg-white p-4 transition-colors hover:border-[#FF420B]/30 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800/50">
+                                <div>
+                                    <p class="font-mono text-xs text-[#FF420B]">{{ $proposal->number }}</p>
+                                    <p class="mt-0.5 font-semibold text-neutral-800 dark:text-neutral-200">
+                                        {{ $proposal->title }}</p>
+                                    <p class="mt-0.5 text-xs text-neutral-400">{{ $proposal->project_type->label() }} ·
+                                        {{ $proposal->created_at->format('d/m/Y') }}</p>
+                                </div>
+                                <div class="text-right">
+                                    <span
+                                        class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $statusColors[$proposal->status->color()] ?? $statusColors['zinc'] }}">
+                                        {{ $proposal->status->label() }}
+                                    </span>
+                                    <p class="mt-2 font-mono text-sm font-bold text-neutral-900 dark:text-neutral-50">
+                                        {{ $proposal->currency }} {{ number_format($proposal->total, 2) }}
+                                    </p>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            </div>
+
+            {{-- Invoices section --}}
+            <livewire:client.invoices.crud :client="$client" />
+
         </div>
     </div>
 </div>

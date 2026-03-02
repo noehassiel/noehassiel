@@ -9,7 +9,9 @@ use App\Livewire\Proposal\Show as ProposalShow;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
+use App\Models\Invoice;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 Route::namespace('App\Http\Controllers')->group(
     function () {
@@ -25,6 +27,16 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('clients', ClientIndex::class)->name('clients.index');
     Route::get('clients/{client}', ClientShow::class)->name('clients.show');
+
+    Route::get('invoices/{invoice}/download', function (Invoice $invoice) {
+        abort_unless(request()->hasValidSignature(), 403);
+        abort_unless($invoice->zip_path && Storage::disk('local')->exists($invoice->zip_path), 404);
+
+        return Storage::disk('local')->download(
+            $invoice->zip_path,
+            "factura-{$invoice->number}.zip"
+        );
+    })->name('invoices.download');
 
     Route::get('proposals', ProposalIndex::class)->name('proposals.index');
     Route::get('proposals/create', ProposalCreate::class)->name('proposals.create');
