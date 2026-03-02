@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ab9a2bfa586d26fe7f6fca2322805e60",
+    "content-hash": "5f840810a1e064816ae09e957bebe105",
     "packages": [
         {
             "name": "blade-ui-kit/blade-icons",
@@ -2307,70 +2307,62 @@
             "time": "2026-01-15T06:54:53+00:00"
         },
         {
-            "name": "livewire/flux",
-            "version": "v2.12.2",
+            "name": "livewire/blaze",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/livewire/flux.git",
-                "reference": "68a3b06b62b23bae82e02d6be39722cf2a8770ff"
+                "url": "https://github.com/livewire/blaze.git",
+                "reference": "581ee7feff0f594e1e1678a59bda186a2154e335"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/flux/zipball/68a3b06b62b23bae82e02d6be39722cf2a8770ff",
-                "reference": "68a3b06b62b23bae82e02d6be39722cf2a8770ff",
+                "url": "https://api.github.com/repos/livewire/blaze/zipball/581ee7feff0f594e1e1678a59bda186a2154e335",
+                "reference": "581ee7feff0f594e1e1678a59bda186a2154e335",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "^10.0|^11.0|^12.0|^13.0",
-                "illuminate/support": "^10.0|^11.0|^12.0|^13.0",
-                "illuminate/view": "^10.0|^11.0|^12.0|^13.0",
-                "laravel/prompts": "^0.1|^0.2|^0.3",
-                "livewire/livewire": "^3.7.4|^4.0",
-                "php": "^8.1",
-                "symfony/console": "^6.0|^7.0|^8.0"
+                "illuminate/support": "^10.0|^11.0|^12.0",
+                "illuminate/view": "^10.0|^11.0|^12.0",
+                "nikic/php-parser": "^5.0",
+                "php": "^8.1"
             },
             "conflict": {
-                "livewire/blaze": "<1.0.0-beta.2"
+                "livewire/flux": "<2.12.1"
+            },
+            "require-dev": {
+                "livewire/flux": "dev-main",
+                "orchestra/testbench": "^8.0|^9.0|^10.0",
+                "pestphp/pest": "^2.0|^3.0",
+                "pestphp/pest-plugin-laravel": "^2.0|^3.0"
             },
             "type": "library",
             "extra": {
                 "laravel": {
-                    "aliases": {
-                        "Flux": "Flux\\Flux"
-                    },
                     "providers": [
-                        "Flux\\FluxServiceProvider"
+                        "Livewire\\Blaze\\BlazeServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Flux\\": "src/"
+                    "Livewire\\Blaze\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "proprietary"
+                "MIT"
             ],
             "authors": [
                 {
-                    "name": "Caleb Porzio",
-                    "email": "calebporzio@gmail.com"
+                    "name": "Caleb Porzio"
                 }
             ],
-            "description": "The official UI component library for Livewire.",
-            "keywords": [
-                "components",
-                "flux",
-                "laravel",
-                "livewire",
-                "ui"
-            ],
+            "description": "A tool for optimizing Blade component performance by folding them into parent templates",
             "support": {
-                "issues": "https://github.com/livewire/flux/issues",
-                "source": "https://github.com/livewire/flux/tree/v2.12.2"
+                "issues": "https://github.com/livewire/blaze/issues",
+                "source": "https://github.com/livewire/blaze/tree/v1.0.4"
             },
-            "time": "2026-02-24T16:29:56+00:00"
+            "time": "2026-03-01T21:10:57+00:00"
         },
         {
             "name": "livewire/livewire",
@@ -4052,6 +4044,66 @@
                 "source": "https://github.com/resend/resend-php/tree/v0.17.0"
             },
             "time": "2025-04-23T20:24:02+00:00"
+        },
+        {
+            "name": "sheaf/cli",
+            "version": "v1.3.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sheafui/cli.git",
+                "reference": "4bf1d1959f7a4c18b0d1388e6bb3509ce6253f79"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sheafui/cli/zipball/4bf1d1959f7a4c18b0d1388e6bb3509ce6253f79",
+                "reference": "4bf1d1959f7a4c18b0d1388e6bb3509ce6253f79",
+                "shasum": ""
+            },
+            "require-dev": {
+                "orchestra/testbench": "^10.4",
+                "pestphp/pest": "^3.8",
+                "pestphp/pest-plugin-laravel": "^3.2"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Sheaf\\Cli\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Sheaf\\Cli\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Youssef ACHCHIRAJ",
+                    "email": "achchiraj.youssef@gmail.com",
+                    "homepage": "https://youssef-achchiraj.com",
+                    "role": "Full Stack Developer"
+                }
+            ],
+            "description": "A CLI tool for Sheaf UI",
+            "homepage": "https://github.com/sheaf/cli",
+            "keywords": [
+                "artisan-command",
+                "cli",
+                "laravel",
+                "laravel-package",
+                "package",
+                "sheaf"
+            ],
+            "support": {
+                "issues": "https://github.com/sheafui/cli/issues",
+                "source": "https://github.com/sheafui/cli/tree/v1.3.4"
+            },
+            "time": "2025-11-30T14:34:29+00:00"
         },
         {
             "name": "spatie/laravel-package-tools",
@@ -6901,6 +6953,135 @@
                 }
             ],
             "time": "2024-11-21T01:49:47+00:00"
+        },
+        {
+            "name": "wireui/heroicons",
+            "version": "v2.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wireui/heroicons.git",
+                "reference": "ccd2ab94293d6f231271c0847c1db34305313c6f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wireui/heroicons/zipball/ccd2ab94293d6f231271c0847c1db34305313c6f",
+                "reference": "ccd2ab94293d6f231271c0847c1db34305313c6f",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^9.16|^10.0|^11.0|^12.0",
+                "php": "^8.1|^8.2|^8.3|^8.4"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.6",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "aliases": [],
+                "laravel": {
+                    "providers": [
+                        "WireUi\\Heroicons\\HeroiconsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WireUi\\Heroicons\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pedro Oliveira",
+                    "email": "pedrolivertwd@gmail.com"
+                }
+            ],
+            "description": "The Tailwind Heroicons for laravel blade by WireUI",
+            "keywords": [
+                "blade components",
+                "blade heroicons",
+                "laravel components",
+                "livewire icons",
+                "livewire icons components",
+                "wireui"
+            ],
+            "support": {
+                "issues": "https://github.com/wireui/heroicons/issues",
+                "source": "https://github.com/wireui/heroicons/tree/v2.9.0"
+            },
+            "time": "2025-03-02T22:06:22+00:00"
+        },
+        {
+            "name": "wireui/phosphoricons",
+            "version": "v2.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wireui/phosphoricons.git",
+                "reference": "a4d4ed73adf760a34878f561edb982ace0aa31ef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wireui/phosphoricons/zipball/a4d4ed73adf760a34878f561edb982ace0aa31ef",
+                "reference": "a4d4ed73adf760a34878f561edb982ace0aa31ef",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": "^9.52|^10.0|^11.0|^12.0",
+                "php": "^8.1|^8.2|^8.3|^8.4"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.6",
+                "mockery/mockery": "^1.5",
+                "orchestra/testbench": "^10.0",
+                "pestphp/pest": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": [],
+                    "providers": [
+                        "WireUi\\PhosphorIcons\\PhosphorIconsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "WireUi\\PhosphorIcons\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "ph7jack",
+                    "email": "pedro@wireui.dev"
+                }
+            ],
+            "description": "The phosphoricons made for laravel blade by WireUI",
+            "keywords": [
+                "Blade Icons",
+                "blade components",
+                "blade phosphoricons",
+                "laravel components",
+                "livewire icons",
+                "livewire icons components",
+                "wireui",
+                "wireui phosphoricons"
+            ],
+            "support": {
+                "issues": "https://github.com/wireui/phosphoricons/issues",
+                "source": "https://github.com/wireui/phosphoricons/tree/v2.4.0"
+            },
+            "time": "2025-03-02T22:06:11+00:00"
         }
     ],
     "packages-dev": [

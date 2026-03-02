@@ -9,15 +9,19 @@
 
     <form wire:submit="confirmPassword" class="flex flex-col gap-6">
         <!-- Password -->
-        <flux:input
-            wire:model="password"
-            :label="__('Password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('Password')"
-        />
+        <x-ui.field>
+            <x-ui.label>{{ __('Password') }}</x-ui.label>
+            <x-ui.input
+                wire:model="password"
+                type="password"
+                required
+                autocomplete="new-password"
+                :placeholder="__('Password')"
+                :revealable="true"
+            />
+            <x-ui.error name="password" />
+        </x-ui.field>
 
-        <flux:button variant="primary" type="submit" class="w-full">{{ __('Confirm') }}</flux:button>
+        <x-ui.button variant="primary" type="submit" class="w-full">{{ __('Confirm') }}</x-ui.button>
     </form>
 </div>

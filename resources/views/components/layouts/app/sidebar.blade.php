@@ -1,12 +1,10 @@
 <aside>
-    hello
-
     {{ $title }}
 
     <form method="POST" action="{{ route('logout') }}" class="w-full">
         @csrf
-        <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
+        <x-ui.button as="button" variant="ghost" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
             {{ __('Log Out') }}
-        </flux:menu.item>
+        </x-ui.button>
     </form>
 </aside>

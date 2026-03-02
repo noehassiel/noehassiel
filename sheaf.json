@@ -1,0 +1,128 @@
+{
+    "project_hash": "616fcd74-5ee1-4caa-a528-8daf559590eb",
+    "components": {
+        "button": {
+            "installationTime": 1772421616
+        },
+        "icon": {
+            "installationTime": 1772422576
+        },
+        "input": {
+            "installationTime": 1772422580
+        },
+        "select": {
+            "installationTime": 1772422662
+        },
+        "popup": {
+            "installationTime": 1772422662
+        },
+        "text": {
+            "installationTime": 1772422743
+        },
+        "textarea": {
+            "installationTime": 1772422745
+        },
+        "switch": {
+            "installationTime": 1772422667
+        },
+        "radio": {
+            "installationTime": 1772422659
+        },
+        "layout": {
+            "installationTime": 1772422430
+        },
+        "sidebar": {
+            "installationTime": 1772422431
+        },
+        "navlist": {
+            "installationTime": 1772422447
+        },
+        "badge": {
+            "installationTime": 1772422507
+        },
+        "navbar": {
+            "installationTime": 1772422448
+        },
+        "accordion": {
+            "installationTime": 1772422458
+        },
+        "alerts": {
+            "installationTime": 1772422463
+        },
+        "autocomplete": {
+            "installationTime": 1772422466
+        },
+        "avatar": {
+            "installationTime": 1772422502
+        },
+        "brand": {
+            "installationTime": 1772422508
+        },
+        "breadcrumbs": {
+            "installationTime": 1772422508
+        },
+        "card": {
+            "installationTime": 1772422509
+        },
+        "checkbox": {
+            "installationTime": 1772422509
+        },
+        "description": {
+            "installationTime": 1772422510
+        },
+        "dropdown": {
+            "installationTime": 1772422530
+        },
+        "error": {
+            "installationTime": 1772422530
+        },
+        "field": {
+            "installationTime": 1772422531
+        },
+        "fieldset": {
+            "installationTime": 1772422571
+        },
+        "heading": {
+            "installationTime": 1772422572
+        },
+        "key-value": {
+            "installationTime": 1772422581
+        },
+        "label": {
+            "installationTime": 1772422581
+        },
+        "link": {
+            "installationTime": 1772422582
+        },
+        "modal": {
+            "installationTime": 1772422584
+        },
+        "otp": {
+            "installationTime": 1772422655
+        },
+        "separator": {
+            "installationTime": 1772422664
+        },
+        "popover": {
+            "installationTime": 1772422656
+        },
+        "slider": {
+            "installationTime": 1772422665
+        },
+        "tabs": {
+            "installationTime": 1772422667
+        },
+        "tags-input": {
+            "installationTime": 1772422668
+        },
+        "theme-switcher": {
+            "installationTime": 1772422746
+        },
+        "toast": {
+            "installationTime": 1772422747
+        },
+        "tooltip": {
+            "installationTime": 1772422748
+        }
+    }
+}
