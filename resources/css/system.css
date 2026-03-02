@@ -1,0 +1,9 @@
+:root {
+    --color-primary: #e85002;
+    --color-dark: #222222;
+    --color-white: #f9f9f9;
+    --color-gray-light: #a7a7a7;
+    --color-gray: #646464;
+    --color-gray-dark: #333333;
+    --color-gradient: linear-gradient(90deg, #000000 0%, #c10801 33%, #f16001 66%, #d9c3ab 100%);
+}
