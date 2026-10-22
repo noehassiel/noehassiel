@@ -357,6 +357,12 @@ class Proposal extends Model
         return ['amount' => $amount, 'fee' => round($charge - $amount, 2), 'charge' => $charge];
     }
 
+    /** Meses sin intereses: Stripe only offers them on MXN card charges, and we only from a minimum amount. */
+    public static function allowsInstallments(float $charge, string $currency): bool
+    {
+        return strtoupper($currency) === 'MXN' && $charge >= config('services.stripe_installments.min_charge');
+    }
+
     public function balanceAmount(): float
     {
         return $this->paymentSchedule()[1]['amount'];

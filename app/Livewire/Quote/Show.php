@@ -118,6 +118,10 @@ class Show extends Component
         $proposal = $this->payableProposal();
         $charge = Proposal::cardCharge($proposal->depositAmount());
 
+        $installments = Proposal::allowsInstallments($charge['charge'], $proposal->currency)
+            ? ['payment_method_options' => ['card' => ['installments' => ['enabled' => true]]]]
+            : [];
+
         $checkout = Checkout::guest()->create([[
             'price_data' => [
                 'currency' => strtolower($proposal->currency),
@@ -133,6 +137,7 @@ class Show extends Component
             'metadata' => ['proposal_id' => $proposal->id],
             'success_url' => route('quotes.show', $this->token).'?pago=listo',
             'cancel_url' => route('quotes.show', $this->token),
+            ...$installments,
         ]);
 
         $proposal->forceFill([
@@ -216,11 +221,14 @@ class Show extends Component
             ? $proposal->totalsFor($this->requiresInvoice)
             : $proposal->totalsFor($proposal->requires_invoice);
 
+        $cardCharge = $proposal->status === ProposalStatus::Accepted ? Proposal::cardCharge($proposal->depositAmount()) : null;
+
         return view('livewire.quote.show', [
             'proposal' => $proposal,
             'totals' => $totals,
             'schedule' => $proposal->paymentSchedule($totals['total']),
-            'cardCharge' => $proposal->status === ProposalStatus::Accepted ? Proposal::cardCharge($proposal->depositAmount()) : null,
+            'cardCharge' => $cardCharge,
+            'allowsInstallments' => $cardCharge && Proposal::allowsInstallments($cardCharge['charge'], $proposal->currency),
             'bank' => config('services.bank'),
             'isUnlocked' => $isUnlocked,
             'isExpired' => $proposal->valid_until?->endOfDay()->isPast() ?? false,

@@ -147,6 +147,29 @@ test('paying by card passes the stripe fee on to the client', function () {
         ->and($charge['fee'])->toBe(round($charge['charge'] - 29000, 2));
 });
 
+test('meses sin intereses start at the minimum charge in mxn', function () {
+    expect(Proposal::allowsInstallments(3000, 'MXN'))->toBeTrue()
+        ->and(Proposal::allowsInstallments(2999.99, 'MXN'))->toBeFalse()
+        ->and(Proposal::allowsInstallments(50000, 'USD'))->toBeFalse();
+});
+
+test('paying by card enables meses sin intereses in stripe checkout', function () {
+    $this->proposal->accept(false);
+
+    $sessions = Mockery::mock();
+    $sessions->shouldReceive('create')
+        ->withArgs(fn (array $payload) => data_get($payload, 'payment_method_options.card.installments.enabled') === true)
+        ->once()
+        ->andReturn(StripeCheckoutSession::constructFrom(['id' => 'cs_test_msi', 'url' => 'https://checkout.stripe.com/c/cs_test_msi']));
+    app()->bind(StripeClient::class, fn () => (object) ['checkout' => (object) ['sessions' => $sessions]]);
+
+    unlockedQuote($this->proposal)
+        ->call('choosePaymentMethod', 'card')
+        ->assertSee('meses sin intereses')
+        ->call('payWithCard')
+        ->assertRedirect('https://checkout.stripe.com/c/cs_test_msi');
+});
+
 test('payment options are not available before accepting', function () {
     unlockedQuote($this->proposal)
         ->call('choosePaymentMethod', 'cash')

@@ -80,6 +80,9 @@
                 <div class="flex justify-between gap-4 text-[var(--silver)]"><dt>Comisión de Stripe (pago con tarjeta)</dt><dd class="font-mono">{{ $money($cardCharge['fee']) }}</dd></div>
                 <div class="flex justify-between gap-4 font-bold"><dt>Total a pagar</dt><dd class="font-mono">{{ $money($cardCharge['charge']) }}</dd></div>
             </dl>
+            @if ($allowsInstallments)
+                <p class="mt-3 text-sm text-[var(--silver)]">Con tarjeta de crédito participante puedes pagarlo a <span class="text-[var(--stone)]">meses sin intereses</span>. Eliges el plazo en la pantalla de pago.</p>
+            @endif
             <button type="button" wire:click="payWithCard" wire:loading.attr="disabled"
                 class="mt-4 w-full cursor-pointer rounded-xl bg-[var(--ember)] px-6 py-3 font-bold text-[var(--obsidian)] transition-opacity hover:opacity-90 disabled:opacity-60 sm:w-auto">
                 <span wire:loading.remove wire:target="payWithCard">Pagar con tarjeta</span>

@@ -54,6 +54,10 @@ return [
         'tax_percent' => (float) env('STRIPE_FEE_TAX_PERCENT', 16),
     ],
 
+    'stripe_installments' => [
+        'min_charge' => (float) env('STRIPE_INSTALLMENTS_MIN_CHARGE', 3000),
+    ],
+
     'leads' => [
         'email' => env('LEADS_EMAIL', env('MAIL_FROM_ADDRESS')),
     ],
