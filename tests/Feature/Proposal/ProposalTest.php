@@ -2,16 +2,19 @@
 
 declare(strict_types=1);
 
+use App\Ai\Agents\ProposalDrafter;
 use App\Enums\ProposalStatus;
 use App\Livewire\Proposal\Create;
 use App\Livewire\Proposal\Edit;
 use App\Livewire\Proposal\Index;
 use App\Livewire\Proposal\Show;
 use App\Models\Client;
+use App\Models\Lead;
 use App\Models\Proposal;
 use App\Models\ProposalItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Ai\Prompts\AgentPrompt;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -62,7 +65,7 @@ test('proposals create page loads', function () {
 
 test('can create a proposal', function () {
     Livewire::test(Create::class)
-        ->set('clientId', $this->client->id)
+        ->set('recipient', "client:{$this->client->id}")
         ->set('title', 'Sitio web premium')
         ->set('projectType', 'website')
         ->set('whatWeDo', 'Diseño y desarrollo de sitio web')
@@ -77,17 +80,54 @@ test('can create a proposal', function () {
     expect(Proposal::where('title', 'Sitio web premium')->exists())->toBeTrue();
 });
 
+test('can create a proposal for a lead', function () {
+    $lead = Lead::factory()->create();
+
+    Livewire::test(Create::class)
+        ->set('recipient', "lead:{$lead->id}")
+        ->set('title', 'Propuesta para prospecto')
+        ->set('projectType', 'website')
+        ->set('whatWeDo', 'Diseño y desarrollo de sitio web')
+        ->set('howWeDoIt', 'Usando Laravel y Tailwind CSS')
+        ->set('stages.0.name', 'Diseño')
+        ->set('items.0.description', 'Diseño UI')
+        ->set('items.0.quantity', 1)
+        ->set('items.0.unit_price', 10000)
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $proposal = Proposal::where('title', 'Propuesta para prospecto')->sole();
+
+    expect($proposal->lead_id)->toBe($lead->id)
+        ->and($proposal->client_id)->toBeNull()
+        ->and($proposal->recipient()->is($lead))->toBeTrue();
+});
+
+test('create proposal rejects a recipient that does not exist', function () {
+    Livewire::test(Create::class)
+        ->set('recipient', 'lead:999999')
+        ->call('save')
+        ->assertHasErrors(['recipient']);
+});
+
+test('lead proposal show page displays the lead name', function () {
+    $lead = Lead::factory()->create(['name' => 'Mariana Prospecto']);
+    $proposal = Proposal::factory()->create(['client_id' => null, 'lead_id' => $lead->id]);
+
+    $this->get(route('proposals.show', $proposal))->assertSuccessful()->assertSee('Mariana Prospecto');
+});
+
 test('create proposal validates required fields', function () {
     Livewire::test(Create::class)
-        ->set('clientId', 0)
+        ->set('recipient', '')
         ->set('title', '')
         ->call('save')
-        ->assertHasErrors(['clientId', 'title', 'projectType', 'whatWeDo', 'howWeDoIt']);
+        ->assertHasErrors(['recipient', 'title', 'projectType', 'whatWeDo', 'howWeDoIt']);
 });
 
 test('create proposal generates proposal number', function () {
     Livewire::test(Create::class)
-        ->set('clientId', $this->client->id)
+        ->set('recipient', "client:{$this->client->id}")
         ->set('title', 'Test Proposal')
         ->set('projectType', 'website')
         ->set('whatWeDo', 'Something')
@@ -112,7 +152,7 @@ test('create proposal calculates subtotals on item change', function () {
 
 test('proposal stages are saved', function () {
     Livewire::test(Create::class)
-        ->set('clientId', $this->client->id)
+        ->set('recipient', "client:{$this->client->id}")
         ->set('title', 'Staged Project')
         ->set('projectType', 'webapp')
         ->set('whatWeDo', 'Build a web app')
@@ -196,4 +236,52 @@ test('can delete a proposal', function () {
         ->call('delete');
 
     expect(Proposal::find($proposal->id))->toBeNull();
+});
+
+// ─── AI draft ─────────────────────────────────────────────────────────────────
+
+test('ai draft fills the form and leaves every price at zero', function () {
+    ProposalDrafter::fake([[
+        'title' => 'Sitio web para Café Origen',
+        'project_type' => 'website',
+        'what_we_do' => 'Un sitio que cuente tu historia.',
+        'how_we_do_it' => 'Diseñamos y construimos en Laravel.',
+        'includes' => ['Diseño UI', 'Desarrollo'],
+        'excludes' => ['Fotografía'],
+        'stages' => [
+            ['name' => 'Diseño', 'description' => 'Wireframes y UI', 'duration' => '2 semanas'],
+            ['name' => 'Desarrollo', 'description' => 'Laravel', 'duration' => '3 semanas'],
+        ],
+        'items' => [['description' => 'Diseño y desarrollo del sitio', 'quantity' => 1]],
+        'open_questions' => ['¿Tienen dominio?'],
+    ]]);
+
+    $lead = Lead::factory()->create(['message' => 'Queremos vender café en línea']);
+
+    Livewire::test(Create::class)
+        ->set('recipient', "lead:{$lead->id}")
+        ->set('draftServices', ['web_design_development'])
+        ->set('draftNotes', 'Cafetería en Puebla, quieren sitio con menú y ubicación.')
+        ->call('draftWithAi')
+        ->assertHasNoErrors()
+        ->assertSet('title', 'Sitio web para Café Origen')
+        ->assertSet('includesRaw', "Diseño UI\nDesarrollo")
+        ->assertCount('stages', 2)
+        ->assertSet('items.0.unit_price', 0)
+        ->assertSet('openQuestions', ['¿Tienen dominio?']);
+
+    ProposalDrafter::assertPrompted(fn (AgentPrompt $prompt) => $prompt->contains('Queremos vender café en línea')
+        && $prompt->contains('Diseño y desarrollo web'));
+});
+
+test('ai draft requires notes and a recipient', function () {
+    ProposalDrafter::fake();
+
+    Livewire::test(Create::class)
+        ->set('recipient', '')
+        ->set('draftNotes', '')
+        ->call('draftWithAi')
+        ->assertHasErrors(['recipient', 'draftNotes']);
+
+    ProposalDrafter::assertNeverPrompted();
 });

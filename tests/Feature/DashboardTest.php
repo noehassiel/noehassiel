@@ -1,5 +1,8 @@
 <?php
 
+use App\Enums\ProjectStatus;
+use App\Models\Project;
+use App\Models\ProjectRequirement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -20,3 +23,15 @@ test('non-admin users are forbidden from the admin', function (string $routeName
 
     $this->get(route($routeName))->assertForbidden();
 })->with(['dashboard', 'clients.index', 'proposals.index', 'settings.profile']);
+
+test('the dashboard summarizes active projects and pending deliverables', function () {
+    $this->actingAs(User::factory()->admin()->create());
+
+    $project = Project::factory()->create(['name' => 'Sitio Innovar', 'status' => ProjectStatus::Design]);
+    ProjectRequirement::factory()->for($project)->create(['title' => 'Logo en vectores']);
+
+    $this->get('/dashboard')
+        ->assertOk()
+        ->assertSee('Sitio Innovar')
+        ->assertSee('Logo en vectores');
+});

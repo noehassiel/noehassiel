@@ -5,6 +5,9 @@ use App\Http\Controllers\SpotifyController;
 use App\Http\Middleware\UseUserLocale;
 use App\Livewire\Client\Index as ClientIndex;
 use App\Livewire\Client\Show as ClientShow;
+use App\Livewire\Dashboard;
+use App\Livewire\Lead\Index as LeadIndex;
+use App\Livewire\Lead\Show as LeadShow;
 use App\Livewire\Portal\AcceptInvitation;
 use App\Livewire\Portal\Home as PortalHome;
 use App\Livewire\Portal\Invoices as PortalInvoices;
@@ -15,6 +18,7 @@ use App\Livewire\Proposal\Create as ProposalCreate;
 use App\Livewire\Proposal\Edit as ProposalEdit;
 use App\Livewire\Proposal\Index as ProposalIndex;
 use App\Livewire\Proposal\Show as ProposalShow;
+use App\Livewire\Quote\Show as QuoteShow;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Security;
@@ -81,6 +85,12 @@ Route::get('invitations/{token}', AcceptInvitation::class)
     ->middleware(['guest', 'throttle:20,1'])
     ->name('invitations.accept');
 
+// Shareable proposal page: the link plus its password are the credential, no account needed
+Route::get('q/{token}', QuoteShow::class)
+    ->where('token', '[A-Za-z0-9]{40}')
+    ->middleware('throttle:60,1')
+    ->name('quotes.show');
+
 Route::prefix('portal')->name('portal.')->middleware(['auth', 'can:access-portal', UseUserLocale::class])->group(function () {
     Route::get('/', PortalHome::class)->name('home');
     Route::get('projects/{project}', PortalProjectShow::class)->name('projects.show');
@@ -94,7 +104,7 @@ Route::prefix('portal')->name('portal.')->middleware(['auth', 'can:access-portal
     })->middleware('can:download,invoice')->name('invoices.download');
 });
 
-Route::view('dashboard', 'dashboard')
+Route::get('dashboard', Dashboard::class)
     ->middleware(['auth', 'verified', 'can:access-admin', UseUserLocale::class])
     ->name('dashboard');
 
@@ -102,6 +112,9 @@ Route::middleware(['auth', 'can:access-admin', UseUserLocale::class])->group(fun
 
     Route::get('clients', ClientIndex::class)->name('clients.index');
     Route::get('clients/{client}', ClientShow::class)->name('clients.show');
+
+    Route::get('leads', LeadIndex::class)->name('leads.index');
+    Route::get('leads/{lead}', LeadShow::class)->name('leads.show');
 
     Route::get('projects/{project}', ProjectShow::class)->name('projects.show');
 

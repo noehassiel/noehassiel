@@ -159,6 +159,7 @@ $loadingAttributes = $loadingAttributes->merge($loading ? [
         'aria-label' => $squared && blank($slot) ? Str::title($icon ?? $iconAfter ?? 'Button') : null,
     ])"  
     data-slot="button"
+    data-variant="{{ $variant }}"
 >
         {{-- This is a special icon component (ui/icon/loading.blade.php) required for the loading indicator --}}
         <div

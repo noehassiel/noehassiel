@@ -1,14 +1,12 @@
 <div>
     {{-- Header --}}
-    <div class="mb-8 flex items-center justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">Clientes</h1>
-            <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">Gestiona tu cartera de clientes</p>
-        </div>
-        <x-ui.button variant="primary" wire:click="openCreate" icon="ps:plus">
-            Nuevo cliente
-        </x-ui.button>
-    </div>
+    <x-admin.page-header eyebrow="Business" title="Clientes" subtitle="Gestiona tu cartera de clientes">
+        <x-slot:actions>
+            <x-ui.button variant="primary" wire:click="openCreate" icon="ps:plus">
+                Nuevo cliente
+            </x-ui.button>
+        </x-slot:actions>
+    </x-admin.page-header>
 
     {{-- Search --}}
     <div class="mb-6">
@@ -19,7 +17,7 @@
     {{-- Grid / Empty state --}}
     @if ($clients->isEmpty())
         <div
-            class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 py-20 dark:border-neutral-700">
+            class="flex flex-col items-center justify-center admin-empty py-20">
             <x-ui.icon name="user-group" class="mb-3 size-10 text-neutral-300 dark:text-neutral-600" />
             <p class="text-sm font-medium text-neutral-500 dark:text-neutral-400">
                 @if ($search)
@@ -35,21 +33,21 @@
             @endif
         </div>
     @else
-        <div class="overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
+        <div class="admin-card overflow-hidden">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900">
                         <th
-                            class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                            class="px-5 py-3.5 text-left admin-eyebrow">
                             Cliente</th>
                         <th
-                            class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                            class="px-5 py-3.5 text-left admin-eyebrow">
                             Contacto</th>
                         <th
-                            class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                            class="px-5 py-3.5 text-left admin-eyebrow">
                             Email</th>
                         <th
-                            class="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-neutral-500">
+                            class="px-5 py-3.5 text-left admin-eyebrow">
                             RFC</th>
                         <th
                             class="px-5 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-neutral-500">
@@ -57,7 +55,7 @@
                         <th class="px-4 py-3.5"></th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+                <tbody class="divide-y divide-[var(--border)]">
                     @foreach ($clients as $client)
                         <tr wire:key="client-{{ $client->id }}"
                             class="group transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/50">

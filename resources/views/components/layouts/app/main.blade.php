@@ -3,12 +3,16 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white dark:bg-neutral-950">
+    <body class="admin min-h-screen">
         <x-ui.layout>
             <x-ui.sidebar>
                 <x-slot:brand>
-                    <a href="{{ route('dashboard') }}" class="flex items-center space-x-2" wire:navigate>
-                        <x-app-logo />
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3" wire:navigate>
+                        <img src="{{ asset('logo/isotipo_dark_ember.svg') }}" alt="noehassiel" class="size-8 shrink-0">
+                        <span data-slot="brand-name" class="leading-none">
+                            <span class="block text-[15px] font-bold tracking-tight">noehassiel</span>
+                            <span class="mt-1 block font-mono text-[10px] tracking-[0.12em] text-[var(--ember)]">artisan developer</span>
+                        </span>
                     </a>
                 </x-slot:brand>
 
@@ -24,6 +28,13 @@
                     </x-ui.navlist.group>
 
                     <x-ui.navlist.group label="{{ __('Business') }}">
+                        <x-ui.navlist.item
+                            icon="sparkles"
+                            :href="route('leads.index')"
+                            :active="request()->routeIs('leads.*')"
+                            label="{{ __('Leads') }}"
+                            wire:navigate
+                        />
                         <x-ui.navlist.item
                             icon="user-group"
                             :href="route('clients.index')"
@@ -44,7 +55,7 @@
                 <div class="mt-auto p-2">
                     <x-ui.dropdown>
                         <x-slot:button>
-                            <x-ui.button variant="ghost" class="w-full justify-start gap-2 px-2 py-1.5">
+                            <x-ui.button variant="ghost" class="w-full justify-start gap-2 rounded-[var(--radius-box)] border border-[#1C1C1C] px-2 py-2">
                                 <x-ui.avatar
                                     :initials="auth()->user()->initials()"
                                     size="sm"
@@ -73,47 +84,16 @@
 
             <x-ui.layout.main>
                 <x-ui.layout.header>
-                    <x-ui.sidebar.toggle />
+                    <x-ui.sidebar.toggle class="md:hidden" />
 
                     <div class="grow"></div>
 
-                    <x-ui.navbar>
-                        <x-ui.tooltip placement="bottom">
-                            <x-slot:trigger>
-                                <x-ui.navbar.item icon="magnifying-glass" href="#" label="{{ __('Search') }}" />
-                            </x-slot:trigger>
-                            <x-ui.tooltip.content>{{ __('Search') }}</x-ui.tooltip.content>
-                        </x-ui.tooltip>
-
-                        <x-ui.tooltip placement="bottom">
-                            <x-slot:trigger>
-                                <x-ui.navbar.item
-                                    class="max-lg:hidden"
-                                    icon="code-bracket-square"
-                                    href="https://github.com/laravel/livewire-starter-kit"
-                                    target="_blank"
-                                    label="{{ __('Repository') }}"
-                                />
-                            </x-slot:trigger>
-                            <x-ui.tooltip.content>{{ __('Repository') }}</x-ui.tooltip.content>
-                        </x-ui.tooltip>
-
-                        <x-ui.tooltip placement="bottom">
-                            <x-slot:trigger>
-                                <x-ui.navbar.item
-                                    class="max-lg:hidden"
-                                    icon="book-open"
-                                    href="https://laravel.com/docs/starter-kits"
-                                    target="_blank"
-                                    label="{{ __('Documentation') }}"
-                                />
-                            </x-slot:trigger>
-                            <x-ui.tooltip.content>{{ __('Documentation') }}</x-ui.tooltip.content>
-                        </x-ui.tooltip>
-                    </x-ui.navbar>
+                    <span class="font-mono text-[11px] tracking-[0.18em] text-[var(--slate)] uppercase max-sm:hidden">
+                        {{ now()->translatedFormat('D d M') }}
+                    </span>
                 </x-ui.layout.header>
 
-                <div class="p-6">
+                <div class="relative z-10 px-4 py-8 sm:px-8 lg:py-10">
                     {{ $slot }}
                 </div>
             </x-ui.layout.main>

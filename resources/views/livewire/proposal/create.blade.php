@@ -2,23 +2,17 @@
     <form wire:submit="save" class="mx-auto max-w-4xl space-y-8 pb-16">
 
         {{-- Page header --}}
-        <div class="flex items-center justify-between">
-            <div>
-                <a href="{{ route('proposals.index') }}" wire:navigate
-                    class="mb-1 inline-flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
-                    <x-ui.icon name="arrow-left" class="size-3.5" />
-                    Volver a proposals
-                </a>
-                <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">Nuevo Proposal</h1>
-            </div>
-            <x-ui.button type="submit" variant="primary" icon="ps:check">
-                Guardar proposal
-            </x-ui.button>
-        </div>
+        <x-admin.page-header class="!mb-0" :back="route('proposals.index')" back-label="Volver a proposals" title="Nuevo proposal">
+            <x-slot:actions>
+                <x-ui.button type="submit" variant="primary" icon="ps:check">
+                    Guardar proposal
+                </x-ui.button>
+            </x-slot:actions>
+        </x-admin.page-header>
 
         {{-- Section: Basic info --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+        <div class="admin-card p-6">
+            <h2 class="mb-5 admin-eyebrow">
                 Información general</h2>
 
             <div class="grid gap-4 sm:grid-cols-2">
@@ -59,9 +53,54 @@
             </div>
         </div>
 
+        {{-- Section: AI draft --}}
+        <div class="admin-card p-6">
+            <h2 class="mb-2 admin-eyebrow">Borrador con IA</h2>
+            <p class="mb-5 text-sm text-neutral-500">Elige el cliente o lead arriba, pega tus notas y la IA llena el título, el alcance, las etapas y los conceptos. Los precios los pones tú.</p>
+
+            <div class="space-y-4">
+                <fieldset>
+                    <legend class="mb-2 text-sm font-medium text-neutral-700 dark:text-neutral-300">Servicios</legend>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach ($this->services as $service)
+                            <label class="cursor-pointer">
+                                <input type="checkbox" wire:model="draftServices" value="{{ $service->value }}" class="peer sr-only">
+                                <span class="inline-block rounded-full border border-neutral-200 px-3 py-1.5 text-xs font-medium text-neutral-600 transition-colors peer-checked:border-[#FF420B] peer-checked:text-[#FF420B] peer-focus-visible:outline-2 peer-focus-visible:outline-[#FF420B] dark:border-neutral-700 dark:text-neutral-400">
+                                    {{ $service->label() }}
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
+                </fieldset>
+
+                <x-ui.field>
+                    <x-ui.label>Notas del proyecto</x-ui.label>
+                    <x-ui.textarea wire:model="draftNotes" rows="6"
+                        placeholder="Notas de la llamada, mensajes de WhatsApp, bullets… lo que tengas." />
+                    <x-ui.error name="draftNotes" />
+                </x-ui.field>
+
+                <x-ui.button type="button" variant="outline" wire:click="draftWithAi" wire:loading.attr="disabled" wire:target="draftWithAi" icon="sparkles">
+                    <span wire:loading.remove wire:target="draftWithAi">Generar borrador</span>
+                    <span wire:loading wire:target="draftWithAi">Escribiendo borrador…</span>
+                </x-ui.button>
+
+                @if ($openQuestions)
+                    <div role="status" class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-900 dark:bg-amber-900/20">
+                        <p class="mb-2 font-semibold text-amber-800 dark:text-amber-300">Confirma con el cliente antes de enviar:</p>
+                        <ul class="list-disc space-y-1 pl-5 text-amber-900 dark:text-amber-200">
+                            @foreach ($openQuestions as $question)
+                                <li>{{ $question }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+            </div>
+        </div>
+
         {{-- Section: Scope --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+        <div class="admin-card p-6">
+            <h2 class="mb-5 admin-eyebrow">
                 Alcance del proyecto</h2>
 
             <div class="space-y-4">
@@ -98,9 +137,9 @@
         </div>
 
         {{-- Section: Stages --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div class="admin-card p-6">
             <div class="mb-5 flex items-center justify-between">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">Etapas
+                <h2 class="admin-eyebrow">Etapas
                     del proyecto</h2>
                 <x-ui.button type="button" variant="outline" size="sm" wire:click="addStage" icon="ps:plus">
                     Agregar etapa
@@ -110,7 +149,7 @@
             <div class="space-y-4">
                 @foreach ($stages as $i => $stage)
                     <div wire:key="stage-{{ $i }}"
-                        class="group relative rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                        class="group relative admin-subcard p-4">
                         <div class="mb-3 flex items-center gap-3">
                             <span
                                 class="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#FF420B] text-xs font-bold text-white">{{ $i + 1 }}</span>
@@ -136,16 +175,16 @@
         </div>
 
         {{-- Section: Cost items --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div class="admin-card p-6">
             <div class="mb-5 flex items-center justify-between">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                <h2 class="admin-eyebrow">
                     Desglose de costos</h2>
                 <x-ui.button type="button" variant="outline" size="sm" wire:click="addItem" icon="ps:plus">
                     Agregar ítem
                 </x-ui.button>
             </div>
 
-            <div class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
+            <div class="admin-card overflow-hidden">
                 <table class="w-full text-sm">
                     <thead>
                         <tr
@@ -158,7 +197,7 @@
                             <th class="w-10 px-2 py-3"></th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+                    <tbody class="divide-y divide-[var(--border)]">
                         @foreach ($items as $i => $item)
                             <tr wire:key="item-{{ $i }}">
                                 <td class="px-4 py-2.5">
@@ -237,8 +276,8 @@
         </div>
 
         {{-- Section: Notes --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+        <div class="admin-card p-6">
+            <h2 class="mb-5 admin-eyebrow">
                 Notas y términos adicionales</h2>
             <x-ui.textarea wire:model="notes" rows="4"
                 placeholder="Condiciones de pago, términos especiales, observaciones..." />

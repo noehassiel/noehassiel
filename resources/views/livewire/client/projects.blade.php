@@ -2,7 +2,7 @@
 
     {{-- Header --}}
     <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">Proyectos</h2>
+        <h2 class="admin-eyebrow">Proyectos</h2>
 
         <x-ui.button wire:click="openCreate" variant="outline" size="sm" icon="plus">
             Nuevo proyecto
@@ -10,7 +10,7 @@
     </div>
 
     @if ($projects->isEmpty())
-        <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 py-10 dark:border-neutral-700">
+        <div class="flex flex-col items-center justify-center admin-empty py-10">
             <x-ui.icon name="folder" class="mb-2 size-7 text-neutral-300 dark:text-neutral-600" />
             <p class="text-sm text-neutral-400">Sin proyectos aún</p>
         </div>
@@ -18,7 +18,7 @@
         <div class="space-y-2">
             @foreach ($projects as $project)
                 <a href="{{ route('projects.show', $project) }}" wire:navigate wire:key="project-{{ $project->id }}"
-                    class="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 bg-white px-4 py-3 transition-colors hover:border-[#FF420B]/30 hover:bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800/50">
+                    class="flex items-center justify-between gap-4 admin-subcard px-4 py-3">
                     <div class="min-w-0">
                         <p class="truncate font-semibold text-neutral-800 dark:text-neutral-200">{{ $project->name }}</p>
                         <p class="mt-0.5 font-mono text-xs text-neutral-400">

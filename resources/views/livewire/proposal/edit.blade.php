@@ -2,24 +2,20 @@
     <form wire:submit="save" class="mx-auto max-w-4xl space-y-8 pb-16">
 
         {{-- Page header --}}
-        <div class="flex items-center justify-between">
-            <div>
-                <a href="{{ route('proposals.show', $proposal) }}" wire:navigate
-                    class="mb-1 inline-flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
-                    <x-ui.icon name="arrow-left" class="size-3.5" />
-                    Volver al proposal
-                </a>
-                <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">Editar Proposal</h1>
-                <p class="mt-0.5 font-mono text-sm text-[#FF420B]">{{ $proposal->number }}</p>
-            </div>
-            <x-ui.button type="submit" variant="primary" icon="check">
-                Guardar cambios
-            </x-ui.button>
-        </div>
+        <x-admin.page-header class="!mb-0" :back="route('proposals.show', $proposal)" back-label="Volver al proposal" title="Editar proposal">
+            <x-slot:meta>
+                <span class="admin-chip text-[var(--ember)]">{{ $proposal->number }}</span>
+            </x-slot:meta>
+            <x-slot:actions>
+                <x-ui.button type="submit" variant="primary" icon="check">
+                    Guardar cambios
+                </x-ui.button>
+            </x-slot:actions>
+        </x-admin.page-header>
 
         {{-- Section: Basic info --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+        <div class="admin-card p-6">
+            <h2 class="mb-5 admin-eyebrow">
                 Información general</h2>
 
             <div class="grid gap-4 sm:grid-cols-2">
@@ -66,8 +62,8 @@
         </div>
 
         {{-- Section: Scope --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+        <div class="admin-card p-6">
+            <h2 class="mb-5 admin-eyebrow">
                 Alcance del proyecto</h2>
 
             <div class="space-y-4">
@@ -100,9 +96,9 @@
         </div>
 
         {{-- Section: Stages --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div class="admin-card p-6">
             <div class="mb-5 flex items-center justify-between">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">Etapas
+                <h2 class="admin-eyebrow">Etapas
                     del proyecto</h2>
                 <x-ui.button type="button" variant="outline" size="sm" wire:click="addStage" icon="plus">
                     Agregar etapa
@@ -112,7 +108,7 @@
             <div class="space-y-4">
                 @foreach ($stages as $i => $stage)
                     <div wire:key="stage-{{ $i }}"
-                        class="group relative rounded-xl border border-neutral-200 bg-neutral-50 p-4 dark:border-neutral-700 dark:bg-neutral-800/50">
+                        class="group relative admin-subcard p-4">
                         <div class="mb-3 flex items-center gap-3">
                             <span
                                 class="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#FF420B] text-xs font-bold text-white">{{ $i + 1 }}</span>
@@ -138,16 +134,16 @@
         </div>
 
         {{-- Section: Cost items --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+        <div class="admin-card p-6">
             <div class="mb-5 flex items-center justify-between">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+                <h2 class="admin-eyebrow">
                     Desglose de costos</h2>
                 <x-ui.button type="button" variant="outline" size="sm" wire:click="addItem" icon="plus">
                     Agregar ítem
                 </x-ui.button>
             </div>
 
-            <div class="overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-700">
+            <div class="admin-card overflow-hidden">
                 <table class="w-full text-sm">
                     <thead>
                         <tr
@@ -160,7 +156,7 @@
                             <th class="w-10 px-2 py-3"></th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-neutral-100 dark:divide-neutral-800">
+                    <tbody class="divide-y divide-[var(--border)]">
                         @foreach ($items as $i => $item)
                             <tr wire:key="item-{{ $i }}">
                                 <td class="px-4 py-2.5">
@@ -229,8 +225,8 @@
         </div>
 
         {{-- Notes --}}
-        <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-            <h2 class="mb-5 text-sm font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500">
+        <div class="admin-card p-6">
+            <h2 class="mb-5 admin-eyebrow">
                 Notas y términos adicionales</h2>
             <x-ui.textarea wire:model="notes" rows="4" />
         </div>

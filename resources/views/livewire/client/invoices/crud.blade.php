@@ -19,7 +19,7 @@
 
     {{-- Invoice list --}}
     @if ($invoices->isEmpty())
-        <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 py-10 dark:border-neutral-700">
+        <div class="flex flex-col items-center justify-center admin-empty py-10">
             <x-ui.icon name="document-text" class="mb-2 size-7 text-neutral-300 dark:text-neutral-600" />
             <p class="text-sm text-neutral-400">Sin facturas enviadas</p>
         </div>
@@ -27,7 +27,7 @@
         <div class="space-y-2">
             @foreach ($invoices as $invoice)
                 <div wire:key="invoice-{{ $invoice->id }}"
-                    class="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900">
+                    class="flex items-center justify-between admin-subcard px-4 py-3">
                     <div>
                         <p class="font-mono text-xs text-[#FF420B]">{{ $invoice->number }}</p>
                         <p class="mt-0.5 text-sm text-neutral-700 dark:text-neutral-300">{{ $invoice->notes }}</p>

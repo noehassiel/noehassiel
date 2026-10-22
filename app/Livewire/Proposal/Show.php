@@ -111,6 +111,24 @@ class Show extends Component
         return "https://wa.me/?text={$text}";
     }
 
+    public function enableSharing(): void
+    {
+        $this->proposal->enableSharing();
+        $this->dispatch('toast', message: 'Link privado creado.', type: 'success');
+    }
+
+    public function rotateAccessPassword(): void
+    {
+        $this->proposal->rotateAccessPassword();
+        $this->dispatch('toast', message: 'Nueva contraseña generada. La anterior ya no funciona.', type: 'success');
+    }
+
+    public function disableSharing(): void
+    {
+        $this->proposal->disableSharing();
+        $this->dispatch('toast', message: 'Link desactivado.', type: 'warning');
+    }
+
     public function markAsSent(): void
     {
         $this->proposal->update([

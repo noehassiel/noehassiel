@@ -2,14 +2,20 @@
 
 namespace App\Livewire\Proposal;
 
+use App\Ai\Agents\ProposalDrafter;
 use App\Enums\ProposalProjectType;
+use App\Enums\ProposalService;
 use App\Livewire\Proposal\Concerns\SelectsRecipient;
+use App\Models\Client;
+use App\Models\Lead;
 use App\Models\Proposal;
 use App\Models\ProposalItem;
 use App\Models\ProposalStage;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use Throwable;
 
 class Create extends Component
 {
@@ -47,6 +53,15 @@ class Create extends Component
 
     public bool $applyTax = true;
 
+    // AI draft
+    public string $draftNotes = '';
+
+    /** @var array<int, string> */
+    public array $draftServices = [];
+
+    /** @var array<int, string> */
+    public array $openQuestions = [];
+
     public function mount(): void
     {
         $this->addStage();
@@ -57,6 +72,79 @@ class Create extends Component
     public function projectTypes(): array
     {
         return ProposalProjectType::cases();
+    }
+
+    #[Computed]
+    public function services(): array
+    {
+        return ProposalService::cases();
+    }
+
+    /**
+     * Fill the form with an AI first draft built from the notes. Prices stay at 0 on purpose.
+     */
+    public function draftWithAi(): void
+    {
+        $this->validate([
+            ...$this->recipientRules(),
+            'draftNotes' => 'required|string|min:20|max:20000',
+            'draftServices' => 'array',
+            'draftServices.*' => [Rule::enum(ProposalService::class)],
+        ]);
+
+        try {
+            $draft = (new ProposalDrafter)->prompt($this->draftPrompt());
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->addError('draftNotes', 'No se pudo generar el borrador. Intenta de nuevo.');
+
+            return;
+        }
+
+        $this->title = $draft['title'];
+        $this->projectType = $draft['project_type'];
+        $this->whatWeDo = $draft['what_we_do'];
+        $this->howWeDoIt = $draft['how_we_do_it'];
+        $this->includesRaw = implode("\n", $draft['includes']);
+        $this->excludesRaw = implode("\n", $draft['excludes']);
+        $this->openQuestions = $draft['open_questions'];
+
+        $this->stages = collect($draft['stages'])->values()->map(fn (array $stage, int $order): array => [
+            'name' => $stage['name'],
+            'description' => $stage['description'],
+            'duration' => $stage['duration'],
+            'order' => $order,
+        ])->all();
+
+        $this->items = collect($draft['items'])->values()->map(fn (array $item, int $order): array => [
+            'description' => $item['description'],
+            'quantity' => $item['quantity'],
+            'unit_price' => 0,
+            'subtotal' => 0,
+            'order' => $order,
+        ])->all();
+
+        $this->dispatch('toast', message: 'Borrador listo. Revisa el texto y pon los precios.', type: 'success');
+    }
+
+    /** The notes plus everything we already know about who the proposal is for. */
+    private function draftPrompt(): string
+    {
+        [$type, $id] = explode(':', $this->recipient);
+        $recipient = $type === 'client' ? Client::find($id) : Lead::find($id);
+
+        $context = collect([
+            'Recipient' => $recipient->name.($type === 'lead' ? ' (prospect)' : ' (existing client)'),
+            'Company' => $recipient->company ?? null,
+            'What they wrote when they contacted us' => $type === 'lead' ? $recipient->message : null,
+            'Budget range they selected' => $type === 'lead' ? $recipient->budget : null,
+            'Timeline they selected' => $type === 'lead' ? $recipient->timeline : null,
+            'Services to include' => collect($this->draftServices)
+                ->map(fn (string $service): string => ProposalService::from($service)->label())
+                ->implode(', ') ?: null,
+        ])->filter()->map(fn (string $value, string $label): string => "{$label}: {$value}")->implode("\n");
+
+        return "{$context}\n\nNotes:\n{$this->draftNotes}";
     }
 
     #[Computed]

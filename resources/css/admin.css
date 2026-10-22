@@ -1,0 +1,419 @@
+/*
+ * Admin — brand surface for the internal dashboard. Tokens come from landing.css.
+ * Scoped to body.admin so the starter-kit components keep working elsewhere.
+ */
+
+body.admin {
+    --color-primary: var(--ember);
+    --color-primary-content: var(--ember);
+    --color-primary-fg: var(--stone);
+    --radius-field: 0.5rem;
+    --radius-box: 0.625rem;
+    --header-height: 64px;
+
+    background: var(--obsidian);
+    color: var(--stone);
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle grain for artisanal warmth (4% noise) */
+body.admin::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.admin .font-mono {
+    font-family: var(--font-mono);
+}
+
+/* Sidebar: no visible scrollbar, content fits the viewport */
+.admin [data-slot='sidebar'] {
+    scrollbar-width: none;
+    background: #0D0D0D;
+    border-color: #1C1C1C;
+}
+
+.admin [data-slot='sidebar']::-webkit-scrollbar {
+    display: none;
+}
+
+.admin [data-slot='sidebar'] > div:last-child {
+    min-height: calc(100dvh - var(--header-height));
+}
+
+.admin [data-slot='sidebar'] > div:first-child {
+    background: #0D0D0D;
+}
+
+/* Main area: thin, quiet scrollbar */
+.admin [data-slot='main'] {
+    scrollbar-width: thin;
+    scrollbar-color: #2D2D2D transparent;
+}
+
+.admin [data-slot='header'] {
+    background: color-mix(in srgb, var(--obsidian) 80%, transparent);
+    backdrop-filter: blur(12px);
+    border-color: #1C1C1C;
+}
+
+/* Nav group labels as mono eyebrows */
+.admin [data-slot='navlist-group'] h4 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slate);
+    padding-top: 1rem;
+}
+
+.admin [data-slot='navlist-group'] > div:last-child {
+    margin-left: 0;
+}
+
+.admin [data-slot='navlist-item'] {
+    position: relative;
+    padding-block: 0.5rem;
+    transition: color 200ms var(--ease-out), background-color 200ms var(--ease-out);
+}
+
+.admin [data-slot='navlist-item'] span {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.admin [data-slot='navlist-item'][data-active-link]::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 25%;
+    bottom: 25%;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--ember);
+}
+
+/* Cards and sections across admin pages */
+.admin .dark\:bg-neutral-900 {
+    background-color: #111111;
+}
+
+.admin .dark\:border-neutral-800 {
+    border-color: #1C1C1C;
+}
+
+.admin h2.uppercase {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    color: var(--slate);
+}
+
+.admin h1 {
+    letter-spacing: -0.02em;
+}
+
+/* Form fields: darker wells, ember focus */
+.admin input:not([type='checkbox']):not([type='radio']),
+.admin textarea,
+.admin select,
+.admin [data-slot='select-trigger'] {
+    background-color: var(--obsidian);
+    border-color: #262626;
+    transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+}
+
+.admin input:not([type='checkbox']):not([type='radio']):focus,
+.admin textarea:focus,
+.admin select:focus {
+    outline: none;
+    border-color: var(--ember);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ember) 18%, transparent);
+}
+
+.admin ::placeholder {
+    color: #525252;
+}
+
+.admin ::selection {
+    background: var(--ember);
+    color: var(--stone);
+}
+
+/*
+ * Dashboard widgets — card shell, inset panel and tick bars adapted from the
+ * Console general dashboard, retuned to the brand palette.
+ */
+body.admin {
+    --surface: #121212;
+    --inset: #191919;
+    --tertiary: #222222;
+    --border: rgba(255, 255, 255, 0.07);
+    --track: #2A2A2A;
+    --heading: #EDEDEC;
+    --body: #A6A6A3;
+    --muted: #7E7E7B;
+}
+
+.admin-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.admin-widget {
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--surface);
+}
+
+.admin-inset {
+    flex: 1;
+    overflow: hidden;
+    border-radius: 16px;
+    background: var(--inset);
+}
+
+.admin-widget-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border: 1px dashed rgba(255, 255, 255, 0.18);
+    border-radius: 12px;
+    color: var(--body);
+}
+
+.admin-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--tertiary);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    color: var(--body);
+}
+
+.admin-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    transition: background-color 200ms var(--ease-out);
+}
+
+.admin-row:last-child {
+    border-bottom: 0;
+}
+
+a.admin-row:hover {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.admin-avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: var(--tertiary);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--brass);
+}
+
+.admin-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    background: var(--ember);
+    color: var(--stone);
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 200ms var(--ease-out), transform 120ms var(--ease-out);
+}
+
+.admin-btn-primary:hover {
+    background: var(--ember-deep);
+}
+
+.admin-btn-primary:active {
+    transform: scale(0.97);
+}
+
+/* Tick bars: thin vertical segments that fill left to right */
+.admin-ticks {
+    display: flex;
+    gap: 3px;
+    height: 14px;
+}
+
+.admin-ticks > span {
+    flex: 1;
+    border-radius: 2px;
+    animation: admin-tick-in 500ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 15ms + 300ms);
+}
+
+.admin-ticks-segments {
+    height: 6px;
+}
+
+/* First-render motion: cards rise 16px with a stagger */
+.admin-rise {
+    animation: admin-rise 550ms cubic-bezier(0.23, 1, 0.32, 1) both;
+    animation-delay: calc(var(--delay, 0) * 50ms);
+}
+
+@keyframes admin-rise {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+}
+
+@keyframes admin-tick-in {
+    from {
+        opacity: 0;
+        transform: scaleY(0.3);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-rise,
+    .admin-ticks > span {
+        animation-name: fade-only;
+    }
+
+    @keyframes fade-only {
+        from {
+            opacity: 0;
+        }
+    }
+}
+
+/*
+ * Shared page pieces — the dashboard's shell + inset look applied to every
+ * admin screen. The 6px surface ring around the inset fakes the card shell
+ * without needing an extra wrapper element.
+ */
+.admin-card {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--inset);
+    box-shadow: 0 0 0 6px var(--surface), 0 0 0 7px var(--border);
+    margin: 7px;
+}
+
+.admin-subcard {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    transition: border-color 200ms var(--ease-out), background-color 200ms var(--ease-out);
+}
+
+a.admin-subcard:hover,
+button.admin-subcard:hover {
+    border-color: color-mix(in srgb, var(--ember) 35%, transparent);
+    background: var(--tertiary);
+}
+
+.admin-dashed,
+.admin-empty {
+    border: 1px dashed rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+}
+
+.admin-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+}
+
+.admin-title {
+    font-size: 30px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--heading);
+}
+
+.admin-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 200ms var(--ease-out);
+}
+
+.admin-back:hover {
+    color: var(--ember);
+}
+
+/* Tables inside cards */
+.admin-card table thead {
+    background: var(--surface);
+}
+
+.admin-card table tbody tr {
+    transition: background-color 200ms var(--ease-out);
+}
+
+.admin-card table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.admin-card table td {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Primary buttons become ember pills, like the dashboard CTA */
+.admin [data-slot='button'][data-variant='primary'] {
+    border-radius: 999px;
+}
+
+/* Pages rise in on first render, same curve as the dashboard */
+.admin [data-slot='main'] > div > div > *:not(script) {
+    animation: admin-rise 550ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin [data-slot='main'] > div > div > *:not(script) {
+        animation-name: fade-only;
+    }
+}
+
+.admin-subtitle {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--body);
+}

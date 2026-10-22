@@ -3,6 +3,7 @@
 @import './cabinet-grotesk.css';
 @import './landing.css';
 @import './portal.css';
+@import './admin.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

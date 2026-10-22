@@ -1,33 +1,23 @@
 <div>
     {{-- Page header --}}
-    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-            <a href="{{ route('proposals.index') }}" wire:navigate
-                class="mb-1 inline-flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
-                <x-ui.icon name="arrow-left" class="size-3.5" />
-                Todos los proposals
-            </a>
-            <div class="flex items-center gap-3">
-                <h1 class="text-2xl font-bold text-neutral-900 dark:text-neutral-50">{{ $proposal->title }}</h1>
-                @php
-                    $colors = [
-                        'zinc' => 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300',
-                        'blue' => 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
-                        'green' => 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300',
-                        'red' => 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300',
-                        'amber' => 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
-                    ];
-                    $statusColor = $colors[$proposal->status->color()] ?? $colors['zinc'];
-                @endphp
-                <span
-                    class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $statusColor }}">
-                    {{ $proposal->status->label() }}
-                </span>
-            </div>
-            <p class="mt-1 font-mono text-sm text-[#FF420B]">{{ $proposal->number }}</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
+    @php
+        $colors = [
+            'zinc' => 'bg-neutral-800 text-neutral-300',
+            'blue' => 'bg-blue-900/30 text-blue-300',
+            'green' => 'bg-green-900/30 text-green-300',
+            'red' => 'bg-red-900/30 text-red-300',
+            'amber' => 'bg-amber-900/30 text-amber-300',
+        ];
+        $statusColor = $colors[$proposal->status->color()] ?? $colors['zinc'];
+    @endphp
+    <x-admin.page-header :back="route('proposals.index')" back-label="Todos los proposals" :title="$proposal->title">
+        <x-slot:meta>
+            <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $statusColor }}">
+                {{ $proposal->status->label() }}
+            </span>
+            <span class="admin-chip text-[var(--ember)]">{{ $proposal->number }}</span>
+        </x-slot:meta>
+        <x-slot:actions>
             {{-- Status change actions --}}
             @if ($proposal->status->value === 'draft')
                 <x-ui.button variant="outline" size="sm" wire:click="markAsSent" icon="paper-airplane">
@@ -69,8 +59,8 @@
             <x-ui.button variant="outline" size="sm" :href="route('proposals.edit', $proposal)" wire:navigate icon="pencil-square">
                 Editar
             </x-ui.button>
-        </div>
-    </div>
+        </x-slot:actions>
+    </x-admin.page-header>
 
     <div class="grid gap-6 lg:grid-cols-3">
 
@@ -78,8 +68,8 @@
         <div class="space-y-6 lg:col-span-2">
 
             {{-- Scope --}}
-            <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-neutral-400">Alcance del proyecto
+            <div class="admin-card p-6">
+                <h2 class="mb-4 admin-eyebrow">Alcance del proyecto
                 </h2>
 
                 <div class="mb-5">
@@ -100,7 +90,7 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     @if ($proposal->includes)
                         <div
-                            class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+                            class="admin-card p-6">
                             <h3
                                 class="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
                                 <span
@@ -122,7 +112,7 @@
 
                     @if ($proposal->excludes)
                         <div
-                            class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+                            class="admin-card p-6">
                             <h3
                                 class="mb-3 flex items-center gap-2 text-sm font-semibold text-neutral-700 dark:text-neutral-300">
                                 <span
@@ -147,8 +137,8 @@
             {{-- Stages --}}
             @if ($proposal->stages->isNotEmpty())
                 <div
-                    class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-neutral-400">Etapas del proyecto
+                    class="admin-card p-6">
+                    <h2 class="mb-4 admin-eyebrow">Etapas del proyecto
                     </h2>
 
                     <div class="space-y-4">
@@ -186,8 +176,8 @@
             {{-- Notes --}}
             @if ($proposal->notes)
                 <div
-                    class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-                    <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-neutral-400">Notas y términos
+                    class="admin-card p-6">
+                    <h2 class="mb-3 admin-eyebrow">Notas y términos
                     </h2>
                     <p class="text-sm leading-relaxed whitespace-pre-line text-neutral-600 dark:text-neutral-400">
                         {{ $proposal->notes }}</p>
@@ -199,8 +189,8 @@
         <div class="space-y-6">
 
             {{-- Meta info --}}
-            <div class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-                <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-neutral-400">Detalles</h2>
+            <div class="admin-card p-6">
+                <h2 class="mb-4 admin-eyebrow">Detalles</h2>
 
                 <dl class="space-y-3 text-sm">
                     <div>
@@ -242,11 +232,60 @@
                 </dl>
             </div>
 
+            {{-- Private client link --}}
+            <div class="admin-card p-6">
+                <h2 class="mb-4 admin-eyebrow">Link para el cliente</h2>
+
+                @if ($proposal->isShared())
+                    <dl class="space-y-3 text-sm" x-data="{ copied: null, copy(value, key) { navigator.clipboard.writeText(value); this.copied = key; setTimeout(() => this.copied = null, 1500) } }">
+                        <div>
+                            <dt class="text-xs font-medium text-neutral-400">URL</dt>
+                            <dd class="mt-0.5 flex items-center gap-2">
+                                <a href="{{ $proposal->publicUrl() }}" target="_blank" class="min-w-0 truncate font-mono text-xs text-neutral-700 hover:underline dark:text-neutral-300">{{ $proposal->publicUrl() }}</a>
+                                <button type="button" @click="copy(@js($proposal->publicUrl()), 'url')" class="shrink-0 cursor-pointer text-xs font-medium text-[#FF420B]"
+                                    x-text="copied === 'url' ? 'Copiado' : 'Copiar'"></button>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-neutral-400">Contraseña</dt>
+                            <dd class="mt-0.5 flex items-center gap-2">
+                                <span class="font-mono text-neutral-800 dark:text-neutral-200">{{ $proposal->access_password }}</span>
+                                <button type="button" @click="copy(@js($proposal->access_password), 'password')" class="shrink-0 cursor-pointer text-xs font-medium text-[#FF420B]"
+                                    x-text="copied === 'password' ? 'Copiada' : 'Copiar'"></button>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-neutral-400">Vistas</dt>
+                            <dd class="mt-0.5 text-neutral-700 dark:text-neutral-300">
+                                @if ($proposal->first_viewed_at)
+                                    {{ $proposal->view_count }} · última {{ $proposal->last_viewed_at->diffForHumans() }}
+                                @else
+                                    Aún no la abre
+                                @endif
+                            </dd>
+                        </div>
+                    </dl>
+
+                    <p class="mt-4 text-xs text-neutral-400">Manda el link y la contraseña por canales distintos (correo y WhatsApp).</p>
+
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <x-ui.button variant="outline" size="sm" wire:click="rotateAccessPassword"
+                            wire:confirm="La contraseña actual dejará de funcionar. ¿Continuar?">Nueva contraseña</x-ui.button>
+                        <x-ui.button variant="outline" size="sm" wire:click="disableSharing"
+                            wire:confirm="El cliente ya no podrá abrir el link. ¿Desactivar?"
+                            class="text-red-500 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800">Desactivar</x-ui.button>
+                    </div>
+                @else
+                    <p class="mb-4 text-sm text-neutral-500">Crea un link privado con contraseña para que el cliente vea la propuesta en línea.</p>
+                    <x-ui.button variant="primary" size="sm" wire:click="enableSharing" icon="link">Crear link privado</x-ui.button>
+                @endif
+            </div>
+
             {{-- Cost breakdown --}}
             @if ($proposal->items->isNotEmpty())
                 <div
-                    class="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wider text-neutral-400">Inversión</h2>
+                    class="admin-card p-6">
+                    <h2 class="mb-4 admin-eyebrow">Inversión</h2>
 
                     <div class="space-y-2">
                         @foreach ($proposal->items as $item)

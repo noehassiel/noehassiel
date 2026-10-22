@@ -1,24 +1,17 @@
 <div>
     {{-- Header --}}
-    <div class="mb-8 flex items-start justify-between gap-4">
-        <div class="min-w-0">
-            <a href="{{ route('clients.show', $project->client) }}" wire:navigate
-                class="mb-1 inline-flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
-                <x-ui.icon name="arrow-left" class="size-3.5" />
-                {{ $project->client->name }}
-            </a>
-            <h1 class="truncate text-2xl font-bold text-neutral-900 dark:text-neutral-50">{{ $project->name }}</h1>
-        </div>
-
-        <x-ui.badge :color="$project->status->color()" variant="soft" class="shrink-0">{{ $project->status->label() }}</x-ui.badge>
-    </div>
+    <x-admin.page-header :back="route('clients.show', $project->client)" :back-label="$project->client->name" :title="$project->name">
+        <x-slot:meta>
+            <x-ui.badge :color="$project->status->color()" variant="soft" class="shrink-0">{{ $project->status->label() }}</x-ui.badge>
+        </x-slot:meta>
+    </x-admin.page-header>
 
     <div class="grid gap-6 lg:grid-cols-3">
 
         {{-- Details --}}
         <div class="space-y-6">
-            <form wire:submit="saveDetails" class="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-                <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">Detalles</h2>
+            <form wire:submit="saveDetails" class="space-y-4 admin-card p-6">
+                <h2 class="admin-eyebrow">Detalles</h2>
 
                 <x-ui.field>
                     <x-ui.label>Nombre</x-ui.label>
@@ -79,7 +72,7 @@
             {{-- Checklist --}}
             <div class="space-y-4">
                 <div>
-                    <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">Checklist de entregables</h2>
+                    <h2 class="admin-eyebrow">Checklist de entregables</h2>
                     <p class="mt-1 text-xs text-neutral-400">Lo que necesitas del cliente. Mientras haya pendientes, se le recuerda por correo.</p>
                 </div>
 
@@ -130,7 +123,7 @@
                     </div>
                 @endif
 
-                <form wire:submit="addRequirement" class="space-y-3 rounded-xl border border-dashed border-neutral-200 p-4 dark:border-neutral-700">
+                <form wire:submit="addRequirement" class="space-y-3 admin-dashed p-4 ">
                     <div class="grid gap-3 sm:grid-cols-3">
                         <x-ui.field class="sm:col-span-2">
                             <x-ui.input wire:model="requirementTitle" placeholder="Logo en vector (AI, SVG o PDF)" />
@@ -152,7 +145,7 @@
             {{-- Shared folders --}}
             <div class="space-y-4">
                 <div>
-                    <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">Carpetas compartidas</h2>
+                    <h2 class="admin-eyebrow">Carpetas compartidas</h2>
                     <p class="mt-1 text-xs text-neutral-400">Donde el cliente sube los recursos. El cliente las ve en su portal.</p>
                 </div>
 
@@ -160,7 +153,7 @@
                     <div class="space-y-2">
                         @foreach ($links as $link)
                             <div wire:key="link-{{ $link->id }}"
-                                class="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900">
+                                class="flex items-center justify-between gap-4 admin-subcard px-4 py-3">
                                 <a href="{{ $link->url }}" target="_blank" rel="noopener noreferrer" class="min-w-0 hover:text-[#FF420B]">
                                     <p class="truncate font-medium text-neutral-800 dark:text-neutral-200">{{ $link->label }}</p>
                                     <p class="truncate font-mono text-xs text-neutral-400">{{ $link->providerName() }}</p>
@@ -172,7 +165,7 @@
                     </div>
                 @endif
 
-                <form wire:submit="addLink" class="grid gap-3 rounded-xl border border-dashed border-neutral-200 p-4 sm:grid-cols-3 dark:border-neutral-700">
+                <form wire:submit="addLink" class="grid gap-3 admin-dashed p-4 sm:grid-cols-3 ">
                     <x-ui.field>
                         <x-ui.input wire:model="linkLabel" placeholder="Fotografías" />
                         <x-ui.error name="linkLabel" />
