@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Middleware\UsePortalLocale;
+use App\Http\Middleware\UseUserLocale;
 use App\Livewire\Portal\Home;
 use App\Models\Client;
 use App\Models\Invoice;
@@ -75,7 +75,7 @@ test('the portal speaks the user\'s language', function () {
 });
 
 test('the portal language also holds on livewire updates', function () {
-    expect(Livewire::getPersistentMiddleware())->toContain(UsePortalLocale::class);
+    expect(Livewire::getPersistentMiddleware())->toContain(UseUserLocale::class);
 });
 
 test('project and invoice policies never cross clients', function () {

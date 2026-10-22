@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Http\Middleware\UsePortalLocale;
+use App\Http\Middleware\UseUserLocale;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
@@ -29,8 +29,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('access-admin', fn (User $user): bool => $user->email === config('app.admin_email'));
         Gate::define('access-portal', fn (User $user): bool => $user->isClient());
 
-        // Livewire re-applies this on /livewire/update so portal actions keep the user's language
-        Livewire::addPersistentMiddleware([UsePortalLocale::class]);
+        // Livewire re-applies this on /livewire/update so every action keeps the user's language
+        Livewire::addPersistentMiddleware([UseUserLocale::class]);
 
         // Every OS1 request costs LLM and TTS money; cap it per visitor
         RateLimiter::for('os1', fn (Request $request): array => [

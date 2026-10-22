@@ -1,0 +1,191 @@
+<div>
+    {{-- Header --}}
+    <div class="mb-8 flex items-start justify-between gap-4">
+        <div class="min-w-0">
+            <a href="{{ route('clients.show', $project->client) }}" wire:navigate
+                class="mb-1 inline-flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300">
+                <x-ui.icon name="arrow-left" class="size-3.5" />
+                {{ $project->client->name }}
+            </a>
+            <h1 class="truncate text-2xl font-bold text-neutral-900 dark:text-neutral-50">{{ $project->name }}</h1>
+        </div>
+
+        <x-ui.badge :color="$project->status->color()" variant="soft" class="shrink-0">{{ $project->status->label() }}</x-ui.badge>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+
+        {{-- Details --}}
+        <div class="space-y-6">
+            <form wire:submit="saveDetails" class="space-y-4 rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
+                <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">Detalles</h2>
+
+                <x-ui.field>
+                    <x-ui.label>Nombre</x-ui.label>
+                    <x-ui.input wire:model="name" />
+                    <x-ui.error name="name" />
+                </x-ui.field>
+
+                <x-ui.field>
+                    <x-ui.label>Estado</x-ui.label>
+                    <x-ui.select wire:model="status">
+                        @foreach ($statuses as $statusOption)
+                            <option value="{{ $statusOption->value }}">{{ $statusOption->label() }}</option>
+                        @endforeach
+                    </x-ui.select>
+                    <x-ui.error name="status" />
+                </x-ui.field>
+
+                <x-ui.field>
+                    <x-ui.label>Descripción</x-ui.label>
+                    <x-ui.textarea wire:model="description" rows="3" />
+                    <x-ui.error name="description" />
+                </x-ui.field>
+
+                <x-ui.field>
+                    <x-ui.label>Nota de avance <span class="text-neutral-400">(la ve el cliente)</span></x-ui.label>
+                    <x-ui.textarea wire:model="progressNote" rows="3" placeholder="Terminamos el diseño de la home; esta semana arrancamos desarrollo." />
+                    <x-ui.error name="progressNote" />
+                </x-ui.field>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <x-ui.field>
+                        <x-ui.label>Inicio</x-ui.label>
+                        <x-ui.input wire:model="startsOn" type="date" />
+                        <x-ui.error name="startsOn" />
+                    </x-ui.field>
+                    <x-ui.field>
+                        <x-ui.label>Entrega</x-ui.label>
+                        <x-ui.input wire:model="dueOn" type="date" />
+                        <x-ui.error name="dueOn" />
+                    </x-ui.field>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <x-ui.button type="submit" variant="primary" size="sm">Guardar</x-ui.button>
+                    <x-action-message on="project-saved">Guardado.</x-action-message>
+                </div>
+            </form>
+
+            <x-ui.button variant="ghost" size="sm" icon="trash" class="text-red-500"
+                wire:click="deleteProject"
+                wire:confirm="¿Eliminar «{{ $project->name }}»? Se borran también su checklist y sus carpetas.">
+                Eliminar proyecto
+            </x-ui.button>
+        </div>
+
+        <div class="space-y-8 lg:col-span-2">
+
+            {{-- Checklist --}}
+            <div class="space-y-4">
+                <div>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">Checklist de entregables</h2>
+                    <p class="mt-1 text-xs text-neutral-400">Lo que necesitas del cliente. Mientras haya pendientes, se le recuerda por correo.</p>
+                </div>
+
+                @if ($requirements->isNotEmpty())
+                    <div class="space-y-2">
+                        @foreach ($requirements as $requirement)
+                            <div wire:key="requirement-{{ $requirement->id }}" @class([
+                                'flex items-start justify-between gap-4 rounded-xl border bg-white px-4 py-3 dark:bg-neutral-900',
+                                'border-[#FF420B]/40' => $requirement->status === \App\Enums\RequirementStatus::ClientMarked,
+                                'border-neutral-200 dark:border-neutral-800' => $requirement->status !== \App\Enums\RequirementStatus::ClientMarked,
+                            ])>
+                                <div class="min-w-0">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        <p @class([
+                                            'font-medium text-neutral-800 dark:text-neutral-200',
+                                            'line-through opacity-60' => $requirement->status === \App\Enums\RequirementStatus::Received,
+                                        ])>{{ $requirement->title }}</p>
+                                        <x-ui.badge :color="$requirement->status->color()" variant="soft" size="sm">{{ $requirement->status->label() }}</x-ui.badge>
+                                    </div>
+                                    @if ($requirement->description)
+                                        <p class="mt-1 text-sm text-neutral-500">{{ $requirement->description }}</p>
+                                    @endif
+                                    <p class="mt-1 font-mono text-xs text-neutral-400">
+                                        @if ($requirement->due_on)
+                                            Para el {{ $requirement->due_on->format('d/m/Y') }}
+                                        @endif
+                                        @if ($requirement->client_marked_at && $requirement->status === \App\Enums\RequirementStatus::ClientMarked)
+                                            · El cliente lo marcó como subido {{ $requirement->client_marked_at->diffForHumans() }}
+                                        @endif
+                                    </p>
+                                </div>
+
+                                <div class="flex shrink-0 items-center gap-1">
+                                    @if ($requirement->status === \App\Enums\RequirementStatus::Received)
+                                        <x-ui.button variant="ghost" size="sm" wire:click="markPending({{ $requirement->id }})">Reabrir</x-ui.button>
+                                    @else
+                                        @if ($requirement->status === \App\Enums\RequirementStatus::ClientMarked)
+                                            <x-ui.button variant="ghost" size="sm" wire:click="markPending({{ $requirement->id }})">Aún falta</x-ui.button>
+                                        @endif
+                                        <x-ui.button variant="outline" size="sm" icon="check" wire:click="markReceived({{ $requirement->id }})">Recibido</x-ui.button>
+                                    @endif
+                                    <x-ui.button variant="ghost" size="sm" icon="trash" squared aria-label="Eliminar punto"
+                                        wire:click="removeRequirement({{ $requirement->id }})"
+                                        wire:confirm="¿Eliminar «{{ $requirement->title }}» del checklist?" class="text-red-500" />
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                <form wire:submit="addRequirement" class="space-y-3 rounded-xl border border-dashed border-neutral-200 p-4 dark:border-neutral-700">
+                    <div class="grid gap-3 sm:grid-cols-3">
+                        <x-ui.field class="sm:col-span-2">
+                            <x-ui.input wire:model="requirementTitle" placeholder="Logo en vector (AI, SVG o PDF)" />
+                            <x-ui.error name="requirementTitle" />
+                        </x-ui.field>
+                        <x-ui.field>
+                            <x-ui.input wire:model="requirementDueOn" type="date" />
+                            <x-ui.error name="requirementDueOn" />
+                        </x-ui.field>
+                    </div>
+                    <x-ui.field>
+                        <x-ui.input wire:model="requirementDescription" placeholder="Detalle opcional: formato, medidas, dónde subirlo…" />
+                        <x-ui.error name="requirementDescription" />
+                    </x-ui.field>
+                    <x-ui.button type="submit" variant="outline" size="sm" icon="plus">Agregar al checklist</x-ui.button>
+                </form>
+            </div>
+
+            {{-- Shared folders --}}
+            <div class="space-y-4">
+                <div>
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-neutral-400">Carpetas compartidas</h2>
+                    <p class="mt-1 text-xs text-neutral-400">Donde el cliente sube los recursos. El cliente las ve en su portal.</p>
+                </div>
+
+                @if ($links->isNotEmpty())
+                    <div class="space-y-2">
+                        @foreach ($links as $link)
+                            <div wire:key="link-{{ $link->id }}"
+                                class="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900">
+                                <a href="{{ $link->url }}" target="_blank" rel="noopener noreferrer" class="min-w-0 hover:text-[#FF420B]">
+                                    <p class="truncate font-medium text-neutral-800 dark:text-neutral-200">{{ $link->label }}</p>
+                                    <p class="truncate font-mono text-xs text-neutral-400">{{ $link->providerName() }}</p>
+                                </a>
+                                <x-ui.button variant="ghost" size="sm" icon="trash" squared aria-label="Quitar carpeta"
+                                    wire:click="removeLink({{ $link->id }})" class="shrink-0 text-red-500" />
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                <form wire:submit="addLink" class="grid gap-3 rounded-xl border border-dashed border-neutral-200 p-4 sm:grid-cols-3 dark:border-neutral-700">
+                    <x-ui.field>
+                        <x-ui.input wire:model="linkLabel" placeholder="Fotografías" />
+                        <x-ui.error name="linkLabel" />
+                    </x-ui.field>
+                    <x-ui.field class="sm:col-span-2">
+                        <x-ui.input wire:model="linkUrl" type="url" placeholder="https://drive.google.com/drive/folders/…" />
+                        <x-ui.error name="linkUrl" />
+                    </x-ui.field>
+                    <div class="sm:col-span-3">
+                        <x-ui.button type="submit" variant="outline" size="sm" icon="link">Agregar carpeta</x-ui.button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

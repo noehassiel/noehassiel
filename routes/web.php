@@ -2,11 +2,12 @@
 
 use App\Http\Controllers\Os1Controller;
 use App\Http\Controllers\SpotifyController;
-use App\Http\Middleware\UsePortalLocale;
+use App\Http\Middleware\UseUserLocale;
 use App\Livewire\Client\Index as ClientIndex;
 use App\Livewire\Client\Show as ClientShow;
 use App\Livewire\Portal\AcceptInvitation;
 use App\Livewire\Portal\Home as PortalHome;
+use App\Livewire\Project\Show as ProjectShow;
 use App\Livewire\Proposal\Create as ProposalCreate;
 use App\Livewire\Proposal\Edit as ProposalEdit;
 use App\Livewire\Proposal\Index as ProposalIndex;
@@ -77,18 +78,20 @@ Route::get('invitations/{token}', AcceptInvitation::class)
     ->middleware(['guest', 'throttle:20,1'])
     ->name('invitations.accept');
 
-Route::prefix('portal')->name('portal.')->middleware(['auth', 'can:access-portal', UsePortalLocale::class])->group(function () {
+Route::prefix('portal')->name('portal.')->middleware(['auth', 'can:access-portal', UseUserLocale::class])->group(function () {
     Route::get('/', PortalHome::class)->name('home');
 });
 
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified', 'can:access-admin'])
+    ->middleware(['auth', 'verified', 'can:access-admin', UseUserLocale::class])
     ->name('dashboard');
 
-Route::middleware(['auth', 'can:access-admin'])->group(function () {
+Route::middleware(['auth', 'can:access-admin', UseUserLocale::class])->group(function () {
 
     Route::get('clients', ClientIndex::class)->name('clients.index');
     Route::get('clients/{client}', ClientShow::class)->name('clients.show');
+
+    Route::get('projects/{project}', ProjectShow::class)->name('projects.show');
 
     Route::get('proposals', ProposalIndex::class)->name('proposals.index');
     Route::get('proposals/create', ProposalCreate::class)->name('proposals.create');

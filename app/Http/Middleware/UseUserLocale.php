@@ -6,10 +6,10 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class UsePortalLocale
+class UseUserLocale
 {
     /**
-     * Render the portal in the language chosen for the signed-in client user.
+     * Render pages and Livewire updates in the signed-in user's language.
      *
      * @param  Closure(Request): (Response)  $next
      */

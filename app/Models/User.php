@@ -22,6 +22,15 @@ class User extends Authenticatable implements PasskeyUser
     use HasRoles;
 
     /**
+     * Mirrors the column default so new, unsaved users already carry a language.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'locale' => 'es',
+    ];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

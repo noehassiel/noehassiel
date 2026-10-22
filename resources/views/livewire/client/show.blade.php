@@ -90,8 +90,11 @@
             </div>
         </div>
 
-        {{-- Proposals & Invoices --}}
+        {{-- Projects, Proposals & Invoices --}}
         <div class="space-y-8 lg:col-span-2">
+
+            {{-- Projects section --}}
+            <livewire:client.projects :client="$client" />
 
             {{-- Proposals section --}}
             <div class="space-y-4">

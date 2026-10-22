@@ -53,4 +53,15 @@ class ProjectLink extends Model
 
         return 'other';
     }
+
+    public function providerName(): string
+    {
+        return match ($this->provider()) {
+            'google_drive' => 'Google Drive',
+            'sharepoint' => 'SharePoint',
+            'onedrive' => 'OneDrive',
+            'dropbox' => 'Dropbox',
+            default => (string) parse_url($this->url, PHP_URL_HOST),
+        };
+    }
 }
