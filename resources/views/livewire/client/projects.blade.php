@@ -53,7 +53,7 @@
                 <x-ui.label>Estado</x-ui.label>
                 <x-ui.select wire:model="status">
                     @foreach ($statuses as $status)
-                        <option value="{{ $status->value }}">{{ $status->label() }}</option>
+                        <x-ui.select.option value="{{ $status->value }}">{{ $status->label() }}</x-ui.select.option>
                     @endforeach
                 </x-ui.select>
                 <x-ui.error name="status" />

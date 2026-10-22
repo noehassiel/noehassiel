@@ -21,6 +21,60 @@
         ],
         "resources/views/components/ui/tab/panel.blade.php": [
             "tabs"
+        ],
+        "resources/js/components/date-picker/index.js": [
+            "date-picker"
+        ],
+        "app/View/Components/DateRange.php": [
+            "calendar"
+        ],
+        "app/Livewire/Synthesizers/DateRangeSynthesizer.php": [
+            "calendar"
+        ],
+        "app/Enums/DateRangePreset.php": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/BlankDay.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/CalendarSelection.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/DateValue.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/Day.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/Manager.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/Month.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/entangle.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/masker.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/navigation.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/presets.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/presetsManager.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/core/utils.js": [
+            "calendar"
+        ],
+        "resources/js/components/calendar/index.js": [
+            "calendar"
+        ],
+        "resources/css/components/calendar/cell.css": [
+            "calendar"
         ]
     },
     "helpers": {
@@ -46,7 +100,8 @@
             "breadcrumbs",
             "dropdown",
             "error",
-            "key-value"
+            "key-value",
+            "date-picker"
         ],
         "text": [
             "select"
@@ -71,6 +126,10 @@
         ],
         "dropdown": [
             "theme-switcher"
+        ],
+        "input": [
+            "date-picker",
+            "calendar"
         ]
     }
 }

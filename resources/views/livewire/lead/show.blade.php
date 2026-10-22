@@ -90,7 +90,7 @@
                     @else
                         <x-ui.select wire:model.live="status">
                             @foreach ($statuses as $statusOption)
-                                <option value="{{ $statusOption->value }}">{{ $statusOption->label() }}</option>
+                                <x-ui.select.option value="{{ $statusOption->value }}">{{ $statusOption->label() }}</x-ui.select.option>
                             @endforeach
                         </x-ui.select>
                         <x-ui.error name="status" />

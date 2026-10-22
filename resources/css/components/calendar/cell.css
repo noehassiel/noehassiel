@@ -1,0 +1,330 @@
+@layer components {
+    :root {
+        /* Base colors */
+        --cal-primary: var(--color-primary);
+        --cal-primary-fg: var(--color-primary-fg);
+        --cal-primary-blank: var(--color-primary);
+
+        /* Range backgrounds - main dates */
+        --cal-range-light: color-mix(in srgb, var(--cal-primary) 8%, transparent);
+        --cal-range-medium: color-mix(in srgb, var(--cal-primary) 16%, transparent);
+        --cal-range-border: color-mix(in srgb, var(--cal-primary) 16%, transparent);
+
+        /* Range backgrounds - blank dates (lighter) */
+        --cal-blank-light: color-mix(in srgb, var(--cal-primary) 6%, transparent);
+        --cal-blank-medium: color-mix(in srgb, var(--cal-primary) 8%, transparent);
+
+        /* Hover preview */
+        --cal-hover-light: color-mix(in srgb, var(--cal-primary) 3%, transparent);
+        --cal-hover-medium: color-mix(in srgb, var(--cal-primary) 4%, transparent);
+        --cal-hover-end: color-mix(in srgb, var(--cal-primary) 15%, transparent);
+
+        /* Hover on cell */
+        --cal-cell-hover: color-mix(in srgb, var(--cal-primary) 10%, transparent);
+
+        /* for better color perception in modern browsers: Chrome 119+, Safari 16.4+, Firefox 121+ */
+        @supports (color: oklch(from white l c h)) {
+            --cal-range-light: oklch(from var(--cal-primary) l c h / 9%);
+            --cal-range-medium: oklch(from var(--cal-primary) l c h / 12%);
+            --cal-range-border: oklch(from var(--cal-primary) l c h / 11%);
+
+            --cal-blank-light: oklch(from var(--cal-primary) l c h / 6%);
+            --cal-blank-medium: oklch(from var(--cal-primary) l c h / 8%);
+
+            --cal-hover-light: oklch(from var(--cal-primary) l c h / 3%);
+            --cal-hover-medium: oklch(from var(--cal-primary) l c h / 4%);
+            --cal-hover-end: oklch(from var(--cal-primary) l c h / 15%);
+
+            --cal-cell-hover: oklch(from var(--cal-primary) l c h / 10%);
+        }
+
+        /* Reusable gradient patterns */
+        --cal-range-gradient: linear-gradient(to right, var(--cal-range-light), var(--cal-range-medium), var(--cal-range-light));
+        --cal-blank-gradient: linear-gradient(to right, var(--cal-blank-light), var(--cal-blank-medium), var(--cal-blank-light));
+    }
+
+    /* PERFORMANCE NOTE: Complex selectors (:has, :is, +) target ~42 sibling cells/month.
+    Browser evaluation is microseconds – negligible performance impact.
+    Much cleaner than manual class toggling, with no real cost. */
+   
+    /* ============================================
+       CALENDAR CELL (Main dates)
+       ============================================ */
+    [data-slot=calendar-cell] {
+        /* BASE CLASSES */
+        @apply size-(--cell-size) flex-shrink-0 cursor-pointer relative z-10 flex items-center justify-center text-sm font-medium focus-visible:outline-none;
+
+        /* ============================================
+           READONLY STATE - Disables all interactions
+           ============================================ */
+        &[data-readonly] {
+            @apply cursor-default pointer-events-none;
+
+            /* Disable hover effects */
+            &:hover:not([data-selected]) {
+                @apply bg-transparent;
+            }
+
+            /* Disable active/press effects */
+            &:active {
+                @apply scale-100;
+            }
+
+            /* Disable focus ring */
+            &[data-focused] {
+                @apply ring-0;
+            }
+
+            /* Keep selected state visible but no hover ring */
+            &[data-selected]:hover {
+                @apply ring-0;
+            }
+        }
+
+        &:hover:not([data-selected], [data-readonly], [data-disabled]) {
+            @apply bg-(--cal-cell-hover) rounded-box;
+        }
+
+        &:active:not([data-readonly]) {
+            @apply transition scale-[105%]
+        }
+
+        &:focus {
+            @apply !rounded;
+        }
+
+        &[data-unavailable] {
+            @apply line-through;
+        }
+
+        /* -- Selected cell -- */
+        &[data-selected] {
+            @apply bg-(--cal-primary) text-(--cal-primary-fg) !rounded-box;
+        }
+
+        /* -- TODAY DOT INDICATOR -- */
+        &:is([data-today])>[data-today-point] {
+            @apply absolute bottom-1 left-1/2 z-10 -translate-x-1/2 size-1 rounded-full bg-(--cal-primary);
+        }
+
+        &[data-today][data-selected]>[data-today-point] {
+            @apply bg-(--cal-primary-fg);
+        }
+
+        &:not([data-today])>[data-today-point] {
+            @apply hidden;
+        }
+        /* -- END TODAY DOT INDICATOR -- */
+
+
+
+        /* -- Disabled cell -- */
+        &[data-disabled] {
+            @apply text-neutral-400 dark:text-neutral-600 cursor-not-allowed hover:bg-transparent;
+        }
+
+        /* -- Focus indicator -- */
+        &[data-focused]:not([data-readonly]) {
+            @apply ring-2 ring-neutral-900 dark:ring-(--color-primary) z-20;
+        }
+
+        /* -- Adjacent two consequences selected dates by remove the contact rounding -- */
+        &[data-selected]:has(+ [data-selected]:not([data-first-in-row])) {
+            @apply !rounded-r-none;
+        }
+
+        [data-selected]:not([data-last-in-row])+&[data-selected] {
+            @apply !rounded-l-none;
+        }
+
+        /* the cell betweens two selected dates when `mode="range"` */
+        &[data-range-middle] {
+            background: var(--cal-range-gradient);
+            @apply border-y border-(--cal-range-border) !rounded-none;
+        }
+
+        /* -- START EXTENSIONS DESIGNS -- */
+
+        /* Extension elements for range connections */
+        &:is([data-selected], [data-hover-end]):has(+ :is([data-range-middle], [data-hover-preview]))::after {
+            @apply content-[''] size-(--cell-size) absolute rounded-l-box -z-10;
+        }
+
+        /* Range-middle connection background */
+        &:not([data-last-in-row]):is([data-selected], [data-hover-end]):has(+ [data-range-middle])::after {
+            background: var(--cal-range-gradient);
+            @apply  border-y border-(--cal-range-border);
+        }
+
+        /* Hover-preview connection background (disabled in readonly) */
+        &:not([data-last-in-row]):not([data-readonly]):is([data-selected], [data-hover-end]):has(+ [data-hover-preview])::after {
+            @apply bg-(--cal-hover-medium);
+        }
+
+        /* Left-side extension elements */
+        &:is([data-range-middle], [data-hover-preview])+&:not([data-first-in-row]):is([data-hover-end], [data-selected])::before {
+            @apply content-[''] size-(--cell-size) absolute rounded-r-box -z-10;
+        }
+
+        [data-range-middle]+&:not([data-first-in-row]):is([data-hover-end], [data-selected])::before {
+            background: var(--cal-range-gradient);
+            @apply border-y border-(--cal-range-border);
+        }
+
+        /* Hover preview before element (disabled in readonly) */
+        [data-hover-preview]+&:not([data-first-in-row]):not([data-readonly]):is([data-hover-end], [data-selected])::before {
+            @apply bg-(--cal-hover-medium);
+        }
+
+        /* -- END EXTENSIONS DESIGNS -- */
+
+        /* Row boundary borders */
+        &:is([data-range-middle])[data-first-in-row] {
+            @apply border-l border-(--cal-range-border) !rounded-l-box;
+        }
+
+        &:is([data-range-middle])[data-last-in-row] {
+            @apply border-r border-(--cal-range-border) !rounded-r-box;
+        }
+
+        /* Hover preview states */
+        &:is([data-range-middle], [data-hover-preview])[data-first-in-row] {
+            @apply !rounded-l-box;
+        }
+
+        &:is([data-range-middle], [data-hover-preview])[data-last-in-row] {
+            @apply !rounded-r-box;
+        }
+
+        /* Hover preview (disabled in readonly) */
+        &[data-hover-preview]:not([data-readonly]) {
+            @apply bg-(--cal-hover-medium);
+        }
+
+        &[data-hover-end]:not([data-readonly]) {
+            @apply bg-(--cal-hover-end) rounded-box;
+        }
+
+        /* TOOLTIP */
+        &:is([data-has-tooltip])>:is([data-special-tooltip]) {
+            @apply absolute invisible opacity-0 transition-all duration-150 ease-out bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 text-xs font-medium bg-neutral-800 text-white rounded-md shadow-lg pointer-events-none z-50 border border-neutral-700;
+
+            &::after {
+                @apply content-[''] absolute top-full left-1/2 -translate-x-1/2 border-6 border-solid border-transparent border-t-neutral-800 dark:border-t-neutral-200;
+            }
+        }
+
+        &[data-has-tooltip]:hover>[data-special-tooltip] {
+            @apply visible opacity-100;
+        }
+    }
+
+    /* ============================================
+       BLANK DAY CELLS (Previous/Next month) 
+       ============================================ */
+
+    /* there is some repetitive with typical day above, but the repetitive is fine cs trying to merge 
+    it with above will make the css more harder to parse then it for now  */
+    [data-slot=calendar-blank-day-cell] {
+        @apply size-(--cell-size) flex shrink-0 items-center justify-center text-xs text-neutral-400 dark:text-neutral-600;
+
+        /* Row boundary rounding */
+        &[data-last-day-in-post-blanks] {
+            @apply rounded-r-box;
+        }
+
+        &[data-first-day-in-pre-blanks] {
+            @apply rounded-l-box;
+        }
+
+        &[data-selected] {
+            @apply bg-[color-mix(in_oklch,_var(--cal-primary)_40%,_transparent)] text-(--cal-primary-fg) !rounded-box;
+        }
+
+        /* -- Adjacent two consequences selected dates by remove the contact rounding -- */
+        &[data-selected]:has(+ [data-selected]:not([data-first-in-row])) {
+            @apply !rounded-r-none;
+        }
+
+        [data-selected]:not([data-last-in-row])+&[data-selected] {
+            @apply !rounded-l-none;
+        }
+        
+        
+        /* -- START EXTENSIONS DESIGNS -- */
+        /* Extension elements for range connections */
+        &:is([data-selected], [data-hover-end]):has(+ :is([data-range-middle], [data-hover-preview]))::after {
+            @apply content-[''] size-(--cell-size) absolute rounded-l-box -z-10;
+        }
+
+        /* Range-middle connection background */
+        &:not([data-last-in-row]):is([data-selected], [data-hover-end]):has(+ [data-range-middle])::after {
+            background: var(--cal-blank-gradient);
+            @apply  border-y border-(--cal-range-border);
+        }
+
+        /* Hover-preview connection background (disabled in readonly) */
+        &:not([data-last-in-row]):not([data-readonly]):is([data-selected], [data-hover-end]):has(+ [data-hover-preview])::after {
+            @apply bg-(--cal-hover-medium);
+        }
+
+        /* Left-side extension elements */
+        &:is([data-range-middle], [data-hover-preview])+&:not([data-first-in-row]):is([data-hover-end], [data-selected])::before {
+            @apply content-[''] size-(--cell-size) absolute rounded-r-box -z-10;
+        }
+
+        [data-range-middle]+&:not([data-first-in-row]):is([data-hover-end], [data-selected])::before {
+            background: var(--cal-blank-gradient);
+            @apply border-y border-(--cal-range-border);
+        }
+        /* -- END EXTENSIONS DESIGNS -- */
+
+        /* Hover preview before element (disabled in readonly) */
+        [data-hover-preview]+&:not([data-first-in-row]):not([data-readonly]):is([data-hover-end], [data-selected])::before {
+            @apply bg-(--cal-hover-medium);
+        }
+        &[data-hover-end]:not([data-readonly]) {
+            @apply bg-(--cal-hover-end) rounded-box;
+        }
+        /* Range selection in blanks */
+        &[data-range-middle] {
+            background: var(--cal-blank-gradient);
+            @apply border-y border-(--cal-range-border);
+
+            &[data-first-day-in-post-blanks] {
+                background: linear-gradient(to right, var(--cal-range-light), var(--cal-blank-medium), var(--cal-blank-light));
+            }
+
+            &[data-last-day-in-pre-blanks] {
+                background: linear-gradient(to left, var(--cal-range-light), var(--cal-blank-medium), var(--cal-blank-light));
+            }
+
+            /* Borders at edges */
+            &[data-first-day-in-pre-blanks] {
+                @apply border-l border-(--cal-range-border);
+            }
+
+            &[data-last-day-in-post-blanks] {
+                @apply border-r border-(--cal-range-border);
+            }
+        }
+
+        /* Hover preview in blanks */
+        &[data-hover-preview] {
+            @apply bg-(--cal-hover-light);
+
+            /* Smooth transition at month boundaries */
+            &[data-first-day-in-post-blanks] {
+                background: linear-gradient(to right, var(--cal-hover-medium), var(--cal-hover-medium), var(--cal-hover-light));
+            }
+
+            &[data-last-day-in-pre-blanks] {
+                background: linear-gradient(to left, var(--cal-hover-medium), var(--cal-hover-medium), var(--cal-hover-light));
+            }
+        }
+    }
+
+    [data-slot=calendar-week-num-cell] {
+        @apply size-(--cell-size) flex-shrink-0 cursor-pointer opacity-50 relative z-10 flex items-center justify-center text-xs font-medium focus-visible:outline-none;
+    }
+}

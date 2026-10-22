@@ -23,7 +23,7 @@
                     <x-ui.label>Estado</x-ui.label>
                     <x-ui.select wire:model="status">
                         @foreach ($statuses as $statusOption)
-                            <option value="{{ $statusOption->value }}">{{ $statusOption->label() }}</option>
+                            <x-ui.select.option value="{{ $statusOption->value }}">{{ $statusOption->label() }}</x-ui.select.option>
                         @endforeach
                     </x-ui.select>
                     <x-ui.error name="status" />
@@ -44,12 +44,12 @@
                 <div class="grid grid-cols-2 gap-3">
                     <x-ui.field>
                         <x-ui.label>Inicio</x-ui.label>
-                        <x-ui.input wire:model="startsOn" type="date" />
+                        <x-ui.date-picker wire:model="startsOn" label="Selecciona una fecha" locale="es-MX" clearable />
                         <x-ui.error name="startsOn" />
                     </x-ui.field>
                     <x-ui.field>
                         <x-ui.label>Entrega</x-ui.label>
-                        <x-ui.input wire:model="dueOn" type="date" />
+                        <x-ui.date-picker wire:model="dueOn" label="Selecciona una fecha" locale="es-MX" clearable />
                         <x-ui.error name="dueOn" />
                     </x-ui.field>
                 </div>
@@ -130,7 +130,7 @@
                             <x-ui.error name="requirementTitle" />
                         </x-ui.field>
                         <x-ui.field>
-                            <x-ui.input wire:model="requirementDueOn" type="date" />
+                            <x-ui.date-picker wire:model="requirementDueOn" label="Selecciona una fecha" locale="es-MX" clearable />
                             <x-ui.error name="requirementDueOn" />
                         </x-ui.field>
                     </div>

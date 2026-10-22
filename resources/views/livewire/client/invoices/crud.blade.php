@@ -62,7 +62,7 @@
 
                 <x-ui.field>
                     <x-ui.label>Fecha de emisión</x-ui.label>
-                    <x-ui.input wire:model="issue_date" type="date" />
+                    <x-ui.date-picker wire:model="issue_date" label="Selecciona una fecha" locale="es-MX" clearable />
                     <x-ui.error name="issue_date" />
                 </x-ui.field>
             </div>
