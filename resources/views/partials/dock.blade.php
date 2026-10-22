@@ -1,5 +1,9 @@
 {{-- Bottom dock: navigation as widgets, Samantha as an app --}}
 <nav class="dock" id="dock" aria-label="Main">
+    <a href="#top" class="dock-widget dock-brand" aria-label="noehassiel, back to top">
+        <span class="brand-mark" aria-hidden="true" data-brand-mark data-brand-mark-compact="(max-width: 940px)"><span data-brand-text>n<span class="brand-slash">/</span>h</span><span class="brand-cursor"></span></span>
+    </a>
+
     <div class="dock-widget dock-clock" aria-hidden="true">
         <span class="dock-clock-time" data-clock>--:--</span>
         <span class="dock-clock-label">Puebla, MX</span>

@@ -19,6 +19,15 @@ if ($dock) {
     tick();
     setInterval(tick, 15000);
 
+    // The dock's brand mark doubles as back-to-top once the header has scrolled out of view
+    const $header = document.querySelector('.site-header');
+
+    if ($header) {
+        new IntersectionObserver(([entry]) => {
+            $dock.classList.toggle('is-past-header', !entry.isIntersecting);
+        }).observe($header);
+    }
+
     const $music = document.getElementById('dock-music');
 
     if ($music) {

@@ -3,6 +3,7 @@ import './globals/modals.js';
 import './language.js';
 import './sam.js';
 import './dock.js';
+import './brand-mark.js';
 import './brief.js';
 import './os1-conversation.js';
 

@@ -39,7 +39,7 @@
 
     <header class="site-header">
         <a href="#top" class="brand" aria-label="noehassiel">
-            <span class="brand-mark" aria-hidden="true">n<span class="brand-slash">/</span>h<span class="brand-cursor"></span></span>
+            <span class="brand-mark" aria-hidden="true" data-brand-mark><span data-brand-text>n<span class="brand-slash">/</span>h</span><span class="brand-cursor"></span></span>
             <span class="brand-name">noehassiel</span>
         </a>
         <a href="#contact" class="button button-small button-dark"><x-t key="nav.cta" /></a>
