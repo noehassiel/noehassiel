@@ -230,9 +230,65 @@
     @include('partials.dock')
 
     <script>
-        document.addEventListener('visibilitychange', function () {
-            document.title = document.hidden ? 'Zzzz...' : '{{ __('landing.meta.title', locale: 'en') }}';
-        });
+        (function () {
+            const originalTitle = document.title;
+            // Background tabs throttle timers to ~1s, so frames are paced at that rate
+            const sleepFrames = ['z', 'zZ', 'zZz', 'zZzZ', 'zZzZz...'];
+            let frameIndex = 0;
+            let sleepTimer = null;
+
+            // Favicon cursor blink: build an "off" frame by painting over the isotipo cursor
+            const iconLinks = Array.from(document.querySelectorAll('link[rel="icon"]'));
+            const originalIconHrefs = iconLinks.map((link) => link.href);
+            let iconOnHref = null;
+            let iconOffHref = null;
+            let isCursorVisible = true;
+
+            const iconImage = new Image();
+            iconImage.onload = function () {
+                const size = 32;
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const context = canvas.getContext('2d');
+                context.drawImage(iconImage, 0, 0, size, size);
+                iconOnHref = canvas.toDataURL('image/png');
+
+                // Sample the background so the cover matches the icon exactly
+                const [red, green, blue] = context.getImageData(size / 2, 2, 1, 1).data;
+                context.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+                context.fillRect(26, 11, 5, 10);
+                iconOffHref = canvas.toDataURL('image/png');
+            };
+            iconImage.src = '/favicon-32x32.png';
+
+            function setIcon(hrefs) {
+                iconLinks.forEach((link, index) => {
+                    link.href = Array.isArray(hrefs) ? hrefs[index] : hrefs;
+                });
+            }
+
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) {
+                    frameIndex = 0;
+                    isCursorVisible = true;
+                    document.title = sleepFrames[frameIndex];
+                    sleepTimer = setInterval(function () {
+                        frameIndex = (frameIndex + 1) % sleepFrames.length;
+                        document.title = sleepFrames[frameIndex];
+
+                        if (iconOffHref) {
+                            isCursorVisible = !isCursorVisible;
+                            setIcon(isCursorVisible ? iconOnHref : iconOffHref);
+                        }
+                    }, 1000);
+                } else {
+                    clearInterval(sleepTimer);
+                    document.title = originalTitle;
+                    setIcon(originalIconHrefs);
+                }
+            });
+        })();
     </script>
 
     @vite(['resources/js/app.js'])
