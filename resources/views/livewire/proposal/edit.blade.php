@@ -13,6 +13,16 @@
             </x-slot:actions>
         </x-admin.page-header>
 
+        {{-- What the client asked for, so the edit answers it --}}
+        @if ($proposal->status === \App\Enums\ProposalStatus::ChangesRequested && $proposal->client_response)
+            <div role="status" class="rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-900 dark:bg-amber-900/20">
+                <p class="text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300">
+                    El cliente pidió cambios · {{ $proposal->responded_at?->translatedFormat('j M, H:i') }}
+                </p>
+                <p class="mt-2 whitespace-pre-line text-amber-950 dark:text-amber-100">{{ $proposal->client_response }}</p>
+            </div>
+        @endif
+
         {{-- Section: AI editor --}}
         <div class="admin-card p-6">
             <h2 class="mb-2 admin-eyebrow">Cambios con IA</h2>
@@ -86,7 +96,7 @@
 
                 <x-ui.field>
                     <x-ui.label>Válido hasta</x-ui.label>
-                    <x-ui.input type="date" wire:model="validUntil" />
+                    <x-ui.date-picker wire:model="validUntil" label="Selecciona una fecha" locale="es-MX" clearable />
                 </x-ui.field>
             </div>
         </div>
@@ -253,6 +263,16 @@
                 </div>
             </div>
         </div>
+
+        {{-- Section: Update note for the client --}}
+        @if ($proposal->isShared())
+            <div class="admin-card p-6">
+                <h2 class="mb-2 admin-eyebrow">Nota de esta actualización</h2>
+                <p class="mb-4 text-sm text-neutral-500">El cliente la verá en el historial de su propuesta, con la fecha. Déjala vacía si solo corregiste detalles.</p>
+                <x-ui.textarea wire:model="updateNote" rows="3" placeholder="Ej. Bajé el precio del diseño y quité el blog, como lo platicamos." />
+                <x-ui.error name="updateNote" />
+            </div>
+        @endif
 
         {{-- Notes --}}
         <div class="admin-card p-6">

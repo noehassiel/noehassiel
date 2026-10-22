@@ -25,7 +25,6 @@
     @else
         @php
             $money = fn ($amount) => '$'.number_format((float) $amount, 2).' '.$proposal->currency;
-            $taxAmount = ($proposal->subtotal - $proposal->discount) * ($proposal->tax_rate / 100);
         @endphp
 
         <article class="flex flex-col gap-12">
@@ -46,6 +45,8 @@
                     </p>
                 @endif
             </header>
+
+            @include('livewire.quote.partials.status', ['proposal' => $proposal])
 
             <section class="grid gap-6 sm:grid-cols-2">
                 <div class="portal-card p-6">
@@ -129,25 +130,38 @@
                         @if ($proposal->discount > 0)
                             <div class="flex justify-between gap-4 text-[var(--silver)]"><dt>Descuento</dt><dd class="font-mono">− {{ $money($proposal->discount) }}</dd></div>
                         @endif
-                        @if ($proposal->tax_rate > 0)
-                            <div class="flex justify-between gap-4 text-[var(--silver)]"><dt>IVA ({{ (float) $proposal->tax_rate }}%)</dt><dd class="font-mono">{{ $money($taxAmount) }}</dd></div>
+                        @if ($totals['tax_rate'] > 0)
+                            <div class="flex justify-between gap-4 text-[var(--silver)]"><dt>IVA ({{ $totals['tax_rate'] }}%)</dt><dd class="font-mono">{{ $money($totals['tax']) }}</dd></div>
                         @endif
                         <div class="mt-2 flex items-baseline justify-between gap-4">
                             <dt class="font-bold">Total</dt>
-                            <dd class="font-mono text-2xl font-bold text-[var(--ember)]">{{ $money($proposal->total) }}</dd>
+                            <dd class="font-mono text-2xl font-bold text-[var(--ember)]">{{ $money($totals['total']) }}</dd>
                         </div>
+                        @if ($totals['tax_rate'] == 0 && $proposal->canBeAccepted())
+                            <p class="text-xs text-[var(--slate)]">Precio sin IVA. Si necesitas factura, márcalo abajo y se suma el {{ \App\Models\Proposal::INVOICE_TAX_RATE }}%.</p>
+                        @endif
                     </dl>
 
                     <h3 class="portal-eyebrow mt-8 mb-4">Forma de pago</h3>
                     <dl class="grid gap-3 sm:grid-cols-2">
-                        @foreach ($proposal->paymentSchedule() as $payment)
-                            <div class="rounded-xl border border-[#1C1C1C] p-4">
+                        @foreach ($schedule as $payment)
+                            <div @class([
+                                'rounded-xl border p-4',
+                                'border-[#1C1C1C]' => ! $payment['paid_at'],
+                                'border-emerald-500/40 bg-emerald-500/5' => $payment['paid_at'],
+                            ])>
                                 <dt class="flex items-baseline justify-between gap-3">
                                     <span class="font-bold">{{ $payment['label'] }}</span>
-                                    <span class="font-mono text-xs text-[var(--slate)]">{{ $payment['percent'] }}%</span>
+                                    @if ($payment['paid_at'])
+                                        <span class="font-mono text-xs uppercase tracking-[0.14em] text-emerald-400">✓ Pagado</span>
+                                    @else
+                                        <span class="font-mono text-xs text-[var(--slate)]">{{ $payment['percent'] }}%</span>
+                                    @endif
                                 </dt>
-                                <dd class="mt-1 font-mono text-lg">{{ $money($payment['amount']) }}</dd>
-                                <dd class="mt-1 text-sm text-[var(--silver)]">{{ $payment['description'] }}</dd>
+                                <dd @class(['mt-1 font-mono text-lg', 'text-emerald-400' => $payment['paid_at']])>{{ $money($payment['amount']) }}</dd>
+                                <dd class="mt-1 text-sm text-[var(--silver)]">
+                                    {{ $payment['paid_at'] ? 'Pagado el '.$payment['paid_at']->translatedFormat('j \\d\\e F, Y') : $payment['description'] }}
+                                </dd>
                             </div>
                         @endforeach
                     </dl>
@@ -160,6 +174,22 @@
                     <p class="text-sm leading-relaxed whitespace-pre-line text-[var(--silver)]">{{ $proposal->notes }}</p>
                 </section>
             @endif
+
+            @if ($proposal->status === \App\Enums\ProposalStatus::ChangesRequested)
+                @include('livewire.quote.partials.changes-received')
+            @endif
+
+            @if ($proposal->isAwaitingAnswer())
+                @include('livewire.quote.partials.answer', ['proposal' => $proposal])
+            @endif
+
+            @if ($proposal->status === \App\Enums\ProposalStatus::Accepted)
+                <div id="pago" class="scroll-mt-8">
+                    @include('livewire.quote.partials.payment')
+                </div>
+            @endif
+
+            @include('livewire.quote.partials.history')
 
             <div class="flex flex-wrap gap-3">
                 <button type="button" wire:click="downloadPdf"

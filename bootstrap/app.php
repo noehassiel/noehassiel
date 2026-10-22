@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Signed-in users who hit a guest page go to their own home (admin or portal)
         $middleware->redirectUsersTo('/home');
+
+        // Stripe can't send a CSRF token; Cashier verifies the webhook signature instead
+        $middleware->validateCsrfTokens(except: ['stripe/*']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -4,6 +4,7 @@ namespace App\Livewire\Proposal;
 
 use App\Ai\Agents\ProposalEditor;
 use App\Enums\ProposalProjectType;
+use App\Enums\ProposalStatus;
 use App\Livewire\Proposal\Concerns\SelectsRecipient;
 use App\Models\Proposal;
 use App\Models\ProposalItem;
@@ -46,6 +47,9 @@ class Edit extends Component
     public float $taxRate = 16;
 
     public bool $applyTax = true;
+
+    /** Shown to the client in the proposal history when saving. */
+    public string $updateNote = '';
 
     // AI editor
     public string $aiInstruction = '';
@@ -185,6 +189,9 @@ class Edit extends Component
         ], -10);
 
         $this->aiInstruction = '';
+
+        // Draft the client-facing note from what the AI changed; the admin can still rewrite it
+        $this->updateNote = trim($this->updateNote."\n".$edited['summary']);
     }
 
     public function undoAiEdit(): void
@@ -277,6 +284,7 @@ class Edit extends Component
             'items.*.description' => 'required|string|max:500',
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.unit_price' => 'required|numeric|min:0',
+            'updateNote' => 'nullable|string|max:5000',
         ]);
 
         $includes = array_values(array_filter(array_map('trim', explode("\n", $this->includesRaw))));
@@ -322,6 +330,11 @@ class Edit extends Component
                 'subtotal' => $item['subtotal'],
                 'order' => $order,
             ]);
+        }
+
+        // Only versions the client can see go into their history
+        if ($this->proposal->isShared() && (trim($this->updateNote) !== '' || $this->proposal->status === ProposalStatus::ChangesRequested)) {
+            $this->proposal->publishUpdate(trim($this->updateNote));
         }
 
         $this->redirectRoute('proposals.show', $this->proposal, navigate: true);

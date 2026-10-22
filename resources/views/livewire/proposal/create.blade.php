@@ -47,7 +47,7 @@
 
                 <x-ui.field>
                     <x-ui.label>Válido hasta</x-ui.label>
-                    <x-ui.input type="date" wire:model="validUntil" />
+                    <x-ui.date-picker wire:model="validUntil" label="Selecciona una fecha" locale="es-MX" clearable />
                     <x-ui.error name="validUntil" />
                 </x-ui.field>
             </div>

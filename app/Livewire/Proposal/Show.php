@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Proposal;
 
+use App\Enums\PaymentMethod;
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -22,7 +23,7 @@ class Show extends Component
 
     public function mount(Proposal $proposal): void
     {
-        $this->proposal = $proposal->load(['client', 'lead', 'stages', 'items']);
+        $this->proposal = $proposal->load(['client', 'lead', 'stages', 'items', 'events']);
         $this->sendEmail = $proposal->recipient()?->email ?? '';
     }
 
@@ -128,6 +129,25 @@ class Show extends Component
     {
         $this->proposal->update(['status' => ProposalStatus::Accepted]);
         $this->dispatch('toast', message: 'Proposal marcado como aceptado.', type: 'success');
+    }
+
+    /** For transfers and cash: the admin confirms the deposit arrived, which creates the project. */
+    public function markDepositReceived(string $method): void
+    {
+        abort_unless(in_array($this->proposal->status, [ProposalStatus::Sent, ProposalStatus::Accepted, ProposalStatus::ChangesRequested], true), 403);
+
+        $project = $this->proposal->markDepositPaid(PaymentMethod::from($method), $this->proposal->depositAmount());
+
+        $this->dispatch('toast', message: 'Anticipo registrado. Proyecto creado y correo de bienvenida enviado.', type: 'success');
+        $this->redirectRoute('projects.show', $project, navigate: true);
+    }
+
+    public function markBalanceReceived(string $method): void
+    {
+        abort_unless($this->proposal->isDepositPaid() && ! $this->proposal->balance_paid_at, 403);
+
+        $this->proposal->markBalancePaid(PaymentMethod::from($method), $this->proposal->balanceAmount());
+        $this->dispatch('toast', message: 'Liquidación registrada. El proyecto queda pagado por completo.', type: 'success');
     }
 
     public function markAsRejected(): void

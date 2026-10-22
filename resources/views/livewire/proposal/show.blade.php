@@ -194,6 +194,94 @@
         {{-- Sidebar: Meta + Cost --}}
         <div class="space-y-6">
 
+            {{-- Client answer and deposit --}}
+            @if ($proposal->responded_at || $proposal->events->isNotEmpty() || $proposal->isDepositPaid() || $proposal->status === \App\Enums\ProposalStatus::Accepted)
+                <div class="admin-card p-6">
+                    <h2 class="mb-4 admin-eyebrow">Respuesta del cliente</h2>
+
+                    <dl class="space-y-3 text-sm">
+                        <div>
+                            <dt class="text-xs font-medium text-neutral-400">Estado</dt>
+                            <dd class="mt-0.5 font-semibold text-neutral-800 dark:text-neutral-200">
+                                {{ $proposal->status->label() }}
+                                @if ($proposal->responded_at)
+                                    <span class="font-normal text-neutral-500">· {{ $proposal->responded_at->diffForHumans() }}</span>
+                                @endif
+                            </dd>
+                        </div>
+                        @if ($proposal->client_response)
+                            <div>
+                                <dt class="text-xs font-medium text-neutral-400">{{ $proposal->status === \App\Enums\ProposalStatus::Rejected ? 'Motivo' : 'Cambios que pidió' }}</dt>
+                                <dd class="mt-1 whitespace-pre-line rounded-lg bg-neutral-50 p-3 text-neutral-700 dark:bg-neutral-800/60 dark:text-neutral-300">{{ $proposal->client_response }}</dd>
+                            </div>
+                        @endif
+                        <div>
+                            <dt class="text-xs font-medium text-neutral-400">Factura</dt>
+                            <dd class="mt-0.5 text-neutral-700 dark:text-neutral-300">{{ $proposal->requires_invoice ? 'Sí, requiere factura' : 'No' }}</dd>
+                        </div>
+                        @if ($proposal->payment_method)
+                            <div>
+                                <dt class="text-xs font-medium text-neutral-400">Forma de pago</dt>
+                                <dd class="mt-0.5 text-neutral-700 dark:text-neutral-300">{{ $proposal->payment_method->label() }}</dd>
+                            </div>
+                        @endif
+                        @if ($proposal->isDepositPaid())
+                            <div>
+                                <dt class="text-xs font-medium text-neutral-400">Anticipo</dt>
+                                <dd class="mt-0.5 font-medium text-green-600 dark:text-green-400">
+                                    {{ number_format($proposal->deposit_paid_amount, 2) }} · {{ $proposal->deposit_paid_at->format('d/m/Y') }}
+                                </dd>
+                            </div>
+                        @endif
+                    </dl>
+
+                    @if ($proposal->events->isNotEmpty())
+                        <h3 class="mt-5 mb-2 text-xs font-medium text-neutral-400">Historial</h3>
+                        <ol class="space-y-2 text-sm">
+                            @foreach ($proposal->events as $event)
+                                <li class="border-l-2 pl-3 {{ $event->type->isFromClient() ? 'border-neutral-300 dark:border-neutral-600' : 'border-[#FF420B]' }}">
+                                    <p class="font-medium text-neutral-700 dark:text-neutral-300">{{ $event->type->adminLabel() }}
+                                        <span class="font-normal text-neutral-400">· {{ $event->created_at->translatedFormat('j M, H:i') }}</span></p>
+                                    @if ($event->body)
+                                        <p class="mt-0.5 whitespace-pre-line text-neutral-500">{{ $event->body }}</p>
+                                    @endif
+                                </li>
+                            @endforeach
+                        </ol>
+                    @endif
+
+                    @if ($proposal->project_id)
+                        <x-ui.button variant="outline" size="sm" class="mt-4" :href="route('projects.show', $proposal->project_id)" wire:navigate icon="arrow-right">Ver proyecto</x-ui.button>
+
+                        @if ($proposal->balance_paid_at)
+                            <p class="mt-4 text-sm font-medium text-green-600 dark:text-green-400">
+                                Liquidación de {{ number_format($proposal->balance_paid_amount, 2) }} recibida el {{ $proposal->balance_paid_at->format('d/m/Y') }} · {{ $proposal->balance_payment_method->label() }}
+                            </p>
+                        @else
+                            <p class="mt-4 mb-2 text-xs text-neutral-400">Al entregar el proyecto: liquidación de {{ number_format($proposal->balanceAmount(), 2) }}.</p>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach (\App\Enums\PaymentMethod::cases() as $method)
+                                    <x-ui.button variant="outline" size="sm" wire:click="markBalanceReceived('{{ $method->value }}')"
+                                        wire:confirm="¿Confirmas que recibiste la liquidación por {{ Str::lower($method->label()) }}?">
+                                        Liquidación por {{ Str::lower($method->label()) }}
+                                    </x-ui.button>
+                                @endforeach
+                            </div>
+                        @endif
+                    @elseif ($proposal->status === \App\Enums\ProposalStatus::Accepted)
+                        <p class="mt-4 mb-2 text-xs text-neutral-400">¿Ya recibiste el anticipo de {{ number_format($proposal->depositAmount(), 2) }}? Al marcarlo se crea el proyecto y se le manda la bienvenida.</p>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach ([\App\Enums\PaymentMethod::Transfer, \App\Enums\PaymentMethod::Cash] as $method)
+                                <x-ui.button variant="outline" size="sm" wire:click="markDepositReceived('{{ $method->value }}')"
+                                    wire:confirm="¿Confirmas que recibiste el anticipo por {{ Str::lower($method->label()) }}? Se creará el proyecto y se avisará al cliente.">
+                                    Recibido por {{ Str::lower($method->label()) }}
+                                </x-ui.button>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            @endif
+
             {{-- Meta info --}}
             <div class="admin-card p-6">
                 <h2 class="mb-4 admin-eyebrow">Detalles</h2>
@@ -335,8 +423,12 @@
                             </span>
                         </div>
                         @foreach ($proposal->paymentSchedule() as $payment)
-                            <div class="flex justify-between gap-3 text-xs text-neutral-500">
-                                <span>{{ $payment['label'] }} {{ $payment['percent'] }}%</span>
+                            <div @class([
+                                'flex justify-between gap-3 text-xs',
+                                'text-neutral-500' => ! $payment['paid_at'],
+                                'font-medium text-green-600 dark:text-green-400' => $payment['paid_at'],
+                            ])>
+                                <span>{{ $payment['label'] }} {{ $payment['percent'] }}%@if ($payment['paid_at']) · pagado {{ $payment['paid_at']->format('d/m/Y') }}@endif</span>
                                 <span class="font-mono">{{ number_format($payment['amount'], 2) }}</span>
                             </div>
                         @endforeach

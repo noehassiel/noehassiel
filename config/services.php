@@ -35,6 +35,25 @@ return [
         ],
     ],
 
+    // Where the client's answers to proposals and payment notices are sent
+    'proposals' => [
+        'notify_email' => env('PROPOSALS_NOTIFY_EMAIL', 'admin@noehassiel.com'),
+    ],
+
+    // Shown to clients who choose to pay by bank transfer
+    'bank' => [
+        'name' => env('BANK_NAME'),
+        'beneficiary' => env('BANK_BENEFICIARY'),
+        'clabe' => env('BANK_CLABE'),
+    ],
+
+    // Stripe's card fee in Mexico, passed on to clients who pay by card. Defaults: 3.6% + $3 MXN, plus IVA on the fee
+    'stripe_fees' => [
+        'percent' => (float) env('STRIPE_FEE_PERCENT', 3.6),
+        'fixed' => (float) env('STRIPE_FEE_FIXED', 3.0),
+        'tax_percent' => (float) env('STRIPE_FEE_TAX_PERCENT', 16),
+    ],
+
     'leads' => [
         'email' => env('LEADS_EMAIL', env('MAIL_FROM_ADDRESS')),
     ],

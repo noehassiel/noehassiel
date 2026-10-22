@@ -174,7 +174,7 @@ test('the payment schedule splits the total 50/50 and adds up exactly', function
 
 test('the unlocked proposal shows the 50/50 payment terms', function () {
     ProposalItem::factory()->create(['proposal_id' => $this->proposal->id]);
-    $this->proposal->update(['total' => 58000]);
+    $this->proposal->update(['subtotal' => 50000, 'discount' => 0, 'tax_rate' => 16, 'total' => 58000]);
 
     Livewire::test(QuoteShow::class, ['token' => $this->proposal->public_token])
         ->set('password', $this->proposal->access_password)

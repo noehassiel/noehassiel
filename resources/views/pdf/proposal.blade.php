@@ -950,8 +950,10 @@
                         </div>
                         @foreach ($proposal->paymentSchedule() as $payment)
                             <div class="totals-row">
-                                <div class="tr-label">{{ $payment['label'] }} {{ $payment['percent'] }}% · {{ Str::lower($payment['description']) }}</div>
-                                <div class="tr-amount">{{ $proposal->currency }} {{ number_format($payment['amount'], 2) }}</div>
+                                <div class="tr-label" @if ($payment['paid_at']) style="color:#15803D;" @endif>
+                                    {{ $payment['label'] }} {{ $payment['percent'] }}% · {{ $payment['paid_at'] ? 'pagado el '.$payment['paid_at']->format('d/m/Y') : Str::lower($payment['description']) }}
+                                </div>
+                                <div class="tr-amount" @if ($payment['paid_at']) style="color:#15803D;" @endif>{{ $proposal->currency }} {{ number_format($payment['amount'], 2) }}</div>
                             </div>
                         @endforeach
                     </div>
