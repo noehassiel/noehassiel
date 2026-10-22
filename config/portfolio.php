@@ -22,7 +22,7 @@ return [
             'placeholder' => false,
         ],
         [
-            'name' => 'Return',
+            'name' => 'Return Policy',
             'client' => 'Own product · Loyalty SaaS',
             'year' => 2026,
             'disciplines' => ['en' => 'Founder · Design & Development', 'es' => 'Fundador · Diseño y desarrollo'],
