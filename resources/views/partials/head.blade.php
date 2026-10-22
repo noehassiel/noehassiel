@@ -8,6 +8,9 @@
 
 @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/passkeys.js', 'resources/css/system.css'])
 
+{{-- app.js bundles Livewire + Alpine; this stops Livewire injecting a second copy --}}
+@livewireScriptConfig
+
 {{-- Anti-FOUC: apply theme from localStorage before render --}}
 <script>
     (function () {
