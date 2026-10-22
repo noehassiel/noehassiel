@@ -772,9 +772,9 @@
             <div class="cover-bottom-table">
                 <div class="cover-info-cell">
                     <div class="cover-info-label">Preparado para</div>
-                    <div class="cover-info-name">{{ $proposal->client->name }}</div>
-                    @if ($proposal->client->email)
-                        <div class="cover-info-sub">{{ $proposal->client->email }}</div>
+                    <div class="cover-info-name">{{ $proposal->recipient()?->name }}</div>
+                    @if ($proposal->recipient()?->email)
+                        <div class="cover-info-sub">{{ $proposal->recipient()?->email }}</div>
                     @endif
                 </div>
                 <div class="cover-info-cell">
@@ -983,13 +983,13 @@
                         <div class="sig-signed">
                             <div class="sig-signed-name">{{ $proposal->client_signature }}</div>
                         </div>
-                        <div class="sig-name">{{ $proposal->client->name }}</div>
+                        <div class="sig-name">{{ $proposal->recipient()?->name }}</div>
                         <div class="sig-role">
                             Firmado el {{ $proposal->client_signed_at->format('d/m/Y') }}
                         </div>
                     @else
                         <div class="sig-area"></div>
-                        <div class="sig-name">{{ $proposal->client->name }}</div>
+                        <div class="sig-name">{{ $proposal->recipient()?->name }}</div>
                         <div class="sig-role">Nombre y firma del cliente</div>
                     @endif
                 </div>

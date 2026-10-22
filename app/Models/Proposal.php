@@ -15,6 +15,7 @@ class Proposal extends Model
 
     protected $fillable = [
         'client_id',
+        'lead_id',
         'number',
         'title',
         'project_type',
@@ -56,6 +57,17 @@ class Proposal extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function lead(): BelongsTo
+    {
+        return $this->belongsTo(Lead::class);
+    }
+
+    /** The client or lead this proposal is addressed to. */
+    public function recipient(): Client|Lead|null
+    {
+        return $this->client ?? $this->lead;
     }
 
     public function stages(): HasMany

@@ -21,8 +21,8 @@ test('security page can be rendered once the password is confirmed', function ()
         ->withSession(['auth.password_confirmed_at' => time()])
         ->get(route('settings.security'))
         ->assertOk()
-        ->assertSee('Enable 2FA')
-        ->assertSee('No passkeys yet');
+        ->assertSee('Activar 2FA')
+        ->assertSee('Aún no tienes passkeys');
 });
 
 test('the old password settings url redirects to security', function () {

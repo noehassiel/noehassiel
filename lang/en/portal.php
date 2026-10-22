@@ -33,11 +33,53 @@ return [
         'email_taken' => 'An account with this email already exists. Log in with it instead.',
     ],
 
+    'nav' => [
+        'projects' => 'Projects',
+        'invoices' => 'Invoices',
+        'security' => 'Security',
+        'logout' => 'Log out',
+        'label' => 'Portal sections',
+    ],
+
     'home' => [
         'title' => 'Your projects',
         'greeting' => 'Hi, :name',
         'empty' => 'There are no active projects yet.',
         'outstanding' => '{0} Everything delivered|{1} 1 item still needed|[2,*] :count items still needed',
+        'due' => 'Estimated delivery :date',
+        'recent_invoices' => 'Recent invoices',
+        'all_invoices' => 'See all',
+    ],
+
+    'project' => [
+        'back' => 'Your projects',
+        'progress' => 'Progress',
+        'starts' => 'Start',
+        'due' => 'Estimated delivery',
+        'checklist' => 'What we need from you',
+        'checklist_hint' => 'Upload it to your shared folder and mark it here. I will check it and confirm.',
+        'checklist_empty' => 'We do not need anything else from you right now.',
+        'all_received' => 'We have everything. Thank you.',
+        'mark_uploaded' => 'I uploaded it',
+        'marked_at' => 'Marked :time · I am reviewing it',
+        'received_at' => 'Received :time',
+        'due_on' => 'Due :date',
+        'folders' => 'Shared folders',
+        'folders_hint' => 'This is where you upload the project resources.',
+        'folders_empty' => 'No folders yet. Share one with me and I will add it here.',
+        'open_folder' => 'Open',
+    ],
+
+    'invoices' => [
+        'title' => 'Invoices',
+        'empty' => 'There are no invoices yet.',
+        'download' => 'Download ZIP',
+        'unavailable' => 'File unavailable',
+        'issued' => 'Issued :date',
+    ],
+
+    'security' => [
+        'title' => 'Security',
     ],
 
 ];

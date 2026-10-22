@@ -7,6 +7,9 @@ use App\Livewire\Client\Index as ClientIndex;
 use App\Livewire\Client\Show as ClientShow;
 use App\Livewire\Portal\AcceptInvitation;
 use App\Livewire\Portal\Home as PortalHome;
+use App\Livewire\Portal\Invoices as PortalInvoices;
+use App\Livewire\Portal\ProjectShow as PortalProjectShow;
+use App\Livewire\Portal\Security as PortalSecurity;
 use App\Livewire\Project\Show as ProjectShow;
 use App\Livewire\Proposal\Create as ProposalCreate;
 use App\Livewire\Proposal\Edit as ProposalEdit;
@@ -80,6 +83,15 @@ Route::get('invitations/{token}', AcceptInvitation::class)
 
 Route::prefix('portal')->name('portal.')->middleware(['auth', 'can:access-portal', UseUserLocale::class])->group(function () {
     Route::get('/', PortalHome::class)->name('home');
+    Route::get('projects/{project}', PortalProjectShow::class)->name('projects.show');
+    Route::get('invoices', PortalInvoices::class)->name('invoices');
+    Route::get('security', PortalSecurity::class)->middleware('password.confirm')->name('security');
+
+    Route::get('invoices/{invoice}/download', function (Invoice $invoice) {
+        abort_unless($invoice->hasZip(), 404);
+
+        return Invoice::disk()->download($invoice->zip_path, "factura-{$invoice->number}.zip");
+    })->middleware('can:download,invoice')->name('invoices.download');
 });
 
 Route::view('dashboard', 'dashboard')
@@ -108,8 +120,13 @@ Route::middleware(['auth', 'can:access-admin', UseUserLocale::class])->group(fun
 
 // Lets password managers deep-link to where passkeys are created and managed
 Route::get('.well-known/passkey-endpoints', fn () => response()->json([
-    'enroll' => route('settings.security'),
-    'manage' => route('settings.security'),
+    'enroll' => route('security.redirect'),
+    'manage' => route('security.redirect'),
 ]))->name('well-known.passkeys');
+
+// Each kind of user manages passkeys on their own security page
+Route::get('account/security', fn () => redirect()->route(
+    auth()->user()->isClient() ? 'portal.security' : 'settings.security'
+))->middleware('auth')->name('security.redirect');
 
 require __DIR__.'/auth.php';

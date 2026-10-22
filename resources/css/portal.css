@@ -1,0 +1,75 @@
+/*
+ * Client portal — brand surface on Obsidian. Tokens come from landing.css.
+ */
+
+body.portal {
+    margin: 0;
+    min-height: 100svh;
+    background: var(--obsidian);
+    color: var(--stone);
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle grain for artisanal warmth (4% noise) */
+body.portal::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.portal .font-mono {
+    font-family: var(--font-mono);
+}
+
+/* Small uppercase mono label used for section eyebrows and metadata */
+.portal-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slate);
+}
+
+.portal-card {
+    border: 1px solid #1C1C1C;
+    background: #111111;
+    border-radius: 16px;
+    transition: border-color 0.4s var(--ease-out), background-color 0.4s var(--ease-out);
+}
+
+a.portal-card:hover,
+a.portal-card:focus-visible {
+    border-color: color-mix(in srgb, var(--ember) 45%, transparent);
+    background: #141414;
+}
+
+.portal :focus-visible {
+    outline: 2px solid var(--ember);
+    outline-offset: 2px;
+}
+
+/* Status stepper: done steps in stone, current in ember, upcoming muted */
+.portal-step {
+    height: 3px;
+    border-radius: 999px;
+    background: #222;
+}
+
+.portal-step[data-state="done"] {
+    background: var(--silver);
+}
+
+.portal-step[data-state="current"] {
+    background: var(--ember);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .portal-card {
+        transition: none;
+    }
+}

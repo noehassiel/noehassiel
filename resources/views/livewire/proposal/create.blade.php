@@ -23,13 +23,16 @@
 
             <div class="grid gap-4 sm:grid-cols-2">
                 <x-ui.field class="sm:col-span-2">
-                    <x-ui.label>Cliente *</x-ui.label>
-                    <x-ui.select wire:model="clientId">
+                    <x-ui.label>Cliente o lead *</x-ui.label>
+                    <x-ui.select wire:model="recipient">
                         @foreach ($this->clients as $client)
-                            <x-ui.select.option value="{{ $client->id }}">{{ $client->name }}</x-ui.select.option>
+                            <x-ui.select.option value="client:{{ $client->id }}">{{ $client->name }}</x-ui.select.option>
+                        @endforeach
+                        @foreach ($this->leads as $lead)
+                            <x-ui.select.option value="lead:{{ $lead->id }}">{{ $lead->name }}{{ $lead->company ? " · {$lead->company}" : '' }} (lead)</x-ui.select.option>
                         @endforeach
                     </x-ui.select>
-                    <x-ui.error name="clientId" />
+                    <x-ui.error name="recipient" />
                 </x-ui.field>
 
                 <x-ui.field class="sm:col-span-2">

@@ -6,8 +6,10 @@ use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
 use Livewire\Component;
 use Resend\Laravel\Facades\Resend;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Show extends Component
 {
@@ -21,11 +23,11 @@ class Show extends Component
 
     public function mount(Proposal $proposal): void
     {
-        $this->proposal = $proposal->load(['client', 'stages', 'items']);
-        $this->sendEmail = $proposal->client->email ?? '';
+        $this->proposal = $proposal->load(['client', 'lead', 'stages', 'items']);
+        $this->sendEmail = $proposal->recipient()?->email ?? '';
     }
 
-    public function downloadPdf(): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function downloadPdf(): StreamedResponse
     {
         $pdf = Pdf::loadView('pdf.proposal', ['proposal' => $this->proposal])
             ->setPaper('a4', 'portrait');
@@ -131,7 +133,7 @@ class Show extends Component
         $this->dispatch('toast', message: 'Proposal marcado como rechazado.', type: 'warning');
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.proposal.show')
             ->layout('components.layouts.app.main', ['title' => $this->proposal->number]);

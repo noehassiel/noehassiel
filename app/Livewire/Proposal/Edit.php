@@ -3,18 +3,19 @@
 namespace App\Livewire\Proposal;
 
 use App\Enums\ProposalProjectType;
-use App\Models\Client;
+use App\Livewire\Proposal\Concerns\SelectsRecipient;
 use App\Models\Proposal;
 use App\Models\ProposalItem;
 use App\Models\ProposalStage;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class Edit extends Component
 {
-    public Proposal $proposal;
+    use SelectsRecipient;
 
-    public int $clientId = 0;
+    public Proposal $proposal;
 
     public string $title = '';
 
@@ -48,7 +49,7 @@ class Edit extends Component
     {
         $this->proposal = $proposal->load(['stages', 'items']);
 
-        $this->clientId = $proposal->client_id;
+        $this->recipient = $proposal->lead_id ? "lead:{$proposal->lead_id}" : "client:{$proposal->client_id}";
         $this->title = $proposal->title;
         $this->projectType = $proposal->project_type->value;
         $this->whatWeDo = $proposal->what_we_do;
@@ -78,12 +79,6 @@ class Edit extends Component
             'subtotal' => (float) $i->subtotal,
             'order' => $i->order,
         ])->toArray();
-    }
-
-    #[Computed]
-    public function clients(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Client::query()->orderBy('name')->get();
     }
 
     #[Computed]
@@ -150,7 +145,7 @@ class Edit extends Component
     public function save(): void
     {
         $this->validate([
-            'clientId' => 'required|exists:clients,id',
+            ...$this->recipientRules(),
             'title' => 'required|string|max:255',
             'projectType' => 'required|string',
             'whatWeDo' => 'required|string',
@@ -168,7 +163,7 @@ class Edit extends Component
         $excludes = array_values(array_filter(array_map('trim', explode("\n", $this->excludesRaw))));
 
         $this->proposal->update([
-            'client_id' => $this->clientId,
+            ...$this->recipientAttributes(),
             'title' => $this->title,
             'project_type' => $this->projectType,
             'what_we_do' => $this->whatWeDo,
@@ -212,7 +207,7 @@ class Edit extends Component
         $this->redirectRoute('proposals.show', $this->proposal, navigate: true);
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.proposal.edit')
             ->layout('components.layouts.app.main', ['title' => 'Editar Proposal']);

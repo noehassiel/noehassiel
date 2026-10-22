@@ -85,7 +85,7 @@
                                 </a>
                                 <p class="mt-0.5 text-xs text-neutral-400">{{ $proposal->project_type->label() }}</p>
                             </td>
-                            <td class="px-5 py-4 text-neutral-600 dark:text-neutral-400">{{ $proposal->client->name }}
+                            <td class="px-5 py-4 text-neutral-600 dark:text-neutral-400">{{ $proposal->recipient()?->name }}
                             </td>
                             <td class="px-5 py-4">
                                 @php

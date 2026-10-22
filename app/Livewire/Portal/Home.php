@@ -3,6 +3,7 @@
 namespace App\Livewire\Portal;
 
 use App\Enums\RequirementStatus;
+use App\Models\Invoice;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +28,19 @@ class Home extends Component
             ->active()
             ->withCount(['requirements as outstanding_count' => fn ($query) => $query->where('status', RequirementStatus::Pending)])
             ->latest()
+            ->get();
+    }
+
+    /**
+     * @return Collection<int, Invoice>
+     */
+    #[Computed]
+    public function recentInvoices(): Collection
+    {
+        return Invoice::query()
+            ->whereBelongsTo(Auth::user()->client)
+            ->latest('issue_date')
+            ->limit(3)
             ->get();
     }
 

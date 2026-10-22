@@ -24,14 +24,21 @@
 
             <div class="grid gap-4 sm:grid-cols-2">
                 <x-ui.field class="sm:col-span-2">
-                    <x-ui.label>Cliente *</x-ui.label>
-                    <x-ui.select wire:model="clientId">
-                        <option value="0">Selecciona un cliente...</option>
-                        @foreach ($this->clients as $client)
-                            <option value="{{ $client->id }}">{{ $client->name }}</option>
-                        @endforeach
+                    <x-ui.label>Cliente o lead *</x-ui.label>
+                    <x-ui.select wire:model="recipient">
+                        <option value="">Selecciona un cliente o lead...</option>
+                        <optgroup label="Clientes">
+                            @foreach ($this->clients as $client)
+                                <option value="client:{{ $client->id }}">{{ $client->name }}</option>
+                            @endforeach
+                        </optgroup>
+                        <optgroup label="Leads">
+                            @foreach ($this->leads as $lead)
+                                <option value="lead:{{ $lead->id }}">{{ $lead->name }}{{ $lead->company ? " · {$lead->company}" : '' }}</option>
+                            @endforeach
+                        </optgroup>
                     </x-ui.select>
-                    <x-ui.error name="clientId" />
+                    <x-ui.error name="recipient" />
                 </x-ui.field>
 
                 <x-ui.field class="sm:col-span-2">

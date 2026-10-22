@@ -206,7 +206,7 @@
                     <div>
                         <dt class="text-xs font-medium text-neutral-400">Cliente</dt>
                         <dd class="mt-0.5 font-semibold text-neutral-800 dark:text-neutral-200">
-                            {{ $proposal->client->name }}</dd>
+                            {{ $proposal->recipient()?->name }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs font-medium text-neutral-400">Tipo de proyecto</dt>

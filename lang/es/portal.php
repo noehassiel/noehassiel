@@ -33,11 +33,53 @@ return [
         'email_taken' => 'Ya existe una cuenta con este correo. Inicia sesión con ella.',
     ],
 
+    'nav' => [
+        'projects' => 'Proyectos',
+        'invoices' => 'Facturas',
+        'security' => 'Seguridad',
+        'logout' => 'Salir',
+        'label' => 'Secciones del portal',
+    ],
+
     'home' => [
         'title' => 'Tus proyectos',
         'greeting' => 'Hola, :name',
         'empty' => 'Todavía no hay proyectos activos.',
         'outstanding' => '{0} Todo entregado|{1} Falta 1 cosa por entregar|[2,*] Faltan :count cosas por entregar',
+        'due' => 'Entrega estimada :date',
+        'recent_invoices' => 'Facturas recientes',
+        'all_invoices' => 'Ver todas',
+    ],
+
+    'project' => [
+        'back' => 'Tus proyectos',
+        'progress' => 'Avance',
+        'starts' => 'Inicio',
+        'due' => 'Entrega estimada',
+        'checklist' => 'Lo que necesitamos de ti',
+        'checklist_hint' => 'Súbelo a tu carpeta compartida y márcalo aquí. Lo reviso y te confirmo.',
+        'checklist_empty' => 'Por ahora no necesitamos nada más de ti.',
+        'all_received' => 'Recibimos todo. Gracias.',
+        'mark_uploaded' => 'Ya lo subí',
+        'marked_at' => 'Marcado :time · lo estoy revisando',
+        'received_at' => 'Recibido :time',
+        'due_on' => 'Para el :date',
+        'folders' => 'Carpetas compartidas',
+        'folders_hint' => 'Aquí es donde subes los recursos del proyecto.',
+        'folders_empty' => 'Aún no hay carpetas. Comparte una conmigo y la agrego aquí.',
+        'open_folder' => 'Abrir',
+    ],
+
+    'invoices' => [
+        'title' => 'Facturas',
+        'empty' => 'Todavía no hay facturas.',
+        'download' => 'Descargar ZIP',
+        'unavailable' => 'Archivo no disponible',
+        'issued' => 'Emitida el :date',
+    ],
+
+    'security' => [
+        'title' => 'Seguridad',
     ],
 
 ];

@@ -1,31 +1,48 @@
-<div class="space-y-8">
+<div class="space-y-14">
     <div>
-        <p class="font-mono text-xs uppercase tracking-widest text-neutral-500">{{ __('portal.home.greeting', ['name' => str(auth()->user()->name)->before(' ')]) }}</p>
-        <x-ui.heading level="h1" size="xl" class="mt-1">{{ __('portal.home.title') }}</x-ui.heading>
+        <p class="portal-eyebrow">{{ __('portal.home.greeting', ['name' => str(auth()->user()->name)->before(' ')]) }}</p>
+        <h1 class="mt-2 text-4xl font-black tracking-tight sm:text-5xl">{{ __('portal.home.title') }}</h1>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2">
+    <section class="grid gap-4 sm:grid-cols-2">
         @forelse ($this->projects as $project)
-            <div wire:key="project-{{ $project->id }}" class="space-y-3 rounded-xl border border-neutral-200 p-5 dark:border-neutral-800">
+            <a href="{{ route('portal.projects.show', $project) }}" wire:navigate wire:key="project-{{ $project->id }}"
+                class="portal-card flex flex-col gap-4 p-6">
                 <div class="flex items-start justify-between gap-3">
-                    <p class="font-semibold">{{ $project->name }}</p>
-                    <x-ui.badge :color="$project->status->color()" size="sm">{{ $project->status->label() }}</x-ui.badge>
+                    <h2 class="text-xl font-bold tracking-tight">{{ $project->name }}</h2>
+                    <span class="portal-eyebrow shrink-0 !text-[var(--brass)]">{{ $project->status->label() }}</span>
                 </div>
 
                 @if ($project->description)
-                    <x-ui.text class="text-neutral-500">{{ $project->description }}</x-ui.text>
+                    <p class="line-clamp-2 text-sm leading-relaxed text-[var(--silver)]">{{ $project->description }}</p>
                 @endif
 
-                <p @class([
-                    'font-mono text-xs',
-                    'text-[#FF420B]' => $project->outstanding_count > 0,
-                    'text-neutral-500' => $project->outstanding_count === 0,
-                ])>
-                    {{ trans_choice('portal.home.outstanding', $project->outstanding_count, ['count' => $project->outstanding_count]) }}
-                </p>
-            </div>
+                <div class="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
+                    <p @class([
+                        'font-mono text-xs',
+                        'text-[var(--ember)]' => $project->outstanding_count > 0,
+                        'text-[var(--slate)]' => $project->outstanding_count === 0,
+                    ])>
+                        {{ trans_choice('portal.home.outstanding', $project->outstanding_count, ['count' => $project->outstanding_count]) }}
+                    </p>
+                    @if ($project->due_on)
+                        <p class="font-mono text-xs text-[var(--slate)]">{{ __('portal.home.due', ['date' => $project->due_on->translatedFormat('j M Y')]) }}</p>
+                    @endif
+                </div>
+            </a>
         @empty
-            <x-ui.text class="text-neutral-500">{{ __('portal.home.empty') }}</x-ui.text>
+            <p class="text-[var(--silver)] sm:col-span-2">{{ __('portal.home.empty') }}</p>
         @endforelse
-    </div>
+    </section>
+
+    @if ($this->recentInvoices->isNotEmpty())
+        <section class="space-y-4">
+            <div class="flex items-baseline justify-between">
+                <h2 class="portal-eyebrow">{{ __('portal.home.recent_invoices') }}</h2>
+                <a href="{{ route('portal.invoices') }}" wire:navigate class="font-mono text-xs text-[var(--ember)] hover:underline">{{ __('portal.home.all_invoices') }} →</a>
+            </div>
+
+            @include('livewire.portal.partials.invoice-list', ['invoices' => $this->recentInvoices])
+        </section>
+    @endif
 </div>

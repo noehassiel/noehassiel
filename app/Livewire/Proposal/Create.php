@@ -3,17 +3,17 @@
 namespace App\Livewire\Proposal;
 
 use App\Enums\ProposalProjectType;
-use App\Models\Client;
+use App\Livewire\Proposal\Concerns\SelectsRecipient;
 use App\Models\Proposal;
 use App\Models\ProposalItem;
 use App\Models\ProposalStage;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class Create extends Component
 {
-    // Basic info
-    public int $clientId = 0;
+    use SelectsRecipient;
 
     public string $title = '';
 
@@ -51,12 +51,6 @@ class Create extends Component
     {
         $this->addStage();
         $this->addItem();
-    }
-
-    #[Computed]
-    public function clients(): \Illuminate\Database\Eloquent\Collection
-    {
-        return Client::query()->orderBy('name')->get();
     }
 
     #[Computed]
@@ -124,7 +118,7 @@ class Create extends Component
     public function save(): void
     {
         $this->validate([
-            'clientId' => 'required|exists:clients,id',
+            ...$this->recipientRules(),
             'title' => 'required|string|max:255',
             'projectType' => 'required|string',
             'whatWeDo' => 'required|string',
@@ -142,7 +136,7 @@ class Create extends Component
         $excludes = array_values(array_filter(array_map('trim', explode("\n", $this->excludesRaw))));
 
         $proposal = Proposal::create([
-            'client_id' => $this->clientId,
+            ...$this->recipientAttributes(),
             'number' => Proposal::generateNumber(),
             'title' => $this->title,
             'project_type' => $this->projectType,
@@ -183,7 +177,7 @@ class Create extends Component
         $this->redirectRoute('proposals.show', $proposal, navigate: true);
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.proposal.create')
             ->layout('components.layouts.app.main', ['title' => 'Nuevo Proposal']);

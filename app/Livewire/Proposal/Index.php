@@ -4,6 +4,7 @@ namespace App\Livewire\Proposal;
 
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
+use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -56,13 +57,14 @@ class Index extends Component
         $this->deletingId = null;
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         $proposals = Proposal::query()
-            ->with('client')
+            ->with(['client', 'lead'])
             ->when($this->search, fn ($q) => $q->where('title', 'like', "%{$this->search}%")
                 ->orWhere('number', 'like', "%{$this->search}%")
-                ->orWhereHas('client', fn ($q) => $q->where('name', 'like', "%{$this->search}%")))
+                ->orWhereHas('client', fn ($q) => $q->where('name', 'like', "%{$this->search}%"))
+                ->orWhereHas('lead', fn ($q) => $q->where('name', 'like', "%{$this->search}%")))
             ->when($this->statusFilter, fn ($q) => $q->where('status', $this->statusFilter))
             ->latest()
             ->paginate(12);
