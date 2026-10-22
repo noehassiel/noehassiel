@@ -45,10 +45,16 @@
                     <x-ui.dropdown.item icon="envelope" wire:click="openSendModal">
                         Enviar por correo
                     </x-ui.dropdown.item>
-                    <x-ui.dropdown.item icon="chat-bubble-left-ellipsis" href="{{ $this->getWhatsappLink() }}"
-                        target="_blank">
-                        Compartir por WhatsApp
-                    </x-ui.dropdown.item>
+                    @if ($proposal->isShared())
+                        <x-ui.dropdown.item icon="chat-bubble-left-ellipsis" href="{{ $this->whatsappLink() }}"
+                            target="_blank">
+                            Compartir por WhatsApp
+                        </x-ui.dropdown.item>
+                    @else
+                        <x-ui.dropdown.item icon="link" wire:click="enableSharing">
+                            Crear link privado
+                        </x-ui.dropdown.item>
+                    @endif
                 </x-slot:menu>
             </x-ui.dropdown>
 

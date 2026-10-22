@@ -3,7 +3,6 @@
 namespace App\Ai\Agents;
 
 use App\Enums\ProposalProjectType;
-use App\Enums\ProposalService;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Ai\Attributes\MaxTokens;
 use Laravel\Ai\Attributes\Model;
@@ -32,8 +31,8 @@ class ProposalDrafter implements Agent, HasStructuredOutput
      */
     public function instructions(): Stringable|string
     {
-        $services = collect(ProposalService::cases())
-            ->map(fn (ProposalService $service): string => "- {$service->label()}: {$service->scope()}")
+        $services = collect(ProposalProjectType::cases())
+            ->map(fn (ProposalProjectType $service): string => "- {$service->label()}: {$service->scope()}")
             ->implode("\n");
 
         return <<<PROMPT
@@ -41,7 +40,7 @@ class ProposalDrafter implements Agent, HasStructuredOutput
 
             You receive rough notes about a client's project (call notes, chat messages, bullet points) and turn them into a clear first draft that noehassiel will review and edit before sending.
 
-            Services noehassiel offers:
+            Project types (services noehassiel offers). Pick the one that fits best for "project_type"; use custom only when none does:
             {$services}
 
             Writing rules:

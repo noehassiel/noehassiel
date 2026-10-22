@@ -8,6 +8,9 @@ use App\Models\Proposal;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Resend\Contracts\Client as ResendClient;
+use Resend\Email;
+use Resend\Service\Email as ResendEmailService;
 
 uses(RefreshDatabase::class);
 
@@ -114,4 +117,44 @@ test('the pdf cannot be downloaded before unlocking', function () {
     Livewire::test(QuoteShow::class, ['token' => $this->proposal->public_token])
         ->call('downloadPdf')
         ->assertForbidden();
+});
+
+// ─── Sending ──────────────────────────────────────────────────────────────────
+
+test('emailing a proposal sends the private link without attaching the pdf', function () {
+    $proposal = Proposal::factory()->draft()->create();
+
+    $emails = Mockery::mock(ResendEmailService::class);
+    $emails->shouldReceive('send')
+        ->once()
+        ->withArgs(function (array $payload) use ($proposal): bool {
+            $proposal->refresh();
+
+            return ! isset($payload['attachments'])
+                && str_contains($payload['html'], $proposal->publicUrl())
+                && ! str_contains($payload['html'], $proposal->access_password);
+        })
+        ->andReturn(Email::from(['id' => 'fake-id']));
+
+    $resend = Mockery::mock(ResendClient::class);
+    $resend->shouldReceive('emails')->andReturn($emails);
+    app()->instance('resend', $resend);
+
+    Livewire::actingAs(User::factory()->admin()->create())
+        ->test(ProposalShow::class, ['proposal' => $proposal])
+        ->set('sendEmail', 'cliente@example.com')
+        ->call('sendByEmail')
+        ->assertHasNoErrors();
+
+    expect($proposal->fresh()->isShared())->toBeTrue();
+});
+
+test('the whatsapp message carries the private link but not the password', function () {
+    $component = Livewire::actingAs(User::factory()->admin()->create())
+        ->test(ProposalShow::class, ['proposal' => $this->proposal]);
+
+    $message = urldecode($component->instance()->whatsappLink());
+
+    expect($message)->toContain($this->proposal->publicUrl())
+        ->not->toContain($this->proposal->access_password);
 });

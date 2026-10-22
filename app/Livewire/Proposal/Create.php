@@ -4,7 +4,6 @@ namespace App\Livewire\Proposal;
 
 use App\Ai\Agents\ProposalDrafter;
 use App\Enums\ProposalProjectType;
-use App\Enums\ProposalService;
 use App\Livewire\Proposal\Concerns\SelectsRecipient;
 use App\Models\Client;
 use App\Models\Lead;
@@ -77,7 +76,7 @@ class Create extends Component
     #[Computed]
     public function services(): array
     {
-        return ProposalService::cases();
+        return ProposalProjectType::services();
     }
 
     /**
@@ -89,7 +88,7 @@ class Create extends Component
             ...$this->recipientRules(),
             'draftNotes' => 'required|string|min:20|max:20000',
             'draftServices' => 'array',
-            'draftServices.*' => [Rule::enum(ProposalService::class)],
+            'draftServices.*' => [Rule::enum(ProposalProjectType::class)],
         ]);
 
         try {
@@ -140,7 +139,7 @@ class Create extends Component
             'Budget range they selected' => $type === 'lead' ? $recipient->budget : null,
             'Timeline they selected' => $type === 'lead' ? $recipient->timeline : null,
             'Services to include' => collect($this->draftServices)
-                ->map(fn (string $service): string => ProposalService::from($service)->label())
+                ->map(fn (string $service): string => ProposalProjectType::from($service)->label())
                 ->implode(', ') ?: null,
         ])->filter()->map(fn (string $value, string $label): string => "{$label}: {$value}")->implode("\n");
 

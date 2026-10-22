@@ -212,7 +212,7 @@
                             @php
                                 $firstName = $proposal->client->contact_name
                                     ? explode(' ', trim($proposal->client->contact_name))[0]
-                                    : $proposal->client->name;
+                                    : $proposal->recipient()?->name;
                             @endphp
                             <h1 class="greeting"
                                 style="font-family:'Cabinet Grotesk',-apple-system,'Helvetica Neue',Arial,sans-serif;font-size:40px;font-weight:900;color:#FAFAF9;letter-spacing:-0.04em;line-height:1.02;margin:0 0 30px;">
@@ -262,7 +262,7 @@
                             {{-- Proposal meta --}}
                             <div class="prop-meta"
                                 style="font-family:'Geist Mono','Courier New',monospace;font-size:10px;color:#333;letter-spacing:0.04em;margin:0 0 40px;">
-                                {{ $proposal->project_type->label() }} · {{ $proposal->client->name }}
+                                {{ $proposal->project_type->label() }} · {{ $proposal->recipient()?->name }}
                             </div>
 
                             {{-- Investment label --}}
@@ -287,10 +287,14 @@
                                 </tr>
                             </table>
 
-                            {{-- Attachment note --}}
+                            {{-- Private link: the password travels on a separate channel --}}
+                            <a href="{{ $proposal->publicUrl() }}"
+                                style="display:inline-block;background-color:#FF420B;color:#0A0A0A;font-family:'Cabinet Grotesk',-apple-system,'Helvetica Neue',Arial,sans-serif;font-size:15px;font-weight:800;padding:14px 26px;border-radius:12px;margin:0 0 16px;">
+                                Ver propuesta
+                            </a>
                             <div class="attach-line"
-                                style="font-family:'Geist Mono','Courier New',monospace;font-size:10px;color:#363636;letter-spacing:0.1em;margin:0 0 10px;">
-                                ↳ PDF adjunto a este correo
+                                style="font-family:'Geist Mono','Courier New',monospace;font-size:10px;color:#6A6A6A;letter-spacing:0.1em;margin:0 0 10px;">
+                                ↳ Es privada. Te mando la contraseña por WhatsApp.
                             </div>
 
                             {{-- Validity --}}

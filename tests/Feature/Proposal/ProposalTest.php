@@ -67,7 +67,7 @@ test('can create a proposal', function () {
     Livewire::test(Create::class)
         ->set('recipient', "client:{$this->client->id}")
         ->set('title', 'Sitio web premium')
-        ->set('projectType', 'website')
+        ->set('projectType', 'web_design_development')
         ->set('whatWeDo', 'Diseño y desarrollo de sitio web')
         ->set('howWeDoIt', 'Usando Laravel y Tailwind CSS')
         ->set('stages.0.name', 'Diseño')
@@ -86,7 +86,7 @@ test('can create a proposal for a lead', function () {
     Livewire::test(Create::class)
         ->set('recipient', "lead:{$lead->id}")
         ->set('title', 'Propuesta para prospecto')
-        ->set('projectType', 'website')
+        ->set('projectType', 'web_design_development')
         ->set('whatWeDo', 'Diseño y desarrollo de sitio web')
         ->set('howWeDoIt', 'Usando Laravel y Tailwind CSS')
         ->set('stages.0.name', 'Diseño')
@@ -129,7 +129,7 @@ test('create proposal generates proposal number', function () {
     Livewire::test(Create::class)
         ->set('recipient', "client:{$this->client->id}")
         ->set('title', 'Test Proposal')
-        ->set('projectType', 'website')
+        ->set('projectType', 'web_design_development')
         ->set('whatWeDo', 'Something')
         ->set('howWeDoIt', 'Somehow')
         ->set('stages.0.name', 'Etapa inicial')
@@ -154,7 +154,7 @@ test('proposal stages are saved', function () {
     Livewire::test(Create::class)
         ->set('recipient', "client:{$this->client->id}")
         ->set('title', 'Staged Project')
-        ->set('projectType', 'webapp')
+        ->set('projectType', 'web_design')
         ->set('whatWeDo', 'Build a web app')
         ->set('howWeDoIt', 'Agile methodology')
         ->set('stages.0.name', 'Discovery')
@@ -243,7 +243,7 @@ test('can delete a proposal', function () {
 test('ai draft fills the form and leaves every price at zero', function () {
     ProposalDrafter::fake([[
         'title' => 'Sitio web para Café Origen',
-        'project_type' => 'website',
+        'project_type' => 'web_design_development',
         'what_we_do' => 'Un sitio que cuente tu historia.',
         'how_we_do_it' => 'Diseñamos y construimos en Laravel.',
         'includes' => ['Diseño UI', 'Desarrollo'],

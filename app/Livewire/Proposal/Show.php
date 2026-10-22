@@ -5,7 +5,6 @@ namespace App\Livewire\Proposal;
 use App\Enums\ProposalStatus;
 use App\Models\Proposal;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 use Livewire\Component;
 use Resend\Laravel\Facades\Resend;
@@ -38,19 +37,6 @@ class Show extends Component
         );
     }
 
-    public function generatePdfPath(): string
-    {
-        $pdf = Pdf::loadView('pdf.proposal', ['proposal' => $this->proposal])
-            ->setPaper('a4', 'portrait');
-
-        $filename = "proposals/{$this->proposal->number}.pdf";
-        Storage::put($filename, $pdf->output());
-
-        $this->proposal->update(['pdf_path' => $filename]);
-
-        return Storage::url($filename);
-    }
-
     public function openSendModal(): void
     {
         $this->showSendModal = true;
@@ -70,26 +56,21 @@ class Show extends Component
             'sendEmail' => 'required|email',
         ]);
 
+        // The email only carries the private link; the PDF lives behind the password
+        if (! $this->proposal->isShared()) {
+            $this->proposal->enableSharing();
+        }
+
         $html = view('emails.proposal', [
             'proposal' => $this->proposal,
             'customMessage' => $this->sendMessage,
         ])->render();
 
-        $pdfContent = Pdf::loadView('pdf.proposal', ['proposal' => $this->proposal])
-            ->setPaper('a4', 'portrait')
-            ->output();
-
         Resend::emails()->send([
             'from' => config('mail.from.name').' <'.config('mail.from.address').'>',
             'to' => [$this->sendEmail],
-            'subject' => "Proposal {$this->proposal->number} — {$this->proposal->title}",
+            'subject' => "Propuesta {$this->proposal->number} — {$this->proposal->title}",
             'html' => $html,
-            'attachments' => [
-                [
-                    'filename' => "proposal-{$this->proposal->number}.pdf",
-                    'content' => base64_encode($pdfContent),
-                ],
-            ],
         ]);
 
         $this->proposal->update([
@@ -103,10 +84,14 @@ class Show extends Component
         $this->dispatch('toast', message: 'Proposal enviado por correo.', type: 'success');
     }
 
-    public function getWhatsappLink(): string
+    /** Shares the private link only; send the password in a separate message. */
+    public function whatsappLink(): ?string
     {
-        $pdfUrl = $this->generatePdfPath();
-        $text = urlencode("Hola, te comparto el proposal #{$this->proposal->number}: {$pdfUrl}");
+        if (! $this->proposal->isShared()) {
+            return null;
+        }
+
+        $text = urlencode("Hola, te comparto la propuesta {$this->proposal->number}: {$this->proposal->publicUrl()}\nEn un momento te mando la contraseña.");
 
         return "https://wa.me/?text={$text}";
     }
