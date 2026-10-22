@@ -179,8 +179,14 @@ return [
         'talk' => 'Habla con Samantha',
     ],
 
+    'github' => [
+        'today' => 'hoy',
+        'week' => 'semana',
+        'streak' => 'racha',
+    ],
+
     'music' => [
-        'listening' => "estoy escuchando",
+        'listening' => 'estoy escuchando',
         'listening_short' => 'escuchando',
     ],
 

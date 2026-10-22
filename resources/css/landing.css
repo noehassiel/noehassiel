@@ -1108,6 +1108,79 @@ html.os1-intro .dock {
     color: var(--silver);
 }
 
+/* GitHub heatmap: tiny contribution calendar, desktop only */
+.dock-github {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 14px;
+    text-decoration: none;
+}
+
+.dock-github:hover {
+    border-color: rgba(250, 250, 249, 0.14);
+}
+
+.dock-github-stats {
+    display: flex;
+    gap: 10px;
+    white-space: nowrap;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--silver);
+}
+
+.dock-github-stats b {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--stone);
+    font-variant-numeric: tabular-nums;
+}
+
+.dock-github-streak {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.dock-github-streak svg {
+    color: var(--ember);
+}
+
+/* 52 days, oldest top-left, read like text */
+.dock-github-grid {
+    display: grid;
+    grid-template-columns: repeat(13, 7px);
+    gap: 3px;
+}
+
+.dock-github-grid i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(250, 250, 249, 0.08);
+}
+
+.dock-github-grid i[data-level="1"] { background: var(--ember-deep); opacity: 0.35; }
+.dock-github-grid i[data-level="2"] { background: var(--ember-deep); opacity: 0.65; }
+.dock-github-grid i[data-level="3"] { background: var(--ember); opacity: 0.85; }
+.dock-github-grid i[data-level="4"] { background: var(--ember); }
+
+/* Only wide screens have room; next to the player it needs a little more */
+@media (max-width: 1280px) {
+    .dock-github {
+        display: none;
+    }
+}
+
+@media (max-width: 1440px) {
+    .dock.has-music .dock-github {
+        display: none;
+    }
+}
+
 .dock-samantha {
     gap: 12px;
     font: inherit;

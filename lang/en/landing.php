@@ -179,6 +179,12 @@ return [
         'talk' => 'Talk to Samantha',
     ],
 
+    'github' => [
+        'today' => 'today',
+        'week' => 'week',
+        'streak' => 'streak',
+    ],
+
     'music' => [
         'listening' => "i'm listening",
         'listening_short' => 'listening',

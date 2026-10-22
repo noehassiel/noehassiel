@@ -46,6 +46,11 @@ return [
         'requests_per_day' => (int) env('OS1_REQUESTS_PER_DAY', 60),
     ],
 
+    'github' => [
+        'username' => env('GITHUB_USERNAME', 'noehassiel'),
+        'token' => env('GITHUB_TOKEN'),
+    ],
+
     'spotify' => [
         'client_id' => env('SPOTIFY_CLIENT_ID'),
         'client_secret' => env('SPOTIFY_CLIENT_SECRET'),

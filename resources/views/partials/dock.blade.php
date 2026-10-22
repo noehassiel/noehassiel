@@ -9,6 +9,24 @@
         <span class="dock-clock-label">Puebla, MX</span>
     </div>
 
+    @if ($contributions ?? null)
+        <a class="dock-widget dock-github" href="https://github.com/{{ config('services.github.username') }}" target="_blank" rel="noopener">
+            <span class="dock-github-stats">
+                <span><b>{{ $contributions['today'] }}</b> <x-t key="github.today" /></span>
+                <span><b>{{ $contributions['week'] }}</b> <x-t key="github.week" /></span>
+                <span class="dock-github-streak">
+                    <svg viewBox="0 0 24 24" width="12" height="12" aria-hidden="true"><path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2.5 1.5-3.5 2-5 1 1 1.5 2 1.5 3 1-1.5 1.5-4.5 1.5-8z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" /></svg>
+                    <b>{{ $contributions['streak'] }}</b> <x-t key="github.streak" />
+                </span>
+            </span>
+            <span class="dock-github-grid" aria-hidden="true">
+                @foreach ($contributions['days'] as $level)
+                    <i data-level="{{ $level }}"></i>
+                @endforeach
+            </span>
+        </a>
+    @endif
+
     <button type="button" class="dock-widget dock-samantha" id="os1-toggle"
         aria-expanded="false" aria-controls="os1-frame">
         <span class="dock-samantha-ring" aria-hidden="true"></span>
