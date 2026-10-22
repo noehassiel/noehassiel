@@ -9,6 +9,25 @@
     <title>{{ __('landing.meta.title', locale: 'en') }}</title>
     <meta name="description" content="{{ __('landing.meta.description', locale: 'en') }}">
     <meta name="theme-color" content="#FAFAF9">
+    <link rel="canonical" href="{{ url('/') }}">
+    @include('partials.favicons')
+
+    {{-- Social previews --}}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="noehassiel">
+    <meta property="og:url" content="{{ url('/') }}">
+    <meta property="og:title" content="{{ __('landing.meta.title', locale: 'en') }}">
+    <meta property="og:description" content="{{ __('landing.meta.description', locale: 'en') }}">
+    <meta property="og:image" content="{{ asset('og-image.png') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="noehassiel — artisan developer">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="es_MX">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ __('landing.meta.title', locale: 'en') }}">
+    <meta name="twitter:description" content="{{ __('landing.meta.description', locale: 'en') }}">
+    <meta name="twitter:image" content="{{ asset('og-image.png') }}">
 
     {{-- Apply the saved language and lock scroll for the intro before first paint --}}
     <script>
