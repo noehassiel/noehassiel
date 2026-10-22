@@ -179,6 +179,10 @@ return [
         'talk' => 'Talk to Samantha',
     ],
 
+    'music' => [
+        'listening' => "i'm listening",
+    ],
+
     'samantha' => [
         'open' => 'Talk to Samantha',
         'minimize' => 'Minimize Samantha',

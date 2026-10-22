@@ -1297,7 +1297,6 @@ html.os1-intro .dock {
 /* Narrow screens: the clock goes, the player takes the wide slot, sections become a one-at-a-time swipeable slot */
 @media (max-width: 860px) {
     .dock-clock,
-    .dock-music-label,
     .dock-music-play,
     .dock-samantha-name {
         display: none;
@@ -1317,6 +1316,10 @@ html.os1-intro .dock {
         min-width: 0;
         max-width: none;
         gap: 10px;
+    }
+
+    .dock-music-label {
+        font-size: 10px;
     }
 
     .dock-music-title {

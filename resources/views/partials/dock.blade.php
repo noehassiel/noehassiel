@@ -19,7 +19,7 @@
         <span class="dock-music-meta">
             <span class="dock-music-label" aria-hidden="true">
                 <span class="dock-music-bars"><i></i><i></i><i></i><i></i></span>
-                now playing
+                <x-t key="music.listening" />
             </span>
             <span class="dock-music-title" data-music-title></span>
             <span class="dock-music-artist" data-music-artist></span>
