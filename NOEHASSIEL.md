@@ -6,29 +6,30 @@ This project defines and develops the personal brand identity for **noehassiel**
 ## Who is noehassiel
 - **Name:** noehassiel (always lowercase, one word, no spaces/dots/hyphens)
 - **Tagline:** artisan developer (always lowercase, set in Geist Mono)
-- **Role:** Fullstack developer (Laravel) + UI/UX designer + Project Manager
-- **Location:** Puebla, Mexico
+- **Role:** Fullstack developer (Laravel) + Mobile app developer (NativePHP Super Native) + UI/UX designer + Project Manager
+- **Web + Mobile, one product:** Builds native iOS and Android apps with NativePHP Super Native — real SwiftUI and Jetpack Compose interfaces, no webview — from the same Laravel codebase that powers the website, in a single monorepo. When a client needs an app, it grows inside the same project instead of starting from zero: one team, one codebase, one source of truth across web, App Store and Google Play. Faster launches, lower maintenance, and features that ship everywhere at once. Native speed and native accessibility (screen readers, dynamic type) out of the box.
+- **Location:** Puebla, Mexico — working with clients worldwide, remote-first
 - **Current work:** PM at Console Clauger, collaborates with Estoria Studio (León, Gto.)
-- **Language:** Bilingual — Spanish for clients/market, English for code/technical/international contexts
+- **Language:** Bilingual — Spanish for Mexican and LATAM clients, English for international clients, code and technical contexts
 
 ## Brand Essence
-A developer with the soul of a designer. A designer with the soul of a developer. noehassiel exists at the intersection of code and design — the "unicorn" who bridges technical architecture and human-centered experience. The mission is to elevate the digital standard in Mexico, proving that well-crafted digital experiences are investments, not luxuries.
+A developer with the soul of a designer. A designer with the soul of a developer. noehassiel exists at the intersection of code and design — the "unicorn" who bridges technical architecture and human-centered experience. The mission is to raise the digital standard wherever the work lands — built in Mexico, crafted for the world — proving that well-crafted digital experiences are investments, not luxuries.
 
 ## Brand Personality Hierarchy (in order of dominance)
 1. **Cercana y humana** — The foundation. Speaks to you, not at you. A friend who's an expert.
-2. **Sofisticada y premium** — The execution. Polished, refined, worth every peso.
+2. **Sofisticada y premium** — The execution. Polished, refined, worth every peso, dollar or euro.
 3. **Rebelde y disruptiva** — The attitude. Quiet disruption through excellence.
 4. **Técnica y confiable** — The silent base. Deep expertise that ensures everything works.
 
 ## Brand Archetypes
 - **The Craftsman (60%)** — Builds with care, detail, pride. The "artisan" in artisan developer.
 - **The Sage (25%)** — Educates and empowers clients. Not condescending — enabling.
-- **The Rebel (15%)** — Challenges the Mexican digital market's status quo.
+- **The Rebel (15%)** — Challenges the status quo of cheap, generic digital work — in Mexico and beyond.
 
 ## Voice & Tone
 - **Voice:** Direct, warm, no pretension. Like a knowledgeable friend. No jargon, no corporate-speak.
 - **Communication style:** "Como un amigo que sabe de lo que habla" — direct and without fluff, but always warm.
-- **Bilingual strategy:** Spanish primary for client-facing. English strategic for tech credibility and code. The blend is natural, never forced.
+- **Bilingual strategy:** Speak the client's language: Spanish for Mexico and LATAM, English for international clients. English always for code and tech credibility. The blend is natural, never forced.
 - **Code comments:** Always in English.
 - **Pronouns:** "We" for collaboration, "I" when owning expertise.
 
@@ -109,7 +110,7 @@ These sites inform the aesthetic and communication direction:
 - [Untold](https://untold.site/en) — Storytelling as brand tool
 
 ## Target Audience
-**Primary:** Mexican businesses and brands ready to invest in quality digital presence — tired of cheap, generic solutions.
+**Primary:** Businesses and brands in Mexico and abroad (US, LATAM, Europe) ready to invest in quality digital presence — tired of cheap, generic solutions.
 **Secondary:** Clients through Estoria Studio seeking premium collaborative development.
 
 ## Content Pillars (Social Media)
@@ -126,7 +127,9 @@ These sites inform the aesthetic and communication direction:
 - Avoid: synergies, leveraging, scalable solutions, disruptive (as buzzword)
 
 ## Technical Context
-- **Stack:** Laravel, Tailwind CSS, GSAP/Framer Motion
+- **Stack:** Laravel, Tailwind CSS, GSAP/Framer Motion, NativePHP Super Native (SwiftUI on iOS, Jetpack Compose on Android, written once in Blade-style EDGE components)
+- **Web + mobile monorepo:** Website and native apps live in one Laravel project. Shared business logic, models and APIs. One codebase, every platform.
+- **Client pitch (ES):** "Empezamos con tu web. Y cuando tu negocio necesite una app, la construimos dentro del mismo proyecto: mismo equipo, misma lógica, mismos datos. Sin empezar de cero, sin tres proveedores distintos."
 - **The "artisan" easter egg:** `php artisan` is Laravel's CLI command — the word "artisan" bridges the brand identity with the actual development tool used daily.
 - **Grid:** 8px base grid, 12-column layouts for web
 - **Performance target:** Lighthouse 95+ on all metrics
