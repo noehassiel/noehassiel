@@ -3,7 +3,11 @@
 namespace App\Livewire\Portal;
 
 use App\Enums\ProjectStatus;
+use App\Enums\RequirementStatus;
+use App\Mail\RequirementUploadedMail;
 use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -29,7 +33,14 @@ class ProjectShow extends Component
 
         $this->authorize('markRequirementUploaded', [$this->project, $requirement]);
 
+        // Only a real change notifies the admin; double clicks or re-marks stay silent
+        if ($requirement->status !== RequirementStatus::Pending) {
+            return;
+        }
+
         $requirement->markUploadedByClient();
+
+        Mail::to(config('app.admin_email'))->queue(new RequirementUploadedMail($requirement, Auth::user()));
     }
 
     public function render(): View

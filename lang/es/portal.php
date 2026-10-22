@@ -82,4 +82,12 @@ return [
         'title' => 'Seguridad',
     ],
 
+    'reminder' => [
+        'subject' => '{1} Falta 1 cosa para avanzar con tu proyecto|[2,*] Faltan :count cosas para avanzar con tu proyecto',
+        'greeting' => 'Hola,',
+        'body' => 'Para seguir avanzando necesitamos lo siguiente. Súbelo a tu carpeta compartida y márcalo como "Ya lo subí" en tu portal.',
+        'action' => 'Ir a mi portal',
+        'footnote' => 'Te escribimos cada pocos días mientras haya pendientes. Si ya lo enviaste, márcalo en el portal y dejamos de recordártelo.',
+    ],
+
 ];

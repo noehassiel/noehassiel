@@ -82,4 +82,12 @@ return [
         'title' => 'Security',
     ],
 
+    'reminder' => [
+        'subject' => '{1} 1 item needed to move your project forward|[2,*] :count items needed to move your project forward',
+        'greeting' => 'Hi,',
+        'body' => 'To keep moving we need the following. Upload it to your shared folder and mark it as "I uploaded it" in your portal.',
+        'action' => 'Go to my portal',
+        'footnote' => 'We write every few days while items are pending. If you already sent it, mark it in the portal and the reminders stop.',
+    ],
+
 ];

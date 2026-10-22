@@ -129,7 +129,7 @@ test('providers are detected from the folder url', function (string $url, string
 
 test('requirements are added at the end of the checklist', function () {
     $project = Project::factory()->create();
-    ProjectRequirement::factory()->for($project)->create(['position' => 4]);
+    ProjectRequirement::factory()->for($project)->create(['title' => 'Fotografías de producto', 'position' => 4]);
 
     Livewire::test(Show::class, ['project' => $project])
         ->set('requirementTitle', 'Logo en vector')

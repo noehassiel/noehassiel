@@ -21,6 +21,13 @@ class Client extends Model
         'notes',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'reminded_at' => 'datetime',
+        ];
+    }
+
     public function projects()
     {
         return $this->hasMany(Project::class);

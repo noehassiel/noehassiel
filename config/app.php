@@ -29,6 +29,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Portal Reminder Interval
+    |--------------------------------------------------------------------------
+    |
+    | Minimum days between reminder emails to a client team while they still
+    | owe deliverables, so a daily schedule never turns into daily spam.
+    |
+    */
+
+    'portal_reminder_days' => (int) env('PORTAL_REMINDER_DAYS', 3),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |
