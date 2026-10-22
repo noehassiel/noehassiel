@@ -4,13 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Ai\Agents\Samantha;
 use App\Http\Requests\Os1ReplyRequest;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Http;
 use Laravel\Ai\Audio;
 use Laravel\Ai\Enums\Lab;
-use Laravel\Ai\Responses\AudioResponse;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Os1Controller extends Controller
 {
@@ -21,37 +24,44 @@ class Os1Controller extends Controller
     public const BRIEF_LINES = ['name', 'about', 'type', 'budget', 'timeline', 'contact', 'review'];
 
     /**
-     * The greeting is synthesized once and served from disk, so it plays instantly and costs nothing after the first visit.
+     * URLs for every fixed line Samantha says, per language. The hash in each URL changes with the text
+     * or the voice, so the CDN can cache them forever without ever serving a stale line.
+     *
+     * @return array<string, array<string, string>>
      */
-    public function greeting(Request $request): BinaryFileResponse
+    public static function voiceUrls(): array
     {
-        return $this->cachedSpeech(Samantha::GREETINGS[$this->language($request->query('language'))]);
+        return collect(Samantha::LANGUAGES)->mapWithKeys(fn (string $language): array => [
+            $language => collect(['greeting', ...self::BRIEF_LINES])->mapWithKeys(fn (string $line): array => [
+                $line => route('os1.voice', [
+                    'line' => $line,
+                    'language' => $language,
+                    'hash' => self::lineHash(self::lineText($line, $language)),
+                ]),
+            ])->all(),
+        ])->all();
     }
 
     /**
-     * Samantha's fixed lines for the project brief, e.g. "What's your name?".
+     * Fixed lines live in the shared cache (the filesystem isn't shared between instances on Laravel Cloud)
+     * and are served as cacheable .mp3 files, so after the first request the CDN answers instantly.
      */
-    public function line(Request $request, string $key): BinaryFileResponse
+    public function voice(string $line, string $language, string $hash): Response
     {
-        abort_unless(in_array($key, self::BRIEF_LINES, true), 404);
+        abort_unless(in_array($line, ['greeting', ...self::BRIEF_LINES], true), 404);
+        abort_unless(in_array($language, Samantha::LANGUAGES, true), 404);
 
-        return $this->cachedSpeech(__("landing.brief.questions.{$key}", locale: $this->language($request->query('language'))));
-    }
+        $text = self::lineText($line, $language);
+        abort_unless(hash_equals(self::lineHash($text), $hash), 404);
 
-    /**
-     * Fixed lines are synthesized once and served from disk, so they play instantly and cost nothing after the first visit.
-     */
-    private function cachedSpeech(string $text): BinaryFileResponse
-    {
-        $path = 'os1/line-'.md5($text.config('services.os1.voice_id')).'.mp3';
+        $audio = Cache::rememberForever("os1.voice.{$hash}", fn (): string => Audio::of($text)
+            ->voice(config('services.os1.voice_id'))
+            ->generate(provider: Lab::ElevenLabs, model: self::VOICE_MODEL)
+            ->audio);
 
-        if (! Storage::disk('local')->exists($path)) {
-            Storage::disk('local')->put($path, $this->synthesize($text)->content());
-        }
-
-        return response()->file(Storage::disk('local')->path($path), [
+        return response(base64_decode($audio), 200, [
             'Content-Type' => 'audio/mpeg',
-            'Cache-Control' => 'public, max-age=604800',
+            'Cache-Control' => 'public, max-age=31536000, immutable',
         ]);
     }
 
@@ -88,6 +98,49 @@ class Os1Controller extends Controller
     }
 
     /**
+     * Streams a reply's audio straight from ElevenLabs, so playback starts before synthesis finishes.
+     * The token is the encrypted text, so only replies this app produced can be spoken.
+     */
+    public function speech(Request $request): StreamedResponse
+    {
+        try {
+            $payload = json_decode(Crypt::decryptString((string) $request->query('t')), true);
+        } catch (DecryptException) {
+            abort(404);
+        }
+
+        abort_if(($payload['expires'] ?? 0) < now()->timestamp, 410);
+
+        $body = Http::withHeaders(['xi-api-key' => config('ai.providers.eleven.key')])
+            ->withOptions(['stream' => true])
+            ->accept('audio/mpeg')
+            ->timeout(30)
+            ->post('https://api.elevenlabs.io/v1/text-to-speech/'.config('services.os1.voice_id').'/stream?output_format=mp3_44100_64', [
+                'text' => $payload['text'],
+                'model_id' => self::VOICE_MODEL,
+            ])
+            ->throw()
+            ->toPsrResponse()
+            ->getBody();
+
+        return response()->stream(function () use ($body): void {
+            while (! $body->eof()) {
+                echo $body->read(4096);
+
+                if (ob_get_level() > 0) {
+                    ob_flush();
+                }
+
+                flush();
+            }
+        }, 200, [
+            'Content-Type' => 'audio/mpeg',
+            'Cache-Control' => 'no-store',
+            'X-Accel-Buffering' => 'no',
+        ]);
+    }
+
+    /**
      * @return 'en'|'es'
      */
     private function language(mixed $language): string
@@ -95,23 +148,33 @@ class Os1Controller extends Controller
         return in_array($language, Samantha::LANGUAGES, true) ? $language : 'en';
     }
 
+    /**
+     * Return the text right away with a short-lived URL that streams its audio.
+     */
     private function speak(string $text, bool $finished = false, ?string $section = null): JsonResponse
     {
-        $audio = $this->synthesize($text);
+        $token = Crypt::encryptString(json_encode([
+            'text' => $text,
+            'expires' => now()->addMinutes(5)->timestamp,
+        ]));
 
         return response()->json([
             'text' => $text,
-            'audio' => $audio->audio,
-            'mime' => $audio->mimeType() ?? 'audio/mpeg',
+            'audio_url' => route('os1.speech', ['t' => $token]),
             'finished' => $finished,
             'section' => $section,
         ]);
     }
 
-    private function synthesize(string $text): AudioResponse
+    private static function lineText(string $line, string $language): string
     {
-        return Audio::of($text)
-            ->voice(config('services.os1.voice_id'))
-            ->generate(provider: Lab::ElevenLabs, model: self::VOICE_MODEL);
+        return $line === 'greeting'
+            ? Samantha::GREETINGS[$language]
+            : __("landing.brief.questions.{$line}", locale: $language);
+    }
+
+    private static function lineHash(string $text): string
+    {
+        return substr(md5($text.config('services.os1.voice_id').self::VOICE_MODEL), 0, 12);
     }
 }

@@ -1,6 +1,6 @@
 <div class="loader os1" id="sam" data-state="INIT_BOOT" data-open="true"
     data-reply-url="{{ route('os1.reply') }}"
-    data-greeting-url="{{ route('os1.greeting') }}"
+    data-voice-urls='@json(\App\Http\Controllers\Os1Controller::voiceUrls())'
     data-greetings='@json(\App\Ai\Agents\Samantha::GREETINGS)'>
     <audio id="myAudio" preload="auto">
         <source src="{{ asset('sounds/start.ogg') }}" type="audio/ogg">

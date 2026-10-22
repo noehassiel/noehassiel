@@ -1,7 +1,10 @@
 <?php
 
 use App\Ai\Agents\Samantha;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\Os1Controller;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Laravel\Ai\Audio;
 use Laravel\Ai\Prompts\AgentPrompt;
@@ -19,12 +22,11 @@ it('replies with text and synthesized audio', function () {
         ->assertSuccessful()
         ->assertJson([
             'text' => 'Suena increíble. ¿Para cuándo lo necesitas?',
-            'audio' => base64_encode('fake-mp3'),
             'finished' => false,
         ]);
 
     Samantha::assertPrompted('Quiero una tienda en línea');
-    Audio::assertGenerated(fn ($prompt) => $prompt->contains('Suena increíble'));
+    Audio::assertNothingGenerated();
 });
 
 it('keeps the conversation history in the session', function () {
@@ -73,16 +75,6 @@ it('rate limits each visitor', function () {
     $this->postJson(route('os1.reply'), ['conversation' => $this->conversation, 'message' => 'c'])->assertTooManyRequests();
 });
 
-it('synthesizes the greeting once and serves it from disk', function () {
-    Storage::fake('local');
-
-    $this->get(route('os1.greeting'))->assertSuccessful();
-    $this->get(route('os1.greeting'))->assertSuccessful();
-
-    Audio::assertGenerated(fn ($prompt) => $prompt->contains(Samantha::GREETINGS['en']));
-    expect(Storage::disk('local')->files('os1'))->toHaveCount(1);
-});
-
 it('instructs the agent to reply in english by default', function () {
     Samantha::fake([['reply' => 'Sounds great.', 'section' => 'none']]);
 
@@ -117,17 +109,6 @@ it('says goodbye in the selected language at the turn cap', function () {
 
     $this->postJson(route('os1.reply'), ['conversation' => $this->conversation, 'message' => 'c', 'language' => 'es'])
         ->assertJson(['text' => Samantha::FAREWELLS['es'], 'finished' => true]);
-});
-
-it('caches a greeting per language', function () {
-    Storage::fake('local');
-
-    $this->get(route('os1.greeting'))->assertSuccessful();
-    $this->get(route('os1.greeting', ['language' => 'es']))->assertSuccessful();
-    $this->get(route('os1.greeting', ['language' => 'fr']))->assertSuccessful();
-
-    Audio::assertGenerated(fn ($prompt) => $prompt->contains(Samantha::GREETINGS['es']));
-    expect(Storage::disk('local')->files('os1'))->toHaveCount(2);
 });
 
 it('starts a fresh conversation on a new visit even after the turn cap', function () {
@@ -177,4 +158,55 @@ it('tells samantha which sections exist', function () {
 
     Samantha::assertPrompted(fn (AgentPrompt $prompt) => collect(array_keys(Samantha::SECTIONS))
         ->every(fn (string $key) => str_contains($prompt->agent->instructions(), "- {$key}:")));
+});
+
+it('returns a streaming audio url that only speaks the reply it was made for', function () {
+    Samantha::fake([['reply' => 'Hola, soy Samantha.', 'section' => 'none']]);
+    config(['ai.providers.eleven.key' => 'test-key']);
+    Http::fake(['api.elevenlabs.io/*' => Http::response('mp3-bytes', 200, ['Content-Type' => 'audio/mpeg'])]);
+
+    $url = $this->postJson(route('os1.reply'), ['conversation' => $this->conversation, 'message' => 'Hola', 'language' => 'es'])
+        ->assertSuccessful()
+        ->json('audio_url');
+
+    $this->get($url)->assertSuccessful()->assertStreamed()->assertStreamedContent('mp3-bytes');
+
+    Http::assertSent(fn ($request) => str_contains($request->url(), '/stream')
+        && $request['text'] === 'Hola, soy Samantha.'
+        && $request->header('xi-api-key')[0] === 'test-key');
+});
+
+it('rejects forged or expired speech tokens', function () {
+    Http::fake();
+
+    $this->get(route('os1.speech', ['t' => 'forged']))->assertNotFound();
+
+    $expired = Crypt::encryptString(json_encode(['text' => 'Hi', 'expires' => now()->subMinute()->timestamp]));
+    $this->get(route('os1.speech', ['t' => $expired]))->assertStatus(410);
+
+    Http::assertNothingSent();
+});
+
+it('serves fixed lines as cacheable mp3s, synthesized once', function () {
+    $urls = Os1Controller::voiceUrls();
+
+    expect($urls)->toHaveKeys(['en', 'es'])
+        ->and($urls['es'])->toHaveKeys(['greeting', 'name', 'review']);
+
+    $this->get($urls['es']['greeting'])
+        ->assertSuccessful()
+        ->assertHeader('Content-Type', 'audio/mpeg')
+        ->assertHeader('Cache-Control', 'immutable, max-age=31536000, public')
+        ->assertCookieMissing('laravel_session');
+    $this->get($urls['es']['greeting'])->assertSuccessful();
+
+    Audio::assertGenerated(fn ($prompt) => $prompt->contains(Samantha::GREETINGS['es']));
+    expect(Cache::has('os1.voice.'.Str::afterLast(Str::beforeLast($urls['es']['greeting'], '.mp3'), '-')))->toBeTrue();
+});
+
+it('404s fixed lines with a stale hash or unknown line', function () {
+    $this->get('/os1/voice/greeting-en-000000000000.mp3')->assertNotFound();
+    $this->get('/os1/voice/nope-en-000000000000.mp3')->assertNotFound();
+
+    Audio::assertNothingGenerated();
 });

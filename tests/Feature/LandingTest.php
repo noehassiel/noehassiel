@@ -7,8 +7,6 @@ use App\Models\Lead;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Storage;
-use Laravel\Ai\Audio;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -153,16 +151,4 @@ it('rate limits brief submissions per visitor', function () {
     fillBrief()->call('submit')->assertHasErrors('message');
 
     expect(Lead::query()->count())->toBe(3);
-});
-
-it('serves samantha\'s brief questions as cached audio', function () {
-    Storage::fake('local');
-    Audio::fake([base64_encode('fake-mp3')]);
-
-    $this->get(route('os1.line', ['key' => 'name', 'language' => 'es']))->assertSuccessful();
-    $this->get(route('os1.line', ['key' => 'name', 'language' => 'es']))->assertSuccessful();
-    $this->get(route('os1.line', ['key' => 'nope']))->assertNotFound();
-
-    Audio::assertGenerated(fn ($prompt) => $prompt->contains('¿Cómo te llamas?'));
-    expect(Storage::disk('local')->files('os1'))->toHaveCount(1);
 });

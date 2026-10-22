@@ -12,8 +12,13 @@ use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Models\Invoice;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 Route::namespace('App\Http\Controllers')->group(
     function () {
@@ -21,10 +26,22 @@ Route::namespace('App\Http\Controllers')->group(
     }
 );
 
-Route::prefix('os1')->name('os1.')->middleware('throttle:os1')->group(function () {
-    Route::get('greeting', [Os1Controller::class, 'greeting'])->name('greeting');
-    Route::get('line/{key}', [Os1Controller::class, 'line'])->name('line');
-    Route::post('reply', [Os1Controller::class, 'reply'])->name('reply');
+Route::prefix('os1')->name('os1.')->group(function () {
+    // Only replies cost money per request, so only they are rate limited; audio URLs are minted by replies or fixed
+    Route::post('reply', [Os1Controller::class, 'reply'])->middleware('throttle:os1')->name('reply');
+    Route::get('speech', [Os1Controller::class, 'speech'])->name('speech');
+
+    // No session or cookies, so Cloudflare can cache the fixed lines at the edge
+    Route::get('voice/{line}-{language}-{hash}.mp3', [Os1Controller::class, 'voice'])
+        ->where(['line' => '[a-z]+', 'language' => 'en|es', 'hash' => '[a-f0-9]{12}'])
+        ->withoutMiddleware([
+            StartSession::class,
+            ShareErrorsFromSession::class,
+            AddQueuedCookiesToResponse::class,
+            PreventRequestForgery::class,
+            EncryptCookies::class,
+        ])
+        ->name('voice');
 });
 
 Route::get('spotify/now-playing', [SpotifyController::class, 'nowPlaying'])

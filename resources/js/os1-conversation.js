@@ -54,6 +54,7 @@ if ($root && $talk) {
     };
 
     const greetings = JSON.parse($root.dataset.greetings);
+    const voiceUrls = JSON.parse($root.dataset.voiceUrls);
     const $toggle = document.getElementById('os1-toggle');
     const $minimize = document.getElementById('os1-minimize');
 
@@ -176,20 +177,20 @@ if ($root && $talk) {
             }
 
             if (data.finished) {
-                await speak(`data:${data.mime};base64,${data.audio}`, data.text);
+                await speak(data.audio_url, data.text);
                 setTimeout(() => (isDocked() ? setOpen(false) : window.os1?.leave()), 800);
 
                 return;
             }
 
             if (data.section) {
-                await speak(`data:${data.mime};base64,${data.audio}`, data.text);
+                await speak(data.audio_url, data.text);
                 goToSection(data.section);
 
                 return;
             }
 
-            await speakThenListen(`data:${data.mime};base64,${data.audio}`, data.text);
+            await speakThenListen(data.audio_url, data.text);
         } catch {
             showCaption(t('offline'));
             setMode('idle');
@@ -214,9 +215,15 @@ if ($root && $talk) {
 
         let transcript = '';
 
+        // Chrome waits 1–2s of silence before ending; stop sooner once words stop arriving
+        let silenceTimer = null;
+
         recognition.onresult = (event) => {
             transcript = Array.from(event.results).map((result) => result[0].transcript).join(' ');
             showCaption(transcript);
+
+            clearTimeout(silenceTimer);
+            silenceTimer = setTimeout(() => recognition?.stop(), 800);
         };
 
         recognition.onerror = (event) => {
@@ -251,7 +258,7 @@ if ($root && $talk) {
         }
 
         started = true;
-        const playedToEnd = await speak(`${$root.dataset.greetingUrl}?language=${language}`, greetings[language]);
+        const playedToEnd = await speak(voiceUrls[language].greeting, greetings[language]);
 
         if (!playedToEnd) {
             // Autoplay blocked: fall back to the "Talk to me" button, whose click unlocks audio

@@ -5,7 +5,7 @@
     $stepNumber = array_search($step, $questionSteps, true);
 @endphp
 
-<div class="brief" data-brief data-line-url="{{ route('os1.line', ['key' => '__KEY__']) }}">
+<div class="brief" data-brief>
     @if ($sent)
         <div class="brief-card" role="status">
             <p class="brief-title"><x-t key="form.success_title" /></p>

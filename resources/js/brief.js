@@ -37,7 +37,14 @@ window.brief = {
             return;
         }
 
-        voice.src = $brief.dataset.lineUrl.replace('__KEY__', key) + `?language=${getLanguage()}`;
+        const urls = JSON.parse(document.getElementById('sam')?.dataset.voiceUrls ?? '{}');
+        const src = urls[getLanguage()]?.[key];
+
+        if (!src) {
+            return;
+        }
+
+        voice.src = src;
         window.os1?.setVoice(voice);
         voice.play().catch(() => {});
     },
