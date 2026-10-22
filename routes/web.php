@@ -17,7 +17,6 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 Route::namespace('App\Http\Controllers')->group(
@@ -63,9 +62,9 @@ Route::middleware(['auth', 'can:access-admin'])->group(function () {
 
     Route::get('invoices/{invoice}/download', function (Invoice $invoice) {
         abort_unless(request()->hasValidSignature(), 403);
-        abort_unless($invoice->zip_path && Storage::disk('local')->exists($invoice->zip_path), 404);
+        abort_unless($invoice->hasZip(), 404);
 
-        return Storage::disk('local')->download(
+        return Invoice::disk()->download(
             $invoice->zip_path,
             "factura-{$invoice->number}.zip"
         );

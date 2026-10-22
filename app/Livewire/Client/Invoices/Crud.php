@@ -4,6 +4,8 @@ namespace App\Livewire\Client\Invoices;
 
 use App\Models\Client;
 use App\Models\Invoice;
+use Illuminate\Support\Facades\URL;
+use Illuminate\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -58,7 +60,7 @@ class Crud extends Component
     {
         $this->validate();
 
-        $path = $this->zip->store("invoices/{$this->client->id}", 'local');
+        $path = $this->zip->store("invoices/{$this->client->id}", Invoice::diskName());
 
         $invoice = Invoice::create([
             'client_id' => $this->client->id,
@@ -77,14 +79,14 @@ class Crud extends Component
 
         $html = view('emails.invoice', [
             'invoice' => $invoice,
-            'downloadUrl' => \Illuminate\Support\Facades\URL::signedRoute(
+            'downloadUrl' => URL::signedRoute(
                 'invoices.download',
                 ['invoice' => $invoice],
                 now()->addDays(30)
             ),
         ])->render();
 
-        $zipContent = \Illuminate\Support\Facades\Storage::disk('local')->get($path);
+        $zipContent = Invoice::disk()->get($path);
 
         Resend::emails()->send([
             'from' => config('mail.from.name').' <'.config('mail.from.address').'>',
@@ -120,7 +122,7 @@ class Crud extends Component
         $this->resetValidation();
     }
 
-    public function render(): \Illuminate\View\View
+    public function render(): View
     {
         return view('livewire.client.invoices.crud', [
             'invoices' => $this->client->invoices()->latest()->get(),

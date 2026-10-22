@@ -36,7 +36,8 @@ function fakeResend(): ResendEmailService&MockInterface
 beforeEach(function () {
     $this->user = User::factory()->admin()->create();
     $this->client = Client::factory()->create(['email' => 'client@example.com']);
-    Storage::fake('local');
+    config(['filesystems.invoices_disk' => 'r2']);
+    Storage::fake('r2');
     fakeResend();
 });
 
@@ -116,7 +117,7 @@ test('sendInvoice creates invoice, stores zip and sends via Resend', function ()
     expect($invoice->sent_at)->not->toBeNull();
     expect($invoice->zip_path)->not->toBeNull();
 
-    Storage::disk('local')->assertExists($invoice->zip_path);
+    Storage::disk('r2')->assertExists($invoice->zip_path);
 });
 
 test('download route returns 403 without valid signature', function () {

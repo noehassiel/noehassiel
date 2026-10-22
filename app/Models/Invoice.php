@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Invoice extends Model
 {
@@ -42,5 +44,29 @@ class Invoice extends Model
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
+    }
+
+    /**
+     * The disk that holds invoice ZIPs (R2 in production, see filesystems.invoices_disk).
+     */
+    public static function disk(): Filesystem
+    {
+        return Storage::disk(config('filesystems.invoices_disk'));
+    }
+
+    /**
+     * Name of the configured invoices disk, for APIs that take a disk name.
+     */
+    public static function diskName(): string
+    {
+        return config('filesystems.invoices_disk');
+    }
+
+    /**
+     * Whether the invoice's ZIP is actually present on the invoices disk.
+     */
+    public function hasZip(): bool
+    {
+        return $this->zip_path && static::disk()->exists($this->zip_path);
     }
 }

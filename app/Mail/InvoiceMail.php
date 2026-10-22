@@ -9,7 +9,6 @@ use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
 class InvoiceMail extends Mailable
@@ -45,14 +44,14 @@ class InvoiceMail extends Mailable
      */
     public function attachments(): array
     {
-        if (! $this->invoice->zip_path || ! Storage::disk('local')->exists($this->invoice->zip_path)) {
+        if (! $this->invoice->hasZip()) {
             return [];
         }
 
         $filename = "factura-{$this->invoice->number}.zip";
 
         return [
-            Attachment::fromStorageDisk('local', $this->invoice->zip_path)
+            Attachment::fromStorageDisk(Invoice::diskName(), $this->invoice->zip_path)
                 ->as($filename)
                 ->withMime('application/zip'),
         ];
