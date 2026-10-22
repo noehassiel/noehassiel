@@ -59,10 +59,13 @@ if ($dock) {
             }
 
             $music.hidden = !track;
+            $dock.classList.toggle('has-music', Boolean(track));
 
             // Check again when the song should end, so the next one shows up right away
             const untilEnd = track ? track.duration_ms - track.progress_ms + 1500 : Infinity;
             pollTimer = setTimeout(poll, Math.min(15000, untilEnd));
+
+            requestAnimationFrame(() => centerActiveLink($dock.querySelector('[aria-current="true"]')));
 
             if (!track) {
                 return;

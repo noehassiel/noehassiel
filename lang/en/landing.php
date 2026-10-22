@@ -181,6 +181,7 @@ return [
 
     'music' => [
         'listening' => "i'm listening",
+        'listening_short' => 'listening',
     ],
 
     'samantha' => [

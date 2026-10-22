@@ -1196,6 +1196,10 @@ html.os1-intro .dock {
     color: var(--ember);
 }
 
+.dock-music-label-short {
+    display: none;
+}
+
 /* Decorative equalizer: Spotify doesn't expose the audio, so the motion is staggered, not measured */
 .dock-music-bars {
     display: inline-flex;
@@ -1302,7 +1306,7 @@ html.os1-intro .dock {
         display: none;
     }
 
-    .dock:has(.dock-music:not([hidden])) {
+    .dock.has-music {
         width: calc(100vw - 32px);
     }
 
@@ -1318,8 +1322,18 @@ html.os1-intro .dock {
         gap: 10px;
     }
 
+    .dock-music-label-long {
+        display: none;
+    }
+
+    .dock-music-label-short {
+        display: inline;
+    }
+
     .dock-music-label {
         font-size: 10px;
+        white-space: nowrap;
+        overflow: hidden;
     }
 
     .dock-music-title {
@@ -1334,8 +1348,27 @@ html.os1-intro .dock {
         min-width: 0;
     }
 
-    .dock-apps {
+    /* Nothing playing: every section number shows, only the active one carries its label */
+    .dock:not(.has-music) .dock-app:not([aria-current="true"]) .dock-app-label {
+        display: none;
+    }
+
+    .dock:not(.has-music) .dock-apps li {
+        flex: 0 0 auto;
+    }
+
+    .dock:not(.has-music) .dock-app {
+        padding: 0 8px;
+    }
+
+    /* Playing: the player takes the wide slot, sections become a one-at-a-time swipeable slot */
+    .dock.has-music .dock-apps {
         flex: 0 0 112px;
+    }
+
+    .dock-apps {
+        flex: 1;
+        min-width: 0;
         padding: 0 4px;
         overflow-x: auto;
         overscroll-behavior-x: contain;
