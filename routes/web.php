@@ -2,8 +2,11 @@
 
 use App\Http\Controllers\Os1Controller;
 use App\Http\Controllers\SpotifyController;
+use App\Http\Middleware\UsePortalLocale;
 use App\Livewire\Client\Index as ClientIndex;
 use App\Livewire\Client\Show as ClientShow;
+use App\Livewire\Portal\AcceptInvitation;
+use App\Livewire\Portal\Home as PortalHome;
 use App\Livewire\Proposal\Create as ProposalCreate;
 use App\Livewire\Proposal\Edit as ProposalEdit;
 use App\Livewire\Proposal\Index as ProposalIndex;
@@ -16,6 +19,7 @@ use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -51,6 +55,32 @@ Route::get('spotify/callback', [SpotifyController::class, 'callback'])
     ->middleware('throttle:10,1')
     ->name('spotify.callback');
 
+// Where every login lands (Fortify "home"): the admin goes to the dashboard, client users to the portal
+Route::get('home', function () {
+    $user = auth()->user();
+
+    return match (true) {
+        Gate::allows('access-admin') => redirect()->route('dashboard'),
+        $user->isClient() => redirect()->route('portal.home'),
+        default => abort(403),
+    };
+})->middleware('auth')->name('home.redirect');
+
+// The emailed link is the credential, so whoever received the invoice can download it without an account
+Route::get('invoices/{invoice}/download', function (Invoice $invoice) {
+    abort_unless($invoice->hasZip(), 404);
+
+    return Invoice::disk()->download($invoice->zip_path, "factura-{$invoice->number}.zip");
+})->middleware(['signed', 'throttle:30,1'])->name('invoices.download');
+
+Route::get('invitations/{token}', AcceptInvitation::class)
+    ->middleware(['guest', 'throttle:20,1'])
+    ->name('invitations.accept');
+
+Route::prefix('portal')->name('portal.')->middleware(['auth', 'can:access-portal', UsePortalLocale::class])->group(function () {
+    Route::get('/', PortalHome::class)->name('home');
+});
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified', 'can:access-admin'])
     ->name('dashboard');
@@ -59,16 +89,6 @@ Route::middleware(['auth', 'can:access-admin'])->group(function () {
 
     Route::get('clients', ClientIndex::class)->name('clients.index');
     Route::get('clients/{client}', ClientShow::class)->name('clients.show');
-
-    Route::get('invoices/{invoice}/download', function (Invoice $invoice) {
-        abort_unless(request()->hasValidSignature(), 403);
-        abort_unless($invoice->hasZip(), 404);
-
-        return Invoice::disk()->download(
-            $invoice->zip_path,
-            "factura-{$invoice->number}.zip"
-        );
-    })->name('invoices.download');
 
     Route::get('proposals', ProposalIndex::class)->name('proposals.index');
     Route::get('proposals/create', ProposalCreate::class)->name('proposals.create');

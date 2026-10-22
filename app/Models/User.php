@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -28,6 +29,7 @@ class User extends Authenticatable implements PasskeyUser
     protected $fillable = [
         'name',
         'email',
+        'locale',
         'password',
     ];
 
@@ -65,5 +67,18 @@ class User extends Authenticatable implements PasskeyUser
             ->explode(' ')
             ->map(fn (string $name) => Str::of($name)->substr(0, 1))
             ->implode('');
+    }
+
+    public function client(): BelongsTo
+    {
+        return $this->belongsTo(Client::class);
+    }
+
+    /**
+     * Whether this account belongs to a client team (and so uses the portal, not the admin).
+     */
+    public function isClient(): bool
+    {
+        return $this->client_id !== null;
     }
 }

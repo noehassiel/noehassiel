@@ -28,7 +28,7 @@ test('users can finish logging in with a valid authentication code', function ()
     $code = app(Google2FA::class)->getCurrentOtp(decrypt($user->two_factor_secret));
 
     $this->post(route('two-factor.login.store'), ['code' => $code])
-        ->assertRedirect(route('dashboard', absolute: false));
+        ->assertRedirect(route('home.redirect', absolute: false));
 
     $this->assertAuthenticatedAs($user);
 });
@@ -39,7 +39,7 @@ test('users can finish logging in with a recovery code that is then spent', func
     $this->post(route('login.store'), ['email' => $user->email, 'password' => 'password']);
 
     $this->post(route('two-factor.login.store'), ['recovery_code' => 'recovery-code-one'])
-        ->assertRedirect(route('dashboard', absolute: false));
+        ->assertRedirect(route('home.redirect', absolute: false));
 
     $this->assertAuthenticatedAs($user);
     expect($user->fresh()->recoveryCodes())->not->toContain('recovery-code-one');

@@ -145,6 +145,9 @@
             {{-- Invoices section --}}
             <livewire:client.invoices.crud :client="$client" />
 
+            {{-- Portal access section --}}
+            <livewire:client.portal-users :client="$client" />
+
         </div>
     </div>
 </div>

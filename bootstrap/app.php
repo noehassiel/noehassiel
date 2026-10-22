@@ -11,7 +11,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Signed-in users who hit a guest page go to their own home (admin or portal)
+        $middleware->redirectUsersTo('/home');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

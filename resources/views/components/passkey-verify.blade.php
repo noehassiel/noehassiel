@@ -30,7 +30,7 @@
                     },
                 });
 
-                window.location.href = response.redirect || '{{ route('dashboard') }}';
+                window.location.href = response.redirect || '{{ route('home.redirect') }}';
             } catch (e) {
                 if (e.constructor?.name !== 'UserCancelledError') {
                     this.error = e.message;

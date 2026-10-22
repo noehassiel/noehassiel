@@ -31,6 +31,11 @@ class Client extends Model
         return $this->hasMany(User::class);
     }
 
+    public function invitations()
+    {
+        return $this->hasMany(ClientInvitation::class);
+    }
+
     public function invoices()
     {
         return $this->hasMany(Invoice::class);
