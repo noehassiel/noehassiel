@@ -1,13 +1,23 @@
 {
     "agents": [
-        "claude_code",
-        "cursor"
+        "claude_code"
     ],
-    "editors": [
-        "claude_code",
-        "cursor",
-        "vscode"
+    "cloud": true,
+    "guidelines": true,
+    "mcp": true,
+    "nightwatch": false,
+    "packages": [
+        "livewire/blaze"
     ],
-    "guidelines": [],
-    "herd_mcp": true
+    "sail": false,
+    "skills": [
+        "infer-conventions",
+        "deploying-to-cloud",
+        "laravel-best-practices",
+        "testing-best-practices",
+        "livewire-development",
+        "volt-development",
+        "tailwindcss-development",
+        "blaze-optimize"
+    ]
 }
