@@ -1294,30 +1294,50 @@ html.os1-intro .dock {
     background: var(--ember);
 }
 
-/* Narrow screens: the clock goes, the section numbers become a strip that follows the active section */
+/* Narrow screens: the clock goes, the player takes the wide slot, sections become a one-at-a-time swipeable slot */
 @media (max-width: 860px) {
     .dock-clock,
-    .dock-music-meta,
+    .dock-music-label,
     .dock-music-play,
-    .dock-samantha-name,
-    .dock-app:not([aria-current="true"]) .dock-app-label {
+    .dock-samantha-name {
         display: none;
     }
 
+    .dock:has(.dock-music:not([hidden])) {
+        width: calc(100vw - 32px);
+    }
+
     .dock-samantha,
-    .dock-music,
     .dock-language {
         flex-shrink: 0;
     }
 
-    .dock-apps {
+    .dock-music {
         flex: 1;
         min-width: 0;
+        max-width: none;
+        gap: 10px;
+    }
+
+    .dock-music-title {
+        font-size: 13px;
+    }
+
+    .dock-music-artist {
+        font-size: 11px;
+    }
+
+    .dock-music-progress {
+        min-width: 0;
+    }
+
+    .dock-apps {
+        flex: 0 0 112px;
+        padding: 0 4px;
         overflow-x: auto;
         overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
         scrollbar-width: none;
-        /* Faded edges hint that more sections sit off to the side */
-        mask-image: linear-gradient(to right, transparent, #000 16px, #000 calc(100% - 16px), transparent);
     }
 
     .dock-apps::-webkit-scrollbar {
@@ -1325,7 +1345,12 @@ html.os1-intro .dock {
     }
 
     .dock-apps li {
-        flex-shrink: 0;
+        flex: 0 0 100%;
+        scroll-snap-align: center;
+    }
+
+    .dock-app {
+        padding: 0 12px;
     }
 
     .dock-app-label {
@@ -1334,10 +1359,6 @@ html.os1-intro .dock {
 
     .dock-widget {
         padding: 0 10px;
-    }
-
-    .dock-app {
-        padding: 0 8px;
     }
 
     .dock-app-number {
