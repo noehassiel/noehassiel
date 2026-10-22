@@ -46,7 +46,7 @@
     @stack('scripts')
 
     @vite(['resources/js/app.js'])
-    @livewireScripts
+    @livewireScriptConfig
 
 
 </body>

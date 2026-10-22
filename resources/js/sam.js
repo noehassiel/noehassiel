@@ -142,7 +142,13 @@ if ($wrap) {
             return;
         }
 
-        x.play();
+        // Browsers block autoplay with sound until the user interacts; retry on first gesture
+        x.play().catch(() => {
+            const resume = () => x.play().catch(() => {});
+            ['pointerdown', 'keydown', 'touchstart'].forEach((type) => {
+                document.addEventListener(type, resume, { once: true });
+            });
+        });
 
         setTimeout(() => {
             toend = true;
