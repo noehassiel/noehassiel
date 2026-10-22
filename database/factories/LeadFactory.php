@@ -18,6 +18,7 @@ class LeadFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->safeEmail(),
+            'phone' => fake()->optional()->e164PhoneNumber(),
             'company' => fake()->optional()->company(),
             'project_type' => fake()->randomElement(Lead::PROJECT_TYPES),
             'budget' => fake()->randomElement(Lead::BUDGETS),

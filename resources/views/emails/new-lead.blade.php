@@ -24,6 +24,7 @@
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;color:#FAFAF9;line-height:1.6;">
                     @foreach ([
                         'Email' => $lead->email,
+                        'Teléfono' => $lead->phone ?? '—',
                         'Tipo' => __('landing.form.types.'.$lead->project_type, locale: 'es'),
                         'Presupuesto' => __('landing.form.budgets.'.$lead->budget, locale: 'es'),
                         'Tiempo' => __('landing.form.timelines.'.$lead->timeline, locale: 'es'),

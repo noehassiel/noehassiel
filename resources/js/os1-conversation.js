@@ -196,8 +196,11 @@ if ($root && $talk) {
         }
     };
 
+    // Set once recognition fails for good (e.g. Arc/Brave: Chromium without Google's speech service)
+    let micUnavailable = false;
+
     const listen = () => {
-        if (!Recognition) {
+        if (!Recognition || micUnavailable) {
             $textForm.hidden = false;
             $textForm.querySelector('input').focus();
 
@@ -221,6 +224,7 @@ if ($root && $talk) {
 
             // "no-speech" and "aborted" are normal; anything else means recognition can't work here
             if (event.error !== 'no-speech' && event.error !== 'aborted') {
+                micUnavailable = true;
                 showCaption(t('micUnavailable'));
                 $textForm.hidden = false;
                 $textForm.querySelector('input').focus();
@@ -309,8 +313,14 @@ if ($root && $talk) {
 
         if (!started) {
             greet();
-        } else if (mode === 'idle') {
-            listen();
+
+            return;
+        }
+
+        // Reopening: start clean and wait for the visitor to tap, instead of replaying her last answer
+        if (mode === 'idle') {
+            showCaption('');
+            setMode('idle');
         }
     });
 

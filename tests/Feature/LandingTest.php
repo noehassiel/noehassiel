@@ -4,11 +4,14 @@ use App\Ai\Agents\Samantha;
 use App\Livewire\Front\ProjectForm;
 use App\Mail\NewLeadMail;
 use App\Models\Lead;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Storage;
+use Laravel\Ai\Audio;
 use Livewire\Livewire;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     config(['services.leads.email' => 'hello@noehassiel.test']);
@@ -43,53 +46,99 @@ it('keeps sections in sync with what samantha can navigate to', function () {
     }
 });
 
-it('stores a lead and emails it', function () {
+function fillBrief()
+{
+    return Livewire::test(ProjectForm::class)
+        ->call('start')
+        ->set('name', 'Ana López')->call('next')
+        ->set('message', 'Necesitamos un sitio nuevo para nuestra cafetería en Puebla.')->call('next')
+        ->call('choose', 'projectType', 'website')
+        ->call('choose', 'budget', '30k_80k')
+        ->call('choose', 'timeline', '1_3_months')
+        ->set('email', 'ana@example.com')
+        ->set('phone', '+52 222 123 4567')->call('next');
+}
+
+it('walks the brief step by step to the review', function () {
+    Livewire::test(ProjectForm::class)
+        ->assertSet('step', 'intro')
+        ->call('start')->assertSet('step', 'name')
+        ->set('name', 'Ana')->call('next')->assertSet('step', 'about')
+        ->set('message', 'A website for our coffee shop in Puebla, with the menu.')->call('next')
+        ->assertSet('step', 'type')
+        ->call('choose', 'projectType', 'website')->assertSet('step', 'budget')
+        ->call('choose', 'budget', 'unsure')->assertSet('step', 'timeline')
+        ->call('choose', 'timeline', 'flexible')->assertSet('step', 'contact')
+        ->set('email', 'ana@example.com')->call('next')
+        ->assertSet('step', 'review')
+        ->assertSee(__('landing.brief.questions.review', locale: 'en'));
+});
+
+it('does not advance past a step with an invalid answer', function () {
+    Livewire::test(ProjectForm::class)
+        ->call('start')
+        ->call('next')
+        ->assertHasErrors('name')
+        ->assertSet('step', 'name');
+});
+
+it('goes back without losing answers', function () {
+    Livewire::test(ProjectForm::class)
+        ->call('start')
+        ->set('name', 'Ana')->call('next')
+        ->call('back')
+        ->assertSet('step', 'name')
+        ->assertSet('name', 'Ana');
+});
+
+it('lets the visitor correct answers on the review step', function () {
+    fillBrief()
+        ->assertSet('step', 'review')
+        ->call('choose', 'budget', 'over_150k')
+        ->assertSet('step', 'review')
+        ->assertSet('budget', 'over_150k');
+});
+
+it('rejects unknown choice fields', function () {
+    Livewire::test(ProjectForm::class)
+        ->call('choose', 'email', 'x')
+        ->assertStatus(422);
+});
+
+it('stores a lead with phone and emails it', function () {
     Mail::fake();
 
-    Livewire::test(ProjectForm::class)
-        ->set('name', 'Ana López')
-        ->set('email', 'ana@example.com')
-        ->set('projectType', 'website')
-        ->set('budget', '30k_80k')
-        ->set('timeline', '1_3_months')
-        ->set('message', 'Necesitamos un sitio nuevo para nuestra cafetería en Puebla.')
+    fillBrief()
         ->call('setLanguage', 'es')
         ->call('submit')
         ->assertHasNoErrors()
-        ->assertSet('sent', true);
+        ->assertSet('sent', true)
+        ->assertSet('step', 'intro');
 
     $lead = Lead::query()->sole();
-    expect($lead->name)->toBe('Ana López')->and($lead->language)->toBe('es');
+    expect($lead->name)->toBe('Ana López')
+        ->and($lead->phone)->toBe('+52 222 123 4567')
+        ->and($lead->language)->toBe('es');
 
     Mail::assertQueued(NewLeadMail::class, fn (NewLeadMail $mail) => $mail->hasTo('hello@noehassiel.test') && $mail->lead->is($lead));
 });
 
-it('validates the brief with messages in the visitor language', function () {
+it('validates contact details in the visitor language', function () {
     Livewire::test(ProjectForm::class)
         ->call('setLanguage', 'es')
+        ->set('step', 'contact')
         ->set('email', 'not-an-email')
-        ->set('budget', 'a-million')
-        ->set('message', 'Hola')
-        ->call('submit')
-        ->assertHasErrors(['name', 'email', 'projectType', 'budget', 'timeline', 'message'])
-        ->assertSee(__('landing.form.errors.email', locale: 'es'));
-
-    expect(Lead::query()->count())->toBe(0);
+        ->set('phone', 'call me maybe')
+        ->call('next')
+        ->assertHasErrors(['email', 'phone'])
+        ->assertSee(__('landing.form.errors.email', locale: 'es'))
+        ->assertSet('step', 'contact');
 });
 
 it('silently drops honeypot submissions', function () {
     Mail::fake();
 
-    Livewire::test(ProjectForm::class)
-        ->set('name', 'Bot')
-        ->set('email', 'bot@example.com')
-        ->set('projectType', 'website')
-        ->set('budget', 'unsure')
-        ->set('timeline', 'asap')
-        ->set('message', 'Buy cheap backlinks for your website today.')
-        ->set('website', 'https://spam.example')
-        ->call('submit')
-        ->assertSet('sent', true);
+    fillBrief()->set('website', 'https://spam.example')->call('submit')->assertSet('sent', true);
 
     expect(Lead::query()->count())->toBe(0);
     Mail::assertNothingQueued();
@@ -98,19 +147,22 @@ it('silently drops honeypot submissions', function () {
 it('rate limits brief submissions per visitor', function () {
     Mail::fake();
 
-    $submit = fn () => Livewire::test(ProjectForm::class)
-        ->set('name', 'Ana')
-        ->set('email', 'ana@example.com')
-        ->set('projectType', 'web_app')
-        ->set('budget', 'over_150k')
-        ->set('timeline', 'flexible')
-        ->set('message', 'A long enough description of the project we have in mind.')
-        ->call('submit');
-
-    $submit();
-    $submit();
-    $submit();
-    $submit()->assertHasErrors('message');
+    fillBrief()->call('submit');
+    fillBrief()->call('submit');
+    fillBrief()->call('submit');
+    fillBrief()->call('submit')->assertHasErrors('message');
 
     expect(Lead::query()->count())->toBe(3);
+});
+
+it('serves samantha\'s brief questions as cached audio', function () {
+    Storage::fake('local');
+    Audio::fake([base64_encode('fake-mp3')]);
+
+    $this->get(route('os1.line', ['key' => 'name', 'language' => 'es']))->assertSuccessful();
+    $this->get(route('os1.line', ['key' => 'name', 'language' => 'es']))->assertSuccessful();
+    $this->get(route('os1.line', ['key' => 'nope']))->assertNotFound();
+
+    Audio::assertGenerated(fn ($prompt) => $prompt->contains('¿Cómo te llamas?'));
+    expect(Storage::disk('local')->files('os1'))->toHaveCount(1);
 });

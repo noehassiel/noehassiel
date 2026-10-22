@@ -18,16 +18,35 @@ class Os1Controller extends Controller
 
     private const VOICE_MODEL = 'eleven_flash_v2_5';
 
+    public const BRIEF_LINES = ['name', 'about', 'type', 'budget', 'timeline', 'contact', 'review'];
+
     /**
      * The greeting is synthesized once and served from disk, so it plays instantly and costs nothing after the first visit.
      */
     public function greeting(Request $request): BinaryFileResponse
     {
-        $greeting = Samantha::GREETINGS[$this->language($request->query('language'))];
-        $path = 'os1/greeting-'.md5($greeting.config('services.os1.voice_id')).'.mp3';
+        return $this->cachedSpeech(Samantha::GREETINGS[$this->language($request->query('language'))]);
+    }
+
+    /**
+     * Samantha's fixed lines for the project brief, e.g. "What's your name?".
+     */
+    public function line(Request $request, string $key): BinaryFileResponse
+    {
+        abort_unless(in_array($key, self::BRIEF_LINES, true), 404);
+
+        return $this->cachedSpeech(__("landing.brief.questions.{$key}", locale: $this->language($request->query('language'))));
+    }
+
+    /**
+     * Fixed lines are synthesized once and served from disk, so they play instantly and cost nothing after the first visit.
+     */
+    private function cachedSpeech(string $text): BinaryFileResponse
+    {
+        $path = 'os1/line-'.md5($text.config('services.os1.voice_id')).'.mp3';
 
         if (! Storage::disk('local')->exists($path)) {
-            Storage::disk('local')->put($path, $this->synthesize($greeting)->content());
+            Storage::disk('local')->put($path, $this->synthesize($text)->content());
         }
 
         return response()->file(Storage::disk('local')->path($path), [
