@@ -13,7 +13,6 @@ it('renders the os1 launch sequence on the landing', function () {
         ->assertSee('data-state="INIT_BOOT"', false)
         ->assertSee('id="os1-frame"', false)
         ->assertSee('id="os1-progress-bar"', false)
-        ->assertSee('class="os1-window"', false)
-        ->assertSee('class="os1-dock-icon"', false)
+        ->assertSee('id="os1-conversation"', false)
         ->assertDontSee('three.js/r77', false);
 });

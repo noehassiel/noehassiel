@@ -1,6 +1,7 @@
 @import './theme.css'; /* By Sheaf.dev */
 @import 'tailwindcss';
 @import './cabinet-grotesk.css';
+@import './landing.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -115,77 +116,144 @@ body {
     background: #fff;
 }
 
-.os1-desktop {
-    position: absolute;
-    inset: 0;
-    perspective: 1200px;
-    perspective-origin: 50% 50%;
-}
-
-.os1-windows {
-    position: absolute;
-    left: 50%;
-    top: 55%;
-    transform-style: preserve-3d;
-}
-
-.os1-window {
-    position: absolute;
-    width: clamp(160px, 26vw, 300px);
-    aspect-ratio: 4 / 3;
-    translate: -70% -50%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 0 0 16px;
-    background: var(--os1-paper);
-    box-shadow: 0 24px 48px -20px rgba(90, 40, 20, 0.35);
-    will-change: transform, opacity;
-}
-
-.os1-window-bar {
-    height: 18px;
-    margin-bottom: 6px;
-    background: var(--os1-red);
-    opacity: 0.85;
-}
-
-.os1-window-line {
-    height: 6px;
-    margin: 0 16px;
-    background: var(--os1-ink);
-}
-
-.os1-window-line--short {
-    margin-right: 45%;
-}
-
-/* L-shaped dock in the bottom-left corner */
-.os1-dock {
+/* Conversation UI, only visible while the ring is listening/speaking */
+.os1-conversation {
     position: absolute;
     left: 24px;
+    right: 24px;
     bottom: 24px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    gap: 16px;
+    color: #fff;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
 }
 
-.os1-dock-column,
-.os1-dock-row {
+.os1[data-state="CONVERSATION"] .os1-conversation {
+    opacity: 1;
+    visibility: visible;
+}
+
+.os1-caption {
+    min-height: 3em;
+    max-width: 36ch;
+    margin: 0;
+    font-family: 'Cabinet Grotesk', system-ui, sans-serif;
+    font-size: clamp(16px, 2vw, 20px);
+    line-height: 1.5;
+    text-align: center;
+    text-wrap: balance;
+}
+
+.os1-controls,
+.os1-text-form {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 12px;
 }
 
-.os1-dock-column {
-    flex-direction: column;
+.os1-talk,
+.os1-leave,
+.os1-text-form button {
+    min-height: 44px;
+    padding: 0 20px;
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
-.os1-dock-icon {
-    width: 28px;
-    height: 28px;
-    border: 1.5px solid rgba(255, 255, 255, 0.85);
-    border-radius: 50%;
+.os1-talk:hover,
+.os1-text-form button:hover {
+    background: rgba(255, 255, 255, 0.12);
 }
+
+.os1-talk:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.os1[data-voice="listening"] .os1-talk {
+    background: #fff;
+    color: var(--os1-red);
+}
+
+.os1-language {
+    display: flex;
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.os1-language button {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.os1-language button[aria-pressed="true"] {
+    background: #fff;
+    color: var(--os1-red);
+}
+
+.os1-language button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -4px;
+}
+
+.os1-leave {
+    border-color: transparent;
+    opacity: 0.75;
+}
+
+.os1-leave:hover {
+    opacity: 1;
+}
+
+.os1-talk:focus-visible,
+.os1-leave:focus-visible,
+.os1-text-form :focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+.os1-text-form input {
+    min-width: min(320px, 60vw);
+    min-height: 44px;
+    padding: 0 16px;
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.08);
+    color: #fff;
+    font: inherit;
+    font-size: 14px;
+}
+
+.os1-text-form input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.os1-text-form[hidden] {
+    display: none;
+}
+
+
 
 .info {
     position: absolute;

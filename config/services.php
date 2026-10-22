@@ -35,4 +35,15 @@ return [
         ],
     ],
 
+    'leads' => [
+        'email' => env('LEADS_EMAIL', env('MAIL_FROM_ADDRESS')),
+    ],
+
+    'os1' => [
+        'voice_id' => env('ELEVENLABS_VOICE_ID'),
+        'max_turns' => (int) env('OS1_MAX_TURNS', 8),
+        'requests_per_minute' => (int) env('OS1_REQUESTS_PER_MINUTE', 6),
+        'requests_per_day' => (int) env('OS1_REQUESTS_PER_DAY', 60),
+    ],
+
 ];

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Os1Controller;
 use App\Livewire\Client\Index as ClientIndex;
 use App\Livewire\Client\Show as ClientShow;
 use App\Livewire\Proposal\Create as ProposalCreate;
@@ -18,6 +19,11 @@ Route::namespace('App\Http\Controllers')->group(
         Route::get('/', 'FrontController@index')->name('home');
     }
 );
+
+Route::prefix('os1')->name('os1.')->middleware('throttle:os1')->group(function () {
+    Route::get('greeting', [Os1Controller::class, 'greeting'])->name('greeting');
+    Route::post('reply', [Os1Controller::class, 'reply'])->name('reply');
+});
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import { gsap } from 'gsap';
+import { createVoiceMeter } from './os1-voice.js';
 
 /*
  * OS1 launch sequence (Her).
  * A single GSAP timeline is the clock; the Three.js knot only reads from it.
- * INIT_BOOT -> ACTIVE_WAVEFORM -> COLLAPSE_BEAD -> PANEL_DISSOLVE -> DESKTOP_CASCADE
+ * INIT_BOOT -> ACTIVE_WAVEFORM -> COLLAPSE_BEAD -> CONVERSATION -> PANEL_DISSOLVE -> DOCKED
+ * DOCKED keeps Samantha on the landing as a small ring the visitor can reopen.
  */
 
 const $root = document.getElementById('sam');
@@ -41,6 +43,10 @@ if ($root && $wrap) {
     const collapse = { progress: 0 };
 
     let rafId = null;
+    let voiceMeter = null;
+    const voiceMeters = new Map();
+    let timeline = null;
+    let inConversation = false;
     let renderer, scene, camera, group, mesh, ring, ringcover;
 
     const setState = (state) => {
@@ -133,6 +139,10 @@ if ($root && $wrap) {
 
     const render = () => {
         const acceleration = collapse.progress;
+        const voice = voiceMeter ? voiceMeter.level() : 0;
+
+        // The waveform's height breathes with the voice
+        mesh.scale.y = mesh.scale.z = 1 + voice * 0.9;
 
         if (acceleration > 0.35) {
             const turn = (acceleration - 0.35) / 0.65;
@@ -146,7 +156,7 @@ if ($root && $wrap) {
             }
             mesh.material.opacity = 1 - bead;
             ringcover.material.opacity = ring.material.opacity = bead;
-            ring.scale.x = ring.scale.y = ringScale * (0.9 + 0.1 * bead);
+            ring.scale.x = ring.scale.y = ringScale * (0.9 + 0.1 * bead) * (1 + voice * 0.12);
         }
 
         renderer.render(scene, camera);
@@ -179,19 +189,12 @@ if ($root && $wrap) {
             });
             renderer.dispose();
             renderer.domElement.remove();
+            renderer = null;
         }
     };
 
-    const windows = gsap.utils.toArray('.os1-window');
-    const dockIcons = gsap.utils.toArray('.os1-dock-icon');
-
-    // Diagonal 3D fan: each window steps right, up and towards the viewer
-    const fan = (k) => ({ x: k * 70, y: k * -46, z: k * 60, rotationY: -28, rotationX: 8 });
-
     gsap.set('#os1-frame', { autoAlpha: 0, scale: 0.98 });
     gsap.set('#os1-progress-bar', { scaleX: 0, transformOrigin: '0% 50%' });
-    gsap.set(dockIcons, { autoAlpha: 0, scale: 0.6 });
-    gsap.set(windows, { ...fan(0), autoAlpha: 0, z: -200 });
 
     /*
      * Timeline length is derived from the audio so the ring completes `ringHold`
@@ -221,23 +224,16 @@ if ($root && $wrap) {
             .to(collapse, { progress: 1, duration: timing.collapse, ease: 'power3.inOut' }, 'collapse')
             .to({}, { duration: timing.ringHold })
 
+            // The ring holds here while the visitor talks to OS1; leave() resumes
             .addLabel('dissolve')
-            .call(setState, ['PANEL_DISSOLVE'])
+            // PANEL_DISSOLVE is set by leave(); a .call() here would fire alongside the pause and overwrite CONVERSATION
+            .addPause('dissolve', enterConversation)
             .to('#os1-frame', { autoAlpha: 0, scale: 0.95, duration: timing.dissolve, ease: 'power2.out' })
+            // The amber screen warms into the landing's Warm Stone instead of cutting to it
+            .to($root, { backgroundColor: '#FAFAF9', duration: timing.dissolve, ease: 'power2.out' }, '<')
             .call(teardown)
-
-            .addLabel('cascade')
-            .call(setState, ['DESKTOP_CASCADE'])
-            .to(dockIcons, { autoAlpha: 1, scale: 1, duration: 0.5, stagger: 0.05 }, 'cascade')
-            .to(windows, {
-                autoAlpha: 1,
-                x: (k) => fan(k).x,
-                y: (k) => fan(k).y,
-                z: (k) => fan(k).z,
-                duration: 0.9,
-                stagger: 0.08,
-                ease: 'expo.out',
-            }, 'cascade+=0.15');
+            .call(dock)
+            .to($root, { backgroundColor: 'rgba(250, 250, 249, 0)', duration: 0.6, ease: 'power2.out' });
 
         return timeline;
     };
@@ -275,13 +271,16 @@ if ($root && $wrap) {
         };
 
         const startAudio = () => audio.play().then(() => {
+            setVoice(audio);
+
             timeline.pause();
             gsap.ticker.add(follow);
         });
 
         audio.addEventListener('ended', () => {
             gsap.ticker.remove(follow);
-            timeline.play(audioEnd);
+            timeline.time(audioEnd);
+            enterConversation();
         }, { once: true });
 
         startAudio().catch(() => {
@@ -301,16 +300,99 @@ if ($root && $wrap) {
         });
     };
 
+    function enterConversation() {
+        if (inConversation) {
+            return;
+        }
+
+        inConversation = true;
+        timeline.pause();
+        setState('CONVERSATION');
+
+        // Seen in full today: the next visits get the quick entrance
+        try {
+            localStorage.setItem('os1.introSeen', today());
+        } catch {
+            // Storage blocked: the full intro will play again
+        }
+    }
+
+    // Samantha shrinks into a ring on the landing; the WebGL scene is gone, a CSS ring pulses with her voice
+    function dock() {
+        inConversation = false;
+        teardown();
+        document.documentElement.classList.remove('os1-intro', 'os1-quick');
+        // Hand the frame over to CSS: from here it's Samantha's app window above the dock
+        gsap.set('#os1-frame', { clearProps: 'all' });
+        setState('DOCKED');
+
+        const pulse = () => {
+            document.documentElement.style.setProperty('--voice', voiceMeter ? voiceMeter.level().toFixed(3) : 0);
+            requestAnimationFrame(pulse);
+        };
+        requestAnimationFrame(pulse);
+    }
+
+    // Dissolve the panel and reveal the landing
+    const leave = () => {
+        if (!inConversation) {
+            return;
+        }
+
+        inConversation = false;
+        setState('PANEL_DISSOLVE');
+        timeline.play(timeline.labels.dissolve + 0.001);
+    };
+
+    // Route any <audio> element (greeting, AI replies) into the ring's pulse
+    const setVoice = (element) => {
+        try {
+            if (!voiceMeters.has(element)) {
+                voiceMeters.set(element, createVoiceMeter(element));
+            }
+            voiceMeter = voiceMeters.get(element);
+            voiceMeter.resume();
+        } catch {
+            // Audio still plays; the ring just won't react
+        }
+    };
+
     const audio = document.getElementById('myAudio');
 
-    window.os1 = { teardown };
+    window.os1 = { teardown, leave, setVoice };
 
-    audioDuration(audio).then((duration) => {
-        const timeline = buildTimeline(duration);
+    function today() {
+        return new Date().toLocaleDateString('en-CA');
+    }
+
+    // Returning visitors today: ring appears, then the panel sinks into the dock (~1.2s)
+    const quickEnter = () => {
+        setState('QUICK');
+
+        gsap.timeline({
+            defaults: { ease: 'power3.out' },
+            onComplete: () => $root.dispatchEvent(new CustomEvent('os1:complete', { bubbles: true })),
+        })
+            .set('#os1-progress', { autoAlpha: 0 })
+            .to('#os1-frame', { autoAlpha: 1, scale: 1, duration: 0.4 })
+            .to('#os1-frame', { autoAlpha: 0, scale: 0.2, y: '40vh', duration: 0.6, ease: 'power3.in' }, '+=0.2')
+            .to($root, { backgroundColor: 'rgba(250, 250, 249, 0)', duration: 0.5 }, '<0.1')
+            .call(dock);
+    };
+
+    if (document.documentElement.classList.contains('os1-quick')) {
+        if (prefersReducedMotion) {
+            dock();
+        } else {
+            quickEnter();
+        }
+    } else audioDuration(audio).then((duration) => {
+        timeline = buildTimeline(duration);
         window.os1.timeline = timeline;
 
         if (prefersReducedMotion) {
-            timeline.progress(1);
+            timeline.progress(1, true);
+            dock();
 
             return;
         }
