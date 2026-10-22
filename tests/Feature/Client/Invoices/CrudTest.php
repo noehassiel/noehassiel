@@ -2,26 +2,31 @@
 
 declare(strict_types=1);
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
-
 use App\Livewire\Client\Invoices\Crud;
 use App\Models\Client;
 use App\Models\Invoice;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
+use Mockery\MockInterface;
 use Resend\Contracts\Client as ResendClient;
+use Resend\Email;
 use Resend\Service\Email as ResendEmailService;
 
-function fakeResend(): ResendEmailService&\Mockery\MockInterface
+uses(RefreshDatabase::class);
+
+function fakeResend(): ResendEmailService&MockInterface
 {
     $emailsMock = Mockery::mock(ResendEmailService::class);
     $emailsMock->shouldReceive('send')
-        ->andReturn(\Resend\Email::from(['id' => 'fake-id']));
+        ->andReturn(Email::from(['id' => 'fake-id']));
 
     $resendMock = Mockery::mock(ResendClient::class);
-    $resendMock->emails = $emailsMock;
+    $resendMock->shouldAllowMockingMethod('emails')
+        ->shouldReceive('emails')
+        ->andReturn($emailsMock);
 
     app()->instance('resend', $resendMock);
 
