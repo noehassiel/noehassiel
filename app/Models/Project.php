@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
@@ -56,6 +57,25 @@ class Project extends Model
     public function outstandingRequirements(): HasMany
     {
         return $this->requirements()->where('status', '!=', RequirementStatus::Received);
+    }
+
+    /**
+     * Projects a portal user may open: their client's, narrowed to the selected ones for restricted members.
+     *
+     * @param  Builder<Project>  $query
+     */
+    public function scopeVisibleTo(Builder $query, User $user): void
+    {
+        $query->where('client_id', $user->client_id);
+
+        if (! $user->seesAllProjects()) {
+            $query->whereHas('members', fn (Builder $members) => $members->whereKey($user->id));
+        }
+    }
+
+    public function members(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)->withTimestamps();
     }
 
     /**

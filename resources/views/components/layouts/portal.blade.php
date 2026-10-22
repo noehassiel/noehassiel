@@ -5,16 +5,17 @@
     </head>
     <body class="portal">
         @php
-            $navItems = [
+            $navItems = array_filter([
                 ['route' => 'portal.home', 'active' => ['portal.home', 'portal.projects.*'], 'label' => __('portal.nav.projects')],
-                ['route' => 'portal.invoices', 'active' => ['portal.invoices'], 'label' => __('portal.nav.invoices')],
+                Gate::allows('view-portal-invoices') ? ['route' => 'portal.invoices', 'active' => ['portal.invoices'], 'label' => __('portal.nav.invoices')] : null,
+                Gate::allows('manage-portal-team') ? ['route' => 'portal.team', 'active' => ['portal.team'], 'label' => __('portal.nav.team')] : null,
                 ['route' => 'portal.security', 'active' => ['portal.security'], 'label' => __('portal.nav.security')],
-            ];
+            ]);
         @endphp
 
         <div class="relative z-10">
             <header class="border-b border-[#1C1C1C]">
-                <div class="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
+                <div class="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
                     <a href="{{ route('portal.home') }}" class="flex min-w-0 items-center gap-3" wire:navigate>
                         <img src="{{ asset('logo/isotipo_dark_ember.svg') }}" alt="noehassiel" class="size-8 shrink-0">
                         <span class="truncate font-bold tracking-tight">{{ auth()->user()->client->name }}</span>
@@ -28,7 +29,7 @@
                     </form>
                 </div>
 
-                <nav aria-label="{{ __('portal.nav.label') }}" class="mx-auto max-w-5xl overflow-x-auto px-4 sm:px-6">
+                <nav aria-label="{{ __('portal.nav.label') }}" class="mx-auto max-w-7xl overflow-x-auto px-4 sm:px-6">
                     <ul class="flex gap-6">
                         @foreach ($navItems as $item)
                             @php($isActive = request()->routeIs(...$item['active']))
@@ -48,11 +49,11 @@
                 </nav>
             </header>
 
-            <main class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+            <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
                 {{ $slot }}
             </main>
 
-            <footer class="mx-auto flex max-w-5xl items-center justify-between px-4 pb-10 sm:px-6">
+            <footer class="mx-auto flex max-w-7xl items-center justify-between px-4 pb-10 sm:px-6">
                 <span class="text-xs font-extrabold tracking-tight">noehassiel</span>
                 <span class="font-mono text-[10px] uppercase tracking-[0.18em] text-[var(--ember)]">artisan developer</span>
             </footer>

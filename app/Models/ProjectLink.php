@@ -31,7 +31,13 @@ class ProjectLink extends Model
         'project_id',
         'label',
         'url',
+        'added_by',
     ];
+
+    public function addedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'added_by');
+    }
 
     public function project(): BelongsTo
     {

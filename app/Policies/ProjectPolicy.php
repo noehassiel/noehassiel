@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\Project;
+use App\Models\ProjectLink;
 use App\Models\ProjectRequirement;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -14,8 +15,25 @@ class ProjectPolicy
      */
     public function view(User $user, Project $project): bool
     {
-        return Gate::forUser($user)->allows('access-admin')
-            || ($user->isClient() && $user->client_id === $project->client_id);
+        return Gate::forUser($user)->allows('access-admin') || $user->canSeeProject($project);
+    }
+
+    /**
+     * The client team can share their own folders on their project.
+     */
+    public function addLink(User $user, Project $project): bool
+    {
+        return $user->canSeeProject($project);
+    }
+
+    /**
+     * A client user can only remove folders they shared; the admin's stay.
+     */
+    public function removeLink(User $user, Project $project, ProjectLink $link): bool
+    {
+        return $this->addLink($user, $project)
+            && $link->project_id === $project->id
+            && $link->added_by === $user->id;
     }
 
     /**
@@ -23,8 +41,7 @@ class ProjectPolicy
      */
     public function markRequirementUploaded(User $user, Project $project, ProjectRequirement $requirement): bool
     {
-        return $user->isClient()
-            && $user->client_id === $project->client_id
+        return $user->canSeeProject($project)
             && $requirement->project_id === $project->id;
     }
 }

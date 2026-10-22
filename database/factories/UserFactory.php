@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PortalRole;
 use App\Models\Client;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -64,6 +65,7 @@ class UserFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'client_id' => $client?->id ?? Client::factory(),
+            'portal_role' => PortalRole::Owner,
         ]);
     }
 

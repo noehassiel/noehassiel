@@ -24,7 +24,7 @@ class Home extends Component
     public function projects(): Collection
     {
         return Project::query()
-            ->whereBelongsTo(Auth::user()->client)
+            ->visibleTo(Auth::user())
             ->active()
             ->withCount(['requirements as outstanding_count' => fn ($query) => $query->where('status', RequirementStatus::Pending)])
             ->latest()
@@ -37,6 +37,10 @@ class Home extends Component
     #[Computed]
     public function recentInvoices(): Collection
     {
+        if (! Auth::user()->canSeeInvoices()) {
+            return new Collection;
+        }
+
         return Invoice::query()
             ->whereBelongsTo(Auth::user()->client)
             ->latest('issue_date')

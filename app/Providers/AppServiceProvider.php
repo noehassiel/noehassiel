@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::define('access-admin', fn (User $user): bool => $user->email === config('app.admin_email'));
         Gate::define('access-portal', fn (User $user): bool => $user->isClient());
+        Gate::define('view-portal-invoices', fn (User $user): bool => $user->canSeeInvoices());
+        Gate::define('manage-portal-team', fn (User $user): bool => $user->isPortalOwner());
 
         // Livewire re-applies this on /livewire/update so every action keeps the user's language
         Livewire::addPersistentMiddleware([UseUserLocale::class]);

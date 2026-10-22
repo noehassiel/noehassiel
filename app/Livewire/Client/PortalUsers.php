@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Client;
 
+use App\Enums\PortalRole;
 use App\Mail\ClientInvitationMail;
 use App\Models\Client;
 use App\Models\ClientInvitation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
@@ -19,6 +21,18 @@ class PortalUsers extends Component
     public string $email = '';
 
     public string $locale = 'es';
+
+    /** The portal user whose role and access are being edited. */
+    public ?int $editingUserId = null;
+
+    public string $editRole = 'owner';
+
+    public bool $editAllProjects = true;
+
+    /** @var array<int, int|string> */
+    public array $editProjectIds = [];
+
+    public bool $editViewInvoices = true;
 
     public function openInvite(): void
     {
@@ -59,7 +73,13 @@ class PortalUsers extends Component
 
         $invitation->delete();
 
-        $this->sendInvitation($invitation->email, $invitation->locale);
+        // Keep what the invitation granted, so a re-sent member invite doesn't come back as an owner
+        $this->sendInvitation($invitation->email, $invitation->locale, [
+            'portal_role' => $invitation->portal_role,
+            'can_view_all_projects' => $invitation->can_view_all_projects,
+            'can_view_invoices' => $invitation->can_view_invoices,
+            'project_ids' => $invitation->project_ids,
+        ]);
     }
 
     public function cancelInvitation(int $invitationId): void
@@ -75,9 +95,57 @@ class PortalUsers extends Component
         $this->client->users()->findOrFail($userId)->delete();
     }
 
-    private function sendInvitation(string $email, string $locale): void
+    public function editAccess(int $userId): void
     {
-        [$invitation, $token] = ClientInvitation::issue($this->client, $email, $locale, Auth::user());
+        $user = $this->client->users()->findOrFail($userId);
+
+        $this->editingUserId = $user->id;
+        $this->editRole = $user->portal_role?->value ?? PortalRole::Owner->value;
+        $this->editAllProjects = $user->can_view_all_projects;
+        $this->editProjectIds = $user->projects()->pluck('projects.id')->map(fn ($id) => (string) $id)->all();
+        $this->editViewInvoices = $user->can_view_invoices;
+        $this->resetValidation();
+        $this->dispatch('open-modal', id: 'portal-access-modal');
+    }
+
+    /**
+     * Change someone's role or, for members, which projects and whether invoices they see.
+     */
+    public function saveAccess(): void
+    {
+        $user = $this->client->users()->findOrFail($this->editingUserId);
+        $isMember = $this->editRole === PortalRole::Member->value;
+
+        $this->validate([
+            'editRole' => ['required', Rule::enum(PortalRole::class)],
+            'editAllProjects' => ['boolean'],
+            'editProjectIds' => [Rule::excludeIf(! $isMember || $this->editAllProjects), 'required', 'array', 'min:1'],
+            'editProjectIds.*' => [Rule::excludeIf(! $isMember || $this->editAllProjects), Rule::in($this->client->projects()->pluck('id')->all())],
+        ], [
+            'editProjectIds.required' => 'Elige al menos un proyecto.',
+        ]);
+
+        DB::transaction(function () use ($user, $isMember): void {
+            $user->forceFill([
+                'portal_role' => $this->editRole,
+                // Owners always see everything; keep their flags open so a later downgrade starts from full access
+                'can_view_all_projects' => ! $isMember || $this->editAllProjects,
+                'can_view_invoices' => ! $isMember || $this->editViewInvoices,
+            ])->save();
+
+            $user->projects()->sync($isMember && ! $this->editAllProjects ? array_map('intval', $this->editProjectIds) : []);
+        });
+
+        $this->editingUserId = null;
+        $this->dispatch('close-modal', id: 'portal-access-modal');
+    }
+
+    /**
+     * @param  array<string, mixed>  $access
+     */
+    private function sendInvitation(string $email, string $locale, array $access = []): void
+    {
+        [$invitation, $token] = ClientInvitation::issue($this->client, $email, $locale, Auth::user(), array_filter($access, fn ($value) => $value !== null));
 
         Mail::to($email)->queue(new ClientInvitationMail($invitation, $token));
     }
@@ -85,7 +153,8 @@ class PortalUsers extends Component
     public function render(): View
     {
         return view('livewire.client.portal-users', [
-            'users' => $this->client->users()->orderBy('name')->get(),
+            'users' => $this->client->users()->with('projects:id,name')->orderBy('name')->get(),
+            'projects' => $this->client->projects()->latest()->get(['id', 'name']),
             'invitations' => $this->client->invitations()->whereNull('accepted_at')->latest()->get(),
         ]);
     }

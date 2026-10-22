@@ -130,3 +130,50 @@ test('the passkey well-known endpoint sends each user to their own security page
         ->get(route('security.redirect'))
         ->assertRedirect(route('settings.security'));
 });
+
+test('a client can share a folder on their project', function () {
+    $project = Project::factory()->for($this->client)->create();
+
+    Livewire::test(ProjectShow::class, ['project' => $project])
+        ->set('linkLabel', 'Fotos y logos')
+        ->set('linkUrl', 'https://drive.google.com/drive/folders/abc')
+        ->call('addLink')
+        ->assertHasNoErrors()
+        ->assertSee('Fotos y logos')
+        ->assertSee(__('portal.project.added_by_you'));
+
+    expect($project->links()->sole())
+        ->added_by->toBe($this->user->id);
+});
+
+test('a shared folder must be an https link', function () {
+    $project = Project::factory()->for($this->client)->create();
+
+    Livewire::test(ProjectShow::class, ['project' => $project])
+        ->set('linkLabel', 'Fotos')
+        ->set('linkUrl', 'http://example.com/folder')
+        ->call('addLink')
+        ->assertHasErrors('linkUrl');
+
+    expect($project->links()->count())->toBe(0);
+});
+
+test('a client can remove folders they shared but not the admin ones', function () {
+    $project = Project::factory()->for($this->client)->create();
+    $own = ProjectLink::factory()->for($project)->create(['added_by' => $this->user->id]);
+    $adminLink = ProjectLink::factory()->for($project)->create(['added_by' => null]);
+
+    $component = Livewire::test(ProjectShow::class, ['project' => $project])
+        ->call('removeLink', $own->id)
+        ->assertHasNoErrors();
+
+    $component->call('removeLink', $adminLink->id)->assertForbidden();
+
+    expect($project->links()->pluck('id')->all())->toBe([$adminLink->id]);
+});
+
+test('a client can not add folders to another client\'s project', function () {
+    $foreignProject = Project::factory()->create();
+
+    expect($this->user->can('addLink', $foreignProject))->toBeFalse();
+});

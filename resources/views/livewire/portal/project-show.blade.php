@@ -64,7 +64,7 @@
 
     <div class="grid gap-10 lg:grid-cols-5">
         {{-- Checklist --}}
-        <section class="space-y-5 lg:col-span-3" aria-labelledby="checklist-heading">
+        <section class="min-w-0 space-y-5 lg:col-span-3" aria-labelledby="checklist-heading">
             <div>
                 <h2 id="checklist-heading" class="text-2xl font-bold tracking-tight">{{ __('portal.project.checklist') }}</h2>
                 @if ($pendingCount > 0)
@@ -126,7 +126,7 @@
         </section>
 
         {{-- Shared folders --}}
-        <section class="space-y-5 lg:col-span-2" aria-labelledby="folders-heading">
+        <section class="min-w-0 space-y-5 lg:col-span-2" aria-labelledby="folders-heading">
             <div>
                 <h2 id="folders-heading" class="text-2xl font-bold tracking-tight">{{ __('portal.project.folders') }}</h2>
                 <p class="mt-2 text-sm text-[var(--silver)]">{{ __('portal.project.folders_hint') }}</p>
@@ -137,19 +137,61 @@
             @else
                 <ul class="space-y-3">
                     @foreach ($links as $link)
-                        <li wire:key="link-{{ $link->id }}">
-                            <a href="{{ $link->url }}" target="_blank" rel="noopener noreferrer"
-                                class="portal-card flex items-center justify-between gap-4 p-5">
+                        <li wire:key="link-{{ $link->id }}" class="portal-card flex items-center gap-4 p-5">
+                            <a href="{{ $link->url }}" target="_blank" rel="noopener noreferrer" class="flex min-w-0 flex-1 items-center justify-between gap-4">
                                 <span class="min-w-0">
                                     <span class="block truncate font-bold">{{ $link->label }}</span>
-                                    <span class="mt-1 block font-mono text-xs text-[var(--slate)]">{{ $link->providerName() }}</span>
+                                    <span class="mt-1 block font-mono text-xs text-[var(--slate)]">
+                                        {{ $link->providerName() }}@if ($link->added_by === auth()->id()) · {{ __('portal.project.added_by_you') }}@endif
+                                    </span>
                                 </span>
                                 <span class="shrink-0 font-mono text-xs uppercase tracking-[0.14em] text-[var(--ember)]">{{ __('portal.project.open_folder') }} ↗</span>
                             </a>
+                            @can('removeLink', [$project, $link])
+                                <button type="button" wire:click="removeLink({{ $link->id }})" wire:confirm="{{ __('portal.project.remove_folder_confirm') }}"
+                                    class="shrink-0 cursor-pointer font-mono text-xs uppercase tracking-[0.14em] text-[var(--slate)] transition-colors hover:text-[var(--stone)]">
+                                    {{ __('portal.project.remove_folder') }}
+                                </button>
+                            @endcan
                         </li>
                     @endforeach
                 </ul>
             @endif
+
+            @can('addLink', $project)
+                <form wire:submit="addLink" class="portal-card space-y-4 p-5" aria-labelledby="add-folder-heading">
+                    <h3 id="add-folder-heading" class="portal-eyebrow">{{ __('portal.project.add_folder') }}</h3>
+
+                    <div class="grid gap-4">
+                        <div class="flex min-w-0 flex-col gap-2">
+                            <label for="link-label" class="text-sm font-bold">{{ __('portal.project.folder_name') }}</label>
+                            <input id="link-label" wire:model="linkLabel" type="text" required maxlength="255"
+                                placeholder="{{ __('portal.project.folder_name_placeholder') }}"
+                                @error('linkLabel') aria-invalid="true" aria-describedby="link-label-error" @enderror
+                                class="w-full min-w-0 rounded-xl border border-[#2A2A2A] bg-[#0D0D0D] px-4 py-3 text-[var(--stone)] placeholder:text-[#3A3A3A]">
+                            @error('linkLabel')
+                                <p id="link-label-error" role="alert" class="text-sm text-[var(--ember)]">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div class="flex min-w-0 flex-col gap-2">
+                            <label for="link-url" class="text-sm font-bold">{{ __('portal.project.folder_url') }}</label>
+                            <input id="link-url" wire:model="linkUrl" type="url" inputmode="url" required placeholder="https://"
+                                aria-describedby="link-url-hint @error('linkUrl') link-url-error @enderror"
+                                @error('linkUrl') aria-invalid="true" @enderror
+                                class="w-full min-w-0 rounded-xl border border-[#2A2A2A] bg-[#0D0D0D] px-4 py-3 font-mono text-sm text-[var(--stone)] placeholder:text-[#3A3A3A]">
+                            <p id="link-url-hint" class="text-xs text-[var(--slate)]">{{ __('portal.project.folder_url_hint') }}</p>
+                            @error('linkUrl')
+                                <p id="link-url-error" role="alert" class="text-sm text-[var(--ember)]">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <button type="submit" wire:loading.attr="disabled"
+                        class="cursor-pointer rounded-xl bg-[var(--ember)] px-5 py-3 font-bold text-[var(--obsidian)] transition-opacity hover:opacity-90 disabled:opacity-60">
+                        {{ __('portal.project.add_folder') }}
+                    </button>
+                </form>
+            @endcan
         </section>
     </div>
 </div>

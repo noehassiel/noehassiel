@@ -34,7 +34,12 @@ class SendPortalReminders extends Command
 
         foreach ($clients as $client) {
             foreach ($client->users as $user) {
-                Mail::to($user)->queue(new PendingRequirementsMail($user, $client->projects));
+                // Members only hear about the projects they were given
+                $projects = $client->projects->filter(fn ($project) => $user->canSeeProject($project));
+
+                if ($projects->isNotEmpty()) {
+                    Mail::to($user)->queue(new PendingRequirementsMail($user, $projects->values()));
+                }
             }
 
             $client->forceFill(['reminded_at' => now()])->save();

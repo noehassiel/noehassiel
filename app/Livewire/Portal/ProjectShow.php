@@ -17,11 +17,48 @@ class ProjectShow extends Component
 {
     public Project $project;
 
+    public string $linkLabel = '';
+
+    public string $linkUrl = '';
+
     public function mount(Project $project): void
     {
         $this->authorize('view', $project);
 
         $this->project = $project;
+    }
+
+    /**
+     * The client shares a folder (Drive, Dropbox, OneDrive…) where they'll upload the project resources.
+     */
+    public function addLink(): void
+    {
+        $this->authorize('addLink', $this->project);
+
+        $validated = $this->validate([
+            'linkLabel' => ['required', 'string', 'max:255'],
+            'linkUrl' => ['required', 'url:https', 'max:2048'],
+        ], attributes: [
+            'linkLabel' => __('portal.project.folder_name'),
+            'linkUrl' => __('portal.project.folder_url'),
+        ]);
+
+        $this->project->links()->create([
+            'label' => $validated['linkLabel'],
+            'url' => $validated['linkUrl'],
+            'added_by' => Auth::id(),
+        ]);
+
+        $this->reset('linkLabel', 'linkUrl');
+    }
+
+    public function removeLink(int $linkId): void
+    {
+        $link = $this->project->links()->findOrFail($linkId);
+
+        $this->authorize('removeLink', [$this->project, $link]);
+
+        $link->delete();
     }
 
     /**

@@ -14,6 +14,6 @@ class InvoicePolicy
     public function download(User $user, Invoice $invoice): bool
     {
         return Gate::forUser($user)->allows('access-admin')
-            || ($user->isClient() && $user->client_id === $invoice->client_id);
+            || ($user->canSeeInvoices() && $user->client_id === $invoice->client_id);
     }
 }

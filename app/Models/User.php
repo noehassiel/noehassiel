@@ -3,9 +3,11 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\PortalRole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -64,6 +66,9 @@ class User extends Authenticatable implements PasskeyUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'portal_role' => PortalRole::class,
+            'can_view_all_projects' => 'boolean',
+            'can_view_invoices' => 'boolean',
         ];
     }
 
@@ -89,5 +94,35 @@ class User extends Authenticatable implements PasskeyUser
     public function isClient(): bool
     {
         return $this->client_id !== null;
+    }
+
+    /**
+     * Projects a member was given access to; owners and "all projects" members don't need rows here.
+     */
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class)->withTimestamps();
+    }
+
+    public function isPortalOwner(): bool
+    {
+        return $this->isClient() && $this->portal_role === PortalRole::Owner;
+    }
+
+    public function seesAllProjects(): bool
+    {
+        return $this->isPortalOwner() || $this->can_view_all_projects;
+    }
+
+    public function canSeeProject(Project $project): bool
+    {
+        return $this->isClient()
+            && $this->client_id === $project->client_id
+            && ($this->seesAllProjects() || $this->projects()->whereKey($project->id)->exists());
+    }
+
+    public function canSeeInvoices(): bool
+    {
+        return $this->isPortalOwner() || ($this->isClient() && $this->can_view_invoices);
     }
 }

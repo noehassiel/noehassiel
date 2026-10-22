@@ -76,6 +76,7 @@ class AcceptInvitation extends Component
                 'email_verified_at' => now(),
             ])->save();
 
+            $invitation->grantAccessTo($user);
             $invitation->forceFill(['accepted_at' => now()])->save();
 
             return $user;

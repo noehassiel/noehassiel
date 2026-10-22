@@ -1,10 +1,12 @@
 <?php
 
+use App\Enums\PortalRole;
 use App\Livewire\Client\PortalUsers;
 use App\Livewire\Portal\AcceptInvitation;
 use App\Mail\ClientInvitationMail;
 use App\Models\Client;
 use App\Models\ClientInvitation;
+use App\Models\Project;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -137,4 +139,40 @@ test('a user of another client can not be revoked from this client\'s screen', f
         ->toThrow(ModelNotFoundException::class);
 
     expect(User::find($stranger->id))->not->toBeNull();
+});
+
+test('admin sees and changes a portal user role and access', function () {
+    $project = Project::factory()->for($this->client)->create(['name' => 'Sitio web']);
+    $user = User::factory()->forClient($this->client)->create();
+
+    Livewire::test(PortalUsers::class, ['client' => $this->client])
+        ->assertSee('Administrador')
+        ->call('editAccess', $user->id)
+        ->set('editRole', 'member')
+        ->set('editAllProjects', false)
+        ->set('editProjectIds', [(string) $project->id])
+        ->set('editViewInvoices', false)
+        ->call('saveAccess')
+        ->assertHasNoErrors()
+        ->assertSee('Sitio web')
+        ->assertSee('sin facturas');
+
+    $user->refresh();
+
+    expect($user->isPortalOwner())->toBeFalse()
+        ->and($user->canSeeProject($project))->toBeTrue()
+        ->and($user->canSeeInvoices())->toBeFalse();
+});
+
+test('resending a member invitation keeps its access', function () {
+    [$invitation] = ClientInvitation::issue($this->client, 'ana@acme.test', 'es', null, [
+        'portal_role' => PortalRole::Member,
+        'can_view_invoices' => false,
+    ]);
+
+    Livewire::test(PortalUsers::class, ['client' => $this->client])->call('resend', $invitation->id);
+
+    expect(ClientInvitation::sole())
+        ->portal_role->toBe(PortalRole::Member)
+        ->can_view_invoices->toBeFalse();
 });
