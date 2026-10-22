@@ -29,6 +29,7 @@ if ($dock) {
         let track = null;
         let syncedAt = 0;
         let pollTimer = null;
+        let freshTimer = null;
 
         // Advance the bar locally between polls so it feels live
         const renderProgress = () => {
@@ -37,7 +38,7 @@ if ($dock) {
             }
 
             const elapsed = track.progress_ms + (Date.now() - syncedAt);
-            $progress.style.width = `${Math.min(100, (elapsed / track.duration_ms) * 100)}%`;
+            $progress.style.transform = `scaleX(${Math.min(1, elapsed / track.duration_ms)})`;
         };
 
         const poll = async () => {
@@ -67,10 +68,21 @@ if ($dock) {
                 return;
             }
 
+            // Equalizer plays briefly whenever the song changes, then rests
+            if ($music.href !== track.url) {
+                $music.classList.add('is-fresh');
+                clearTimeout(freshTimer);
+                freshTimer = setTimeout(() => $music.classList.remove('is-fresh'), 4500);
+            }
+
             $music.href = track.url;
-            $music.setAttribute('aria-label', `Now playing: ${track.title} by ${track.artist}. Open in Spotify`);
+            $music.setAttribute('aria-label', document.documentElement.dataset.lang === 'es'
+                ? `Sonando ahora: ${track.title} de ${track.artist}. Abrir en Spotify (nueva pestaña)`
+                : `Now playing: ${track.title} by ${track.artist}. Open in Spotify (new tab)`);
             $title.textContent = track.title;
             $artist.textContent = track.artist;
+
+            $cover.hidden = !track.cover;
 
             if (track.cover && $cover.src !== track.cover) {
                 $cover.src = track.cover;
@@ -88,6 +100,21 @@ if ($dock) {
         [...$dock.querySelectorAll('[data-dock-link]')].map((link) => [link.dataset.dockLink, link]),
     );
 
+    // On narrow screens the numbers scroll horizontally; keep the active one centered
+    const $apps = $dock.querySelector('.dock-apps');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const centerActiveLink = (link) => {
+        if (!link || $apps.scrollWidth <= $apps.clientWidth) {
+            return;
+        }
+
+        $apps.scrollTo({
+            left: link.offsetLeft - ($apps.clientWidth - link.offsetWidth) / 2,
+            behavior: prefersReducedMotion.matches ? 'auto' : 'smooth',
+        });
+    };
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (!entry.isIntersecting) {
@@ -101,6 +128,8 @@ if ($dock) {
                     link.removeAttribute('aria-current');
                 }
             });
+
+            centerActiveLink(links.get(entry.target.id));
         });
     }, { rootMargin: '-45% 0px -50% 0px' });
 
