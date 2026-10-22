@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Os1Controller;
+use App\Http\Controllers\SpotifyController;
 use App\Livewire\Client\Index as ClientIndex;
 use App\Livewire\Client\Show as ClientShow;
 use App\Livewire\Proposal\Create as ProposalCreate;
@@ -22,8 +23,17 @@ Route::namespace('App\Http\Controllers')->group(
 
 Route::prefix('os1')->name('os1.')->middleware('throttle:os1')->group(function () {
     Route::get('greeting', [Os1Controller::class, 'greeting'])->name('greeting');
+    Route::get('line/{key}', [Os1Controller::class, 'line'])->name('line');
     Route::post('reply', [Os1Controller::class, 'reply'])->name('reply');
 });
+
+Route::get('spotify/now-playing', [SpotifyController::class, 'nowPlaying'])
+    ->middleware('throttle:30,1')
+    ->name('spotify.now-playing');
+
+Route::get('spotify/callback', [SpotifyController::class, 'callback'])
+    ->middleware('throttle:10,1')
+    ->name('spotify.callback');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

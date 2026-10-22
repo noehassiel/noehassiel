@@ -46,4 +46,10 @@ return [
         'requests_per_day' => (int) env('OS1_REQUESTS_PER_DAY', 60),
     ],
 
+    'spotify' => [
+        'client_id' => env('SPOTIFY_CLIENT_ID'),
+        'client_secret' => env('SPOTIFY_CLIENT_SECRET'),
+        'redirect_uri' => env('SPOTIFY_REDIRECT_URI'),
+    ],
+
 ];
