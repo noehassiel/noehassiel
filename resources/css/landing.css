@@ -1129,6 +1129,7 @@ html.os1-intro .dock {
 .dock-app-label {
     font-family: var(--font-mono);
     font-size: 12px;
+    white-space: nowrap;
 }
 
 .dock-language {
@@ -1157,7 +1158,7 @@ html.os1-intro .dock {
 .dock-music {
     gap: 12px;
     padding: 0 12px 0 12px;
-    max-width: 280px;
+    max-width: 300px;
     color: var(--stone);
     text-decoration: none;
     transition: background-color 0.2s ease;
@@ -1191,6 +1192,8 @@ html.os1-intro .dock {
     display: flex;
     align-items: center;
     gap: 6px;
+    line-height: 1.3;
+    white-space: nowrap;
     font-family: var(--font-mono);
     font-size: 11px;
     color: var(--ember);
@@ -1298,8 +1301,22 @@ html.os1-intro .dock {
     background: var(--ember);
 }
 
+/* Mid widths: the player needs room, so the clock and the play button step aside while it shows */
+@media (max-width: 1200px) {
+    .dock.has-music .dock-clock,
+    .dock.has-music .dock-music-play {
+        display: none;
+    }
+}
+
+@media (max-width: 1024px) {
+    .dock.has-music .dock-samantha-name {
+        display: none;
+    }
+}
+
 /* Narrow screens: the clock goes, the player takes the wide slot, sections become a one-at-a-time swipeable slot */
-@media (max-width: 860px) {
+@media (max-width: 940px) {
     .dock-clock,
     .dock-music-play,
     .dock-samantha-name {
@@ -1332,7 +1349,6 @@ html.os1-intro .dock {
 
     .dock-music-label {
         font-size: 10px;
-        white-space: nowrap;
         overflow: hidden;
     }
 
@@ -1414,7 +1430,7 @@ html.os1-intro .dock {
 }
 
 /* The active section's label rolls up into place when it changes */
-@media (max-width: 860px) and (prefers-reduced-motion: no-preference) {
+@media (max-width: 940px) and (prefers-reduced-motion: no-preference) {
     .dock-app[aria-current="true"] .dock-app-label {
         animation: dock-label-in 0.45s var(--ease-out);
     }
