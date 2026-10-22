@@ -18,7 +18,7 @@
             <div class="grid gap-4 sm:grid-cols-2">
                 <x-ui.field class="sm:col-span-2">
                     <x-ui.label>Cliente o lead *</x-ui.label>
-                    <x-ui.select wire:model="recipient">
+                    <x-ui.select wire:model="recipient" placeholder="Selecciona un cliente o lead..." searchable>
                         @foreach ($this->clients as $client)
                             <x-ui.select.option value="client:{{ $client->id }}">{{ $client->name }}</x-ui.select.option>
                         @endforeach
@@ -280,7 +280,7 @@
             <h2 class="mb-5 admin-eyebrow">
                 Notas y términos adicionales</h2>
             <x-ui.textarea wire:model="notes" rows="4"
-                placeholder="Condiciones de pago, términos especiales, observaciones..." />
+                placeholder="Términos especiales, observaciones... (la forma de pago 50/50 se agrega sola)" />
         </div>
 
         {{-- Submit --}}

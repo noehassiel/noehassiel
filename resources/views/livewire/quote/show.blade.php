@@ -137,6 +137,20 @@
                             <dd class="font-mono text-2xl font-bold text-[var(--ember)]">{{ $money($proposal->total) }}</dd>
                         </div>
                     </dl>
+
+                    <h3 class="portal-eyebrow mt-8 mb-4">Forma de pago</h3>
+                    <dl class="grid gap-3 sm:grid-cols-2">
+                        @foreach ($proposal->paymentSchedule() as $payment)
+                            <div class="rounded-xl border border-[#1C1C1C] p-4">
+                                <dt class="flex items-baseline justify-between gap-3">
+                                    <span class="font-bold">{{ $payment['label'] }}</span>
+                                    <span class="font-mono text-xs text-[var(--slate)]">{{ $payment['percent'] }}%</span>
+                                </dt>
+                                <dd class="mt-1 font-mono text-lg">{{ $money($payment['amount']) }}</dd>
+                                <dd class="mt-1 text-sm text-[var(--silver)]">{{ $payment['description'] }}</dd>
+                            </div>
+                        @endforeach
+                    </dl>
                 </section>
             @endif
 

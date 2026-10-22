@@ -948,6 +948,12 @@
                                 {{ $proposal->currency }} {{ number_format($proposal->total, 2) }}
                             </div>
                         </div>
+                        @foreach ($proposal->paymentSchedule() as $payment)
+                            <div class="totals-row">
+                                <div class="tr-label">{{ $payment['label'] }} {{ $payment['percent'] }}% · {{ Str::lower($payment['description']) }}</div>
+                                <div class="tr-amount">{{ $proposal->currency }} {{ number_format($payment['amount'], 2) }}</div>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

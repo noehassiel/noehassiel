@@ -13,6 +13,42 @@
             </x-slot:actions>
         </x-admin.page-header>
 
+        {{-- Section: AI editor --}}
+        <div class="admin-card p-6">
+            <h2 class="mb-2 admin-eyebrow">Cambios con IA</h2>
+            <p class="mb-5 text-sm text-neutral-500">Dile qué cambiar: texto, alcance, etapas, conceptos o precios. Revisa el resultado abajo y guarda.</p>
+
+            @if ($aiHistory)
+                <ol class="mb-4 space-y-3 text-sm" aria-label="Cambios en esta sesión">
+                    @foreach ($aiHistory as $message)
+                        <li @class([
+                            'rounded-xl px-4 py-3 whitespace-pre-line',
+                            'ml-8 bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300' => $message['role'] === 'user',
+                            'mr-8 border border-neutral-200 text-neutral-600 dark:border-neutral-800 dark:text-neutral-400' => $message['role'] === 'assistant',
+                        ])>{{ $message['content'] }}</li>
+                    @endforeach
+                </ol>
+            @endif
+
+            <x-ui.field>
+                <x-ui.label class="sr-only">Cambio a aplicar</x-ui.label>
+                <x-ui.textarea wire:model="aiInstruction" rows="3" wire:keydown.meta.enter.prevent="editWithAi"
+                    placeholder="Ej. Quita el blog, agrega una etapa de pruebas de 1 semana y baja el total a 45 mil." />
+                <x-ui.error name="aiInstruction" />
+            </x-ui.field>
+
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+                <x-ui.button type="button" variant="outline" wire:click="editWithAi" wire:loading.attr="disabled" wire:target="editWithAi" icon="sparkles">
+                    <span wire:loading.remove wire:target="editWithAi">Aplicar cambios</span>
+                    <span wire:loading wire:target="editWithAi">Aplicando…</span>
+                </x-ui.button>
+                @if ($aiUndoSnapshot)
+                    <x-ui.button type="button" variant="ghost" wire:click="undoAiEdit" icon="arrow-uturn-left">Deshacer</x-ui.button>
+                @endif
+                <span class="text-xs text-neutral-400">⌘ + Enter</span>
+            </div>
+        </div>
+
         {{-- Section: Basic info --}}
         <div class="admin-card p-6">
             <h2 class="mb-5 admin-eyebrow">
@@ -21,18 +57,13 @@
             <div class="grid gap-4 sm:grid-cols-2">
                 <x-ui.field class="sm:col-span-2">
                     <x-ui.label>Cliente o lead *</x-ui.label>
-                    <x-ui.select wire:model="recipient">
-                        <option value="">Selecciona un cliente o lead...</option>
-                        <optgroup label="Clientes">
-                            @foreach ($this->clients as $client)
-                                <option value="client:{{ $client->id }}">{{ $client->name }}</option>
-                            @endforeach
-                        </optgroup>
-                        <optgroup label="Leads">
-                            @foreach ($this->leads as $lead)
-                                <option value="lead:{{ $lead->id }}">{{ $lead->name }}{{ $lead->company ? " · {$lead->company}" : '' }}</option>
-                            @endforeach
-                        </optgroup>
+                    <x-ui.select wire:model="recipient" placeholder="Selecciona un cliente o lead..." searchable>
+                        @foreach ($this->clients as $client)
+                            <x-ui.select.option value="client:{{ $client->id }}">{{ $client->name }}</x-ui.select.option>
+                        @endforeach
+                        @foreach ($this->leads as $lead)
+                            <x-ui.select.option value="lead:{{ $lead->id }}">{{ $lead->name }}{{ $lead->company ? " · {$lead->company}" : '' }} (lead)</x-ui.select.option>
+                        @endforeach
                     </x-ui.select>
                     <x-ui.error name="recipient" />
                 </x-ui.field>
@@ -45,10 +76,9 @@
 
                 <x-ui.field>
                     <x-ui.label>Tipo de proyecto *</x-ui.label>
-                    <x-ui.select wire:model="projectType">
-                        <option value="">Selecciona...</option>
+                    <x-ui.select wire:model="projectType" placeholder="Selecciona...">
                         @foreach ($this->projectTypes as $type)
-                            <option value="{{ $type->value }}">{{ $type->label() }}</option>
+                            <x-ui.select.option value="{{ $type->value }}">{{ $type->label() }}</x-ui.select.option>
                         @endforeach
                     </x-ui.select>
                     <x-ui.error name="projectType" />

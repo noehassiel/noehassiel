@@ -13,10 +13,9 @@
         <x-ui.input wire:model.live.debounce.300ms="search" placeholder="Buscar por número, título o cliente..."
             class="sm:max-w-xs" leading-icon="magnifying-glass" />
 
-        <x-ui.select wire:model.live="statusFilter" class="sm:max-w-48">
-            <option value="">Todos los estados</option>
+        <x-ui.select wire:model.live="statusFilter" placeholder="Todos los estados" clearable class="sm:max-w-48">
             @foreach ($this->statuses as $status)
-                <option value="{{ $status->value }}">{{ $status->label() }}</option>
+                <x-ui.select.option value="{{ $status->value }}">{{ $status->label() }}</x-ui.select.option>
             @endforeach
         </x-ui.select>
     </div>

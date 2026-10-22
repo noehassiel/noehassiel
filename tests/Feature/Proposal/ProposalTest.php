@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Ai\Agents\ProposalDrafter;
+use App\Ai\Agents\ProposalEditor;
 use App\Enums\ProposalStatus;
 use App\Livewire\Proposal\Create;
 use App\Livewire\Proposal\Edit;
@@ -284,4 +285,83 @@ test('ai draft requires notes and a recipient', function () {
         ->assertHasErrors(['recipient', 'draftNotes']);
 
     ProposalDrafter::assertNeverPrompted();
+});
+
+// ─── AI editor ────────────────────────────────────────────────────────────────
+
+function editedProposal(array $overrides = []): array
+{
+    return [
+        'title' => 'Título nuevo',
+        'project_type' => 'web_design_development',
+        'what_we_do' => 'Qué haremos',
+        'how_we_do_it' => 'Cómo lo haremos',
+        'includes' => ['Diseño', 'Desarrollo'],
+        'excludes' => [],
+        'notes' => '',
+        'valid_until' => '2026-12-31',
+        'discount' => 0,
+        'apply_tax' => true,
+        'tax_rate' => 16,
+        'stages' => [['name' => 'Diseño', 'description' => '', 'duration' => '1 semana']],
+        'items' => [['description' => 'Sitio web', 'quantity' => 2, 'unit_price' => 15000]],
+        'summary' => '• Cambié el título.',
+        ...$overrides,
+    ];
+}
+
+test('ai editor applies the requested changes to the form without saving', function () {
+    ProposalEditor::fake([editedProposal()]);
+    $proposal = Proposal::factory()->create(['client_id' => $this->client->id, 'title' => 'Título viejo']);
+
+    Livewire::test(Edit::class, ['proposal' => $proposal])
+        ->set('aiInstruction', 'Cambia el título y pon 2 sitios a 15 mil')
+        ->call('editWithAi')
+        ->assertHasNoErrors()
+        ->assertSet('title', 'Título nuevo')
+        ->assertSet('items.0.subtotal', 30000.0)
+        ->assertSet('includesRaw', "Diseño\nDesarrollo")
+        ->assertSet('aiInstruction', '')
+        ->assertCount('aiHistory', 2);
+
+    expect($proposal->fresh()->title)->toBe('Título viejo');
+
+    ProposalEditor::assertPrompted(fn (AgentPrompt $prompt) => $prompt->contains('Título viejo')
+        && $prompt->contains('pon 2 sitios a 15 mil'));
+});
+
+test('ai edits can be undone', function () {
+    ProposalEditor::fake([editedProposal()]);
+    $proposal = Proposal::factory()
+        ->has(ProposalItem::factory()->count(1), 'items')
+        ->create(['client_id' => $this->client->id, 'title' => 'Título viejo']);
+
+    $component = Livewire::test(Edit::class, ['proposal' => $proposal]);
+    $originalItems = $component->get('items');
+
+    $component->set('aiInstruction', 'Cambia el título')
+        ->call('editWithAi')
+        ->call('undoAiEdit')
+        ->assertSet('title', 'Título viejo')
+        ->assertSet('aiUndoSnapshot', null);
+
+    expect(array_column($component->get('items'), 'unit_price'))
+        ->toEqual(array_map('floatval', array_column($originalItems, 'unit_price')));
+});
+
+test('saving after an ai edit persists the new items', function () {
+    ProposalEditor::fake([editedProposal()]);
+    $proposal = Proposal::factory()->create(['client_id' => $this->client->id]);
+
+    Livewire::test(Edit::class, ['proposal' => $proposal])
+        ->set('aiInstruction', 'Cambia todo')
+        ->call('editWithAi')
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $proposal->refresh();
+
+    expect($proposal->title)->toBe('Título nuevo')
+        ->and($proposal->items)->toHaveCount(1)
+        ->and((float) $proposal->subtotal)->toBe(30000.0);
 });

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Livewire\Proposal\Show as ProposalShow;
 use App\Livewire\Quote\Show as QuoteShow;
 use App\Models\Proposal;
+use App\Models\ProposalItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -157,4 +158,29 @@ test('the whatsapp message carries the private link but not the password', funct
 
     expect($message)->toContain($this->proposal->publicUrl())
         ->not->toContain($this->proposal->access_password);
+});
+
+// ─── Payment terms ────────────────────────────────────────────────────────────
+
+test('the payment schedule splits the total 50/50 and adds up exactly', function () {
+    $proposal = Proposal::factory()->make(['total' => 10000.01]);
+
+    $schedule = $proposal->paymentSchedule();
+
+    expect(array_column($schedule, 'percent'))->toBe([50, 50])
+        ->and($schedule[0]['amount'])->toBe(5000.01)
+        ->and($schedule[0]['amount'] + $schedule[1]['amount'])->toBe(10000.01);
+});
+
+test('the unlocked proposal shows the 50/50 payment terms', function () {
+    ProposalItem::factory()->create(['proposal_id' => $this->proposal->id]);
+    $this->proposal->update(['total' => 58000]);
+
+    Livewire::test(QuoteShow::class, ['token' => $this->proposal->public_token])
+        ->set('password', $this->proposal->access_password)
+        ->call('unlock')
+        ->assertSee('Forma de pago')
+        ->assertSee('Antes de iniciar el proyecto')
+        ->assertSee('Al entregar el proyecto completo')
+        ->assertSee('29,000.00');
 });

@@ -52,6 +52,7 @@ class ProposalDrafter implements Agent, HasStructuredOutput
             - Only include work the notes ask for or clearly imply. Put reasonable things that are NOT covered in "excludes" so expectations are clear (e.g. content writing, photography, paid ads, hosting costs), but only when relevant.
             - Stages: 3 to 6, in order, each with a realistic duration like "1 semana" or "2-3 semanas".
             - Items are the billable line items. Give each a clear description and a quantity (usually 1). Never include prices or amounts anywhere: noehassiel sets every price.
+            - Payment terms are fixed and added automatically: 50% deposit before starting, 50% when the complete project is delivered. Never write other payment terms, installments or milestone payments anywhere. Stages are about work, not payments.
             - Never invent facts about the client (numbers, names, history) that are not in the notes.
             - "open_questions": things missing from the notes that noehassiel should confirm with the client before sending. Empty if nothing important is missing.
             PROMPT;

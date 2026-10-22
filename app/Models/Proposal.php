@@ -111,6 +111,25 @@ class Proposal extends Model
         ]);
     }
 
+    /** noehassiel's standard terms: half before starting, the rest on full delivery. */
+    public const DEPOSIT_PERCENT = 50;
+
+    /**
+     * The payment schedule for the current total. The balance absorbs rounding so both add up exactly.
+     *
+     * @return array<int, array{label: string, description: string, percent: int, amount: float}>
+     */
+    public function paymentSchedule(): array
+    {
+        $total = (float) $this->total;
+        $deposit = round($total * self::DEPOSIT_PERCENT / 100, 2);
+
+        return [
+            ['label' => 'Anticipo', 'description' => 'Antes de iniciar el proyecto', 'percent' => self::DEPOSIT_PERCENT, 'amount' => $deposit],
+            ['label' => 'Liquidación', 'description' => 'Al entregar el proyecto completo', 'percent' => 100 - self::DEPOSIT_PERCENT, 'amount' => round($total - $deposit, 2)],
+        ];
+    }
+
     /** Readable alphabet for passwords dictated over WhatsApp or the phone: no 0/o, 1/l/i. */
     private const PASSWORD_ALPHABET = 'abcdefghjkmnpqrstuvwxyz23456789';
 

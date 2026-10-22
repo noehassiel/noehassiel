@@ -334,6 +334,12 @@
                                 {{ $proposal->currency }} {{ number_format($proposal->total, 2) }}
                             </span>
                         </div>
+                        @foreach ($proposal->paymentSchedule() as $payment)
+                            <div class="flex justify-between gap-3 text-xs text-neutral-500">
+                                <span>{{ $payment['label'] }} {{ $payment['percent'] }}%</span>
+                                <span class="font-mono">{{ number_format($payment['amount'], 2) }}</span>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             @endif
