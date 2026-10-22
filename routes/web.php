@@ -9,8 +9,8 @@ use App\Livewire\Proposal\Edit as ProposalEdit;
 use App\Livewire\Proposal\Index as ProposalIndex;
 use App\Livewire\Proposal\Show as ProposalShow;
 use App\Livewire\Settings\Appearance;
-use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
+use App\Livewire\Settings\Security;
 use App\Models\Invoice;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -53,10 +53,10 @@ Route::get('spotify/callback', [SpotifyController::class, 'callback'])
     ->name('spotify.callback');
 
 Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth', 'verified', 'can:access-admin'])
     ->name('dashboard');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'can:access-admin'])->group(function () {
 
     Route::get('clients', ClientIndex::class)->name('clients.index');
     Route::get('clients/{client}', ClientShow::class)->name('clients.show');
@@ -79,8 +79,15 @@ Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
     Route::get('settings/profile', Profile::class)->name('settings.profile');
-    Route::get('settings/password', Password::class)->name('settings.password');
+    Route::redirect('settings/password', 'settings/security');
+    Route::get('settings/security', Security::class)->middleware('password.confirm')->name('settings.security');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
 });
+
+// Lets password managers deep-link to where passkeys are created and managed
+Route::get('.well-known/passkey-endpoints', fn () => response()->json([
+    'enroll' => route('settings.security'),
+    'manage' => route('settings.security'),
+]))->name('well-known.passkeys');
 
 require __DIR__.'/auth.php';

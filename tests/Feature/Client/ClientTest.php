@@ -3,15 +3,16 @@
 declare(strict_types=1);
 
 use App\Livewire\Client\Index;
-
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 use App\Livewire\Client\Show;
 use App\Models\Client;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
+uses(RefreshDatabase::class);
+
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->admin()->create();
     $this->actingAs($this->user);
 });
 

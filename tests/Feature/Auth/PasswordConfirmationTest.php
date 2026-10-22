@@ -1,41 +1,35 @@
 <?php
 
-use App\Livewire\Auth\ConfirmPassword;
 use App\Models\User;
-use Livewire\Livewire;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 test('confirm password screen can be rendered', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->get('/confirm-password');
-
-    $response->assertStatus(200);
+    $this->actingAs($user)->get(route('password.confirm'))
+        ->assertOk()
+        ->assertSee('Confirm with passkey', false);
 });
 
 test('password can be confirmed', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user);
+    $this->actingAs($user)
+        ->post(route('password.confirm.store'), ['password' => 'password'])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
 
-    $response = Livewire::test(ConfirmPassword::class)
-        ->set('password', 'password')
-        ->call('confirmPassword');
-
-    $response
-        ->assertHasNoErrors()
-        ->assertRedirect(route('dashboard', absolute: false));
+    expect(session('auth.password_confirmed_at'))->not->toBeNull();
 });
 
 test('password is not confirmed with invalid password', function () {
     $user = User::factory()->create();
 
-    $this->actingAs($user);
+    $this->actingAs($user)
+        ->post(route('password.confirm.store'), ['password' => 'wrong-password'])
+        ->assertSessionHasErrors('password');
 
-    $response = Livewire::test(ConfirmPassword::class)
-        ->set('password', 'wrong-password')
-        ->call('confirmPassword');
-
-    $response->assertHasErrors(['password']);
+    expect(session('auth.password_confirmed_at'))->toBeNull();
 });

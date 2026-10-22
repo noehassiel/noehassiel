@@ -2,7 +2,7 @@
     <div class="me-10 w-full pb-4 md:w-[220px]">
         <x-ui.navlist>
             <x-ui.navlist.item :href="route('settings.profile')" label="{{ __('Profile') }}" wire:navigate />
-            <x-ui.navlist.item :href="route('settings.password')" label="{{ __('Password') }}" wire:navigate />
+            <x-ui.navlist.item :href="route('settings.security')" label="{{ __('Security') }}" wire:navigate />
             <x-ui.navlist.item :href="route('settings.appearance')" label="{{ __('Appearance') }}" wire:navigate />
         </x-ui.navlist>
     </div>

@@ -1,8 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\ServiceProvider;
-
 return [
 
     /*
@@ -17,6 +14,18 @@ return [
     */
 
     'name' => env('APP_NAME', 'noehassiel'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Email
+    |--------------------------------------------------------------------------
+    |
+    | The only account allowed into the admin. Every other authenticated
+    | user is denied by the "access-admin" gate.
+    |
+    */
+
+    'admin_email' => env('ADMIN_EMAIL', 'webmaster@noehassiel.com'),
 
     /*
     |--------------------------------------------------------------------------

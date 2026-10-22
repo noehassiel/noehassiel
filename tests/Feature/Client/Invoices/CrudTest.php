@@ -34,7 +34,7 @@ function fakeResend(): ResendEmailService&MockInterface
 }
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->admin()->create();
     $this->client = Client::factory()->create(['email' => 'client@example.com']);
     Storage::fake('local');
     fakeResend();

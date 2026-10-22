@@ -3,19 +3,21 @@
 declare(strict_types=1);
 
 use App\Enums\ProposalStatus;
-
-uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 use App\Livewire\Proposal\Create;
 use App\Livewire\Proposal\Edit;
 use App\Livewire\Proposal\Index;
 use App\Livewire\Proposal\Show;
 use App\Models\Client;
 use App\Models\Proposal;
+use App\Models\ProposalItem;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
+uses(RefreshDatabase::class);
+
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->admin()->create();
     $this->actingAs($this->user);
     $this->client = Client::factory()->create();
 });
@@ -138,7 +140,7 @@ test('proposals edit page loads', function () {
 
 test('can update a proposal title', function () {
     $proposal = Proposal::factory()
-        ->has(\App\Models\ProposalItem::factory()->count(1), 'items')
+        ->has(ProposalItem::factory()->count(1), 'items')
         ->create(['client_id' => $this->client->id]);
 
     Livewire::test(Edit::class, ['proposal' => $proposal])
