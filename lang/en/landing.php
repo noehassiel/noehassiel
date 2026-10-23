@@ -83,8 +83,9 @@ return [
     'about' => [
         'label' => 'about',
         'title' => 'Hi, I\'m Hassiel.',
-        'body_1' => 'I build at the intersection of code and design. Fullstack developer, UI/UX designer and project manager, based in Puebla, Mexico.',
-        'body_2' => 'I believe Mexican brands deserve digital work as good as anywhere in the world, and that well-crafted experiences are investments, not luxuries. I also collaborate with Estoria Studio on premium projects.',
+        'body_1' => 'I can\'t design without thinking about how it\'ll be built, or code without thinking about who\'ll use it. So I do both, and I run the project too: nothing gets lost between one person and the next.',
+        'body_2' => 'I obsess over the details nobody asks for but everyone notices. I\'d rather tell you the truth about timelines and scope than promise something that won\'t happen. And I\'m convinced Mexico can produce digital work on par with anywhere in the world. Every project is my way of proving it.',
+        'body_3' => 'I also collaborate with <a href="https://estoria.studio/" target="_blank" rel="noopener">Estoria Studio</a>, a studio from León I really admire. I\'m genuinely happy to work with them.',
         'portrait' => 'Portrait of Hassiel',
         'facts' => [
             'based' => 'Based in',

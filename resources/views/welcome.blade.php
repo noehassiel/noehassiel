@@ -192,6 +192,7 @@
                     <h2 class="section-title" id="about-title"><x-t key="about.title" /></h2>
                     <p class="about-body"><x-t key="about.body_1" /></p>
                     <p class="about-body"><x-t key="about.body_2" /></p>
+                    <p class="about-body"><x-t key="about.body_3" :html="true" /></p>
 
                     <dl class="about-facts">
                         @foreach (['based', 'speaks', 'stack'] as $fact)

@@ -586,6 +586,18 @@ body.landing::before {
     color: var(--slate);
 }
 
+.about-body a {
+    color: var(--charcoal);
+    text-decoration: underline;
+    text-decoration-color: var(--ember);
+    text-underline-offset: 3px;
+    transition: color 0.2s var(--ease-out);
+}
+
+.about-body a:hover {
+    color: var(--ember);
+}
+
 .about-facts {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));

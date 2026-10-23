@@ -83,8 +83,9 @@ return [
     'about' => [
         'label' => 'sobre mí',
         'title' => 'Hola, soy Hassiel.',
-        'body_1' => 'Construyo en la intersección entre código y diseño. Desarrollador fullstack, diseñador UI/UX y project manager, desde Puebla, México.',
-        'body_2' => 'Creo que las marcas mexicanas merecen trabajo digital tan bueno como el de cualquier parte del mundo, y que una experiencia bien hecha es una inversión, no un lujo. También colaboro con Estoria Studio en proyectos premium.',
+        'body_1' => 'No sé diseñar sin pensar en cómo se va a construir, ni programar sin pensar en quién lo va a usar. Por eso hago las dos cosas, y además llevo el proyecto: así nada se pierde entre una persona y otra.',
+        'body_2' => 'Me obsesionan los detalles que nadie pide pero todos notan. Prefiero decirte la verdad sobre tiempos y alcance que prometerte algo que no va a pasar. Y estoy convencido de que en México se puede hacer trabajo digital al nivel de cualquier parte del mundo. Cada proyecto es mi forma de demostrarlo.',
+        'body_3' => 'También colaboro con <a href="https://estoria.studio/" target="_blank" rel="noopener">Estoria Studio</a>, un estudio de León que admiro mucho. Me hace feliz trabajar con ellos.',
         'portrait' => 'Retrato de Hassiel',
         'facts' => [
             'based' => 'Desde',
