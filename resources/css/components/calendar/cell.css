@@ -210,7 +210,11 @@
             @apply absolute invisible opacity-0 transition-all duration-150 ease-out bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-1 text-xs font-medium bg-neutral-800 text-white rounded-md shadow-lg pointer-events-none z-50 border border-neutral-700;
 
             &::after {
-                @apply content-[''] absolute top-full left-1/2 -translate-x-1/2 border-6 border-solid border-transparent border-t-neutral-800 dark:border-t-neutral-200;
+                @apply content-[''] absolute top-full left-1/2 -translate-x-1/2 border-6 border-solid border-transparent border-t-neutral-800;
+            }
+
+            :where(.dark, .dark *) &::after {
+                @apply border-t-neutral-200;
             }
         }
 
