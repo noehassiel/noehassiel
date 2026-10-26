@@ -55,7 +55,7 @@ test('uploads are validated', function (array $uploads) {
 
     expect($this->requirement->files()->count())->toBe(0);
 })->with([
-    'too large' => fn () => [UploadedFile::fake()->create('video.mov', 10241)],
+    'too large' => fn () => [UploadedFile::fake()->create('video.mov', 51201)],
     'too many' => fn () => array_map(fn ($i) => UploadedFile::fake()->create("f{$i}.pdf", 1), range(1, 11)),
 ]);
 
