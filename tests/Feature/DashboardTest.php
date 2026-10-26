@@ -1,8 +1,10 @@
 <?php
 
 use App\Enums\ProjectStatus;
+use App\Enums\ProposalStatus;
 use App\Models\Project;
 use App\Models\ProjectRequirement;
+use App\Models\Proposal;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -35,3 +37,11 @@ test('the dashboard summarizes active projects and pending deliverables', functi
         ->assertSee('Sitio Innovar')
         ->assertSee('Logo en vectores');
 });
+
+test('the dashboard renders proposals in every status', function (ProposalStatus $status) {
+    $this->actingAs(User::factory()->admin()->create());
+
+    Proposal::factory()->create(['status' => $status]);
+
+    $this->get('/dashboard')->assertOk();
+})->with(ProposalStatus::cases());

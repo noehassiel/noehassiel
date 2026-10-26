@@ -7,7 +7,9 @@
     $statusTone = [
         'draft' => 'bg-[var(--track)]',
         'sent' => 'bg-[var(--brass)]',
+        'changes_requested' => 'bg-[var(--brass)]',
         'accepted' => 'bg-[var(--ember)]',
+        'paid' => 'bg-[var(--ember)]',
         'rejected' => 'bg-[#4A4A4A]',
         'expired' => 'bg-[#3A3A3A]',
     ];
