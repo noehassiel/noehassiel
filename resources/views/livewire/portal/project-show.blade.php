@@ -233,4 +233,78 @@
             @endcan
         </section>
     </div>
+    {{-- Requests: bugs, changes and questions, mirrored to Linear --}}
+    <section class="mt-14 grid gap-10 lg:grid-cols-5" aria-labelledby="tickets-heading">
+        <div class="min-w-0 space-y-5 lg:col-span-3">
+            <div>
+                <h2 id="tickets-heading" class="text-2xl font-bold tracking-tight">{{ __('portal.tickets.title') }}</h2>
+                <p class="mt-2 text-sm text-[var(--silver)]">{{ __('portal.tickets.hint') }}</p>
+            </div>
+
+            @if ($tickets->isEmpty())
+                <p class="text-sm text-[var(--slate)]">{{ __('portal.tickets.empty') }}</p>
+            @else
+                <ul class="space-y-3">
+                    @foreach ($tickets as $ticket)
+                        <li wire:key="ticket-{{ $ticket->id }}" class="portal-card p-5">
+                            <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                                <p class="min-w-0 font-bold">{{ $ticket->title }}</p>
+                                <span @class([
+                                    'shrink-0 font-mono text-xs uppercase tracking-[0.14em]',
+                                    'text-[var(--slate)]' => $ticket->status === \App\Enums\TicketStatus::Open,
+                                    'text-[var(--brass)]' => $ticket->status === \App\Enums\TicketStatus::InProgress,
+                                    'text-emerald-400' => $ticket->status === \App\Enums\TicketStatus::Resolved,
+                                    'text-[var(--silver)] line-through' => $ticket->status === \App\Enums\TicketStatus::Closed,
+                                ])>{{ $ticket->status->label() }}</span>
+                            </div>
+                            <p class="mt-1 font-mono text-xs text-[var(--slate)]">
+                                {{ $ticket->type->label() }} · {{ $ticket->created_at->translatedFormat('j M') }}@if ($ticket->user) · {{ $ticket->user->name }}@endif
+                            </p>
+                            <p class="mt-3 line-clamp-3 whitespace-pre-line text-sm text-[var(--silver)]">{{ $ticket->description }}</p>
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+
+        <form wire:submit="submitTicket" class="portal-card min-w-0 space-y-4 self-start p-6 lg:col-span-2" aria-labelledby="new-ticket-heading">
+            <h3 id="new-ticket-heading" class="portal-eyebrow">{{ __('portal.tickets.new') }}</h3>
+
+            <fieldset class="flex flex-wrap gap-2">
+                <legend class="sr-only">{{ __('portal.tickets.type_field') }}</legend>
+                @foreach (\App\Enums\TicketType::cases() as $type)
+                    <label class="cursor-pointer">
+                        <input type="radio" wire:model="ticketType" value="{{ $type->value }}" class="peer sr-only">
+                        <span class="inline-block rounded-full border border-[#2A2A2A] px-3 py-1.5 text-sm text-[var(--silver)] transition-colors peer-checked:border-[var(--ember)] peer-checked:text-[var(--stone)] peer-focus-visible:outline-2 peer-focus-visible:outline-[var(--ember)]">{{ $type->label() }}</span>
+                    </label>
+                @endforeach
+            </fieldset>
+
+            <div class="flex min-w-0 flex-col gap-2">
+                <label for="ticket-title" class="text-sm font-bold">{{ __('portal.tickets.title_field') }}</label>
+                <input id="ticket-title" wire:model="ticketTitle" type="text" required maxlength="255"
+                    @error('ticketTitle') aria-invalid="true" aria-describedby="ticket-title-error" @enderror
+                    class="w-full min-w-0 rounded-xl border border-[#2A2A2A] bg-[#0D0D0D] px-4 py-3 text-[var(--stone)]">
+                @error('ticketTitle')
+                    <p id="ticket-title-error" role="alert" class="text-sm text-[var(--ember)]">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="flex min-w-0 flex-col gap-2">
+                <label for="ticket-description" class="text-sm font-bold">{{ __('portal.tickets.description_field') }}</label>
+                <textarea id="ticket-description" wire:model="ticketDescription" rows="5" required
+                    placeholder="{{ __('portal.tickets.description_placeholder') }}"
+                    @error('ticketDescription') aria-invalid="true" aria-describedby="ticket-description-error" @enderror
+                    class="w-full min-w-0 rounded-xl border border-[#2A2A2A] bg-[#0D0D0D] px-4 py-3 text-[var(--stone)] placeholder:text-[#3A3A3A]"></textarea>
+                @error('ticketDescription')
+                    <p id="ticket-description-error" role="alert" class="text-sm text-[var(--ember)]">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <button type="submit" wire:loading.attr="disabled"
+                class="w-full cursor-pointer rounded-xl bg-[var(--ember)] px-5 py-3 font-bold text-[var(--obsidian)] transition-opacity hover:opacity-90 disabled:opacity-60">
+                {{ __('portal.tickets.send') }}
+            </button>
+        </form>
+    </section>
 </div>

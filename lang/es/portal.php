@@ -81,7 +81,7 @@ return [
         'file' => 'archivo',
         'upload' => 'Subir',
         'uploading' => 'Subiendo…',
-        'upload_hint' => 'Hasta 10 archivos de 10 MB cada uno. Para algo más pesado, usa tu carpeta compartida.',
+        'upload_hint' => 'Hasta 10 archivos de 50 MB cada uno. Para algo más pesado, usa tu carpeta compartida.',
         'remove_file' => 'Quitar',
         'remove_file_confirm' => '¿Quitar este archivo?',
     ],
@@ -117,6 +117,29 @@ return [
         'view_invoices_hint' => 'Las facturas que noehassiel le envía a tu empresa.',
         'email_taken' => 'Ya existe una cuenta con este correo.',
         'invited' => 'Invitación enviada.',
+    ],
+
+    'tickets' => [
+        'title' => 'Solicitudes',
+        'hint' => '¿Algo no funciona, quieres un cambio o tienes una duda? Escríbelo aquí y lo vemos.',
+        'empty' => 'Todavía no hay solicitudes.',
+        'new' => 'Nueva solicitud',
+        'type_field' => 'Tipo',
+        'title_field' => 'Título',
+        'description_field' => 'Detalles',
+        'description_placeholder' => 'Qué pasa, dónde lo viste y qué esperabas.',
+        'send' => 'Enviar solicitud',
+        'types' => [
+            'bug' => 'Algo no funciona',
+            'change' => 'Cambio',
+            'question' => 'Duda',
+        ],
+        'statuses' => [
+            'open' => 'Recibida',
+            'in_progress' => 'En proceso',
+            'resolved' => 'Resuelta',
+            'closed' => 'Cerrada',
+        ],
     ],
 
     'invoices' => [

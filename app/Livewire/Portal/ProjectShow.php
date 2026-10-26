@@ -4,12 +4,16 @@ namespace App\Livewire\Portal;
 
 use App\Enums\ProjectStatus;
 use App\Enums\RequirementStatus;
+use App\Enums\TicketType;
+use App\Jobs\CreateLinearIssueForTicket;
 use App\Mail\RequirementUploadedMail;
+use App\Mail\TicketOpenedMail;
 use App\Models\Project;
 use App\Models\ProjectRequirement;
 use App\Models\RequirementFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -26,6 +30,12 @@ class ProjectShow extends Component
     public string $linkLabel = '';
 
     public string $linkUrl = '';
+
+    public string $ticketType = 'change';
+
+    public string $ticketTitle = '';
+
+    public string $ticketDescription = '';
 
     /** @var array<int, array<int, TemporaryUploadedFile>> Pending uploads, keyed by requirement id */
     public array $uploads = [];
@@ -95,7 +105,7 @@ class ProjectShow extends Component
 
         $this->validate([
             "uploads.{$requirementId}" => ['required', 'array', 'max:10'],
-            "uploads.{$requirementId}.*" => ['file', 'max:10240'],
+            "uploads.{$requirementId}.*" => ['file', 'max:51200'],
         ], attributes: [
             "uploads.{$requirementId}" => __('portal.project.files'),
             "uploads.{$requirementId}.*" => __('portal.project.file'),
@@ -141,6 +151,36 @@ class ProjectShow extends Component
         Mail::to(config('app.admin_email'))->send(new RequirementUploadedMail($requirement, Auth::user()));
     }
 
+    /**
+     * The client reports a bug, asks for a change or a question; it goes to Linear and to the admin's inbox.
+     */
+    public function submitTicket(): void
+    {
+        $this->authorize('view', $this->project);
+
+        $validated = $this->validate([
+            'ticketType' => ['required', Rule::enum(TicketType::class)],
+            'ticketTitle' => ['required', 'string', 'max:255'],
+            'ticketDescription' => ['required', 'string', 'max:10000'],
+        ], attributes: [
+            'ticketTitle' => __('portal.tickets.title_field'),
+            'ticketDescription' => __('portal.tickets.description_field'),
+        ]);
+
+        $ticket = $this->project->tickets()->create([
+            'user_id' => Auth::id(),
+            'type' => $validated['ticketType'],
+            'title' => $validated['ticketTitle'],
+            'description' => $validated['ticketDescription'],
+        ]);
+
+        Mail::to(config('app.admin_email'))->send(new TicketOpenedMail($ticket));
+        CreateLinearIssueForTicket::dispatchAfterResponse($ticket);
+
+        $this->reset('ticketTitle', 'ticketDescription');
+        $this->ticketType = TicketType::Change->value;
+    }
+
     public function render(): View
     {
         $steps = array_values(array_filter(
@@ -151,6 +191,7 @@ class ProjectShow extends Component
         return view('livewire.portal.project-show', [
             'requirements' => $this->project->requirements()->with('files')->get(),
             'links' => $this->project->links()->get(),
+            'tickets' => $this->project->tickets()->with('user')->get(),
             'steps' => $steps,
             'currentStep' => array_search($this->project->status, $steps, true),
         ])->title($this->project->name);

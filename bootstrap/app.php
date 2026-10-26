@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->redirectUsersTo('/home');
 
         // Stripe can't send a CSRF token; Cashier verifies the webhook signature instead
-        $middleware->validateCsrfTokens(except: ['stripe/*']);
+        $middleware->validateCsrfTokens(except: ['stripe/*', 'linear/webhook']);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

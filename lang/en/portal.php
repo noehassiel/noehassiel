@@ -81,7 +81,7 @@ return [
         'file' => 'file',
         'upload' => 'Upload',
         'uploading' => 'Uploading…',
-        'upload_hint' => 'Up to 10 files, 10 MB each. For anything heavier, use your shared folder.',
+        'upload_hint' => 'Up to 10 files, 50 MB each. For anything heavier, use your shared folder.',
         'remove_file' => 'Remove',
         'remove_file_confirm' => 'Remove this file?',
     ],
@@ -117,6 +117,29 @@ return [
         'view_invoices_hint' => 'The invoices noehassiel sends to your company.',
         'email_taken' => 'An account with this email already exists.',
         'invited' => 'Invitation sent.',
+    ],
+
+    'tickets' => [
+        'title' => 'Requests',
+        'hint' => 'Something broken, want a change or have a question? Write it here and we will look into it.',
+        'empty' => 'No requests yet.',
+        'new' => 'New request',
+        'type_field' => 'Type',
+        'title_field' => 'Title',
+        'description_field' => 'Details',
+        'description_placeholder' => 'What happens, where you saw it and what you expected.',
+        'send' => 'Send request',
+        'types' => [
+            'bug' => 'Something is broken',
+            'change' => 'Change',
+            'question' => 'Question',
+        ],
+        'statuses' => [
+            'open' => 'Received',
+            'in_progress' => 'In progress',
+            'resolved' => 'Resolved',
+            'closed' => 'Closed',
+        ],
     ],
 
     'invoices' => [

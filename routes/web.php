@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LinearWebhookController;
 use App\Http\Controllers\Os1Controller;
 use App\Http\Controllers\SpotifyController;
 use App\Http\Middleware\UseUserLocale;
@@ -95,6 +96,9 @@ Route::get('requirement-files/{file}/download', function (RequirementFile $file)
 Route::get('invitations/{token}', AcceptInvitation::class)
     ->middleware(['guest', 'throttle:20,1'])
     ->name('invitations.accept');
+
+// Linear signs each delivery; the controller verifies it
+Route::post('linear/webhook', LinearWebhookController::class)->middleware('throttle:120,1')->name('linear.webhook');
 
 // Shareable proposal page: the link plus its password are the credential, no account needed
 Route::get('q/{token}', QuoteShow::class)

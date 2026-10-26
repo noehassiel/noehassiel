@@ -40,6 +40,13 @@ return [
         'notify_email' => env('PROPOSALS_NOTIFY_EMAIL', 'admin@noehassiel.com'),
     ],
 
+    // Projects paid through a proposal and client portal tickets are mirrored to one Linear team
+    'linear' => [
+        'api_key' => env('LINEAR_API_KEY'),
+        'team_id' => env('LINEAR_TEAM_ID'),
+        'webhook_secret' => env('LINEAR_WEBHOOK_SECRET'),
+    ],
+
     // Shown to clients who choose to pay by bank transfer
     'bank' => [
         'name' => env('BANK_NAME'),

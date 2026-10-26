@@ -3,10 +3,14 @@
 namespace App\Livewire\Project;
 
 use App\Enums\ProjectStatus;
+use App\Jobs\CreateLinearIssueForTicket;
+use App\Jobs\SyncProjectToLinear;
 use App\Models\Project;
+use App\Services\Linear;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Livewire\Component;
+use Throwable;
 
 class Show extends Component
 {
@@ -124,6 +128,40 @@ class Show extends Component
         $this->project->requirements()->findOrFail($requirementId)->delete();
     }
 
+    /**
+     * Create (or retry creating) the Linear project; runs now so the admin sees the result.
+     */
+    public function syncToLinear(Linear $linear): void
+    {
+        if (! $linear->isConfigured()) {
+            $this->dispatch('toast', message: 'Linear no está configurado (LINEAR_API_KEY y LINEAR_TEAM_ID).', type: 'warning');
+
+            return;
+        }
+
+        try {
+            SyncProjectToLinear::dispatchSync($this->project);
+            $this->project->refresh();
+            $this->dispatch('toast', message: 'Proyecto creado en Linear.', type: 'success');
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->dispatch('toast', message: 'Linear no respondió. Intenta de nuevo.', type: 'error');
+        }
+    }
+
+    public function retryTicket(int $ticketId): void
+    {
+        $ticket = $this->project->tickets()->findOrFail($ticketId);
+
+        try {
+            CreateLinearIssueForTicket::dispatchSync($ticket);
+            $this->project->refresh();
+        } catch (Throwable $exception) {
+            report($exception);
+            $this->dispatch('toast', message: 'Linear no respondió. Intenta de nuevo.', type: 'error');
+        }
+    }
+
     public function deleteProject(): void
     {
         $client = $this->project->client;
@@ -137,6 +175,8 @@ class Show extends Component
     {
         return view('livewire.project.show', [
             'links' => $this->project->links()->get(),
+            'tickets' => $this->project->tickets()->with('user')->get(),
+            'linearConfigured' => app(Linear::class)->isConfigured(),
             'requirements' => $this->project->requirements()->with('files.uploader')->get(),
             'statuses' => ProjectStatus::cases(),
         ])->layout('components.layouts.app.main', ['title' => $this->project->name]);

@@ -153,6 +153,47 @@
                 </form>
             </div>
 
+            {{-- Linear --}}
+            <div class="space-y-3">
+                <div class="flex items-center justify-between gap-3">
+                    <h2 class="admin-eyebrow">Linear</h2>
+                    @if ($project->linear_project_url)
+                        <x-ui.button variant="ghost" size="sm" :href="$project->linear_project_url" target="_blank" iconAfter="arrow-top-right-on-square">Abrir en Linear</x-ui.button>
+                    @elseif ($linearConfigured)
+                        <x-ui.button variant="outline" size="sm" wire:click="syncToLinear" wire:loading.attr="disabled" wire:target="syncToLinear" icon="arrow-path">Crear en Linear</x-ui.button>
+                    @endif
+                </div>
+                @unless ($linearConfigured)
+                    <p class="text-xs text-neutral-400">Agrega LINEAR_API_KEY y LINEAR_TEAM_ID al .env para mandar proyectos y solicitudes a Linear.</p>
+                @endunless
+            </div>
+
+            {{-- Client requests --}}
+            <div class="space-y-3">
+                <div>
+                    <h2 class="admin-eyebrow">Solicitudes del cliente</h2>
+                    <p class="mt-1 text-xs text-neutral-400">Lo que el cliente reporta desde su portal. El estado se actualiza desde Linear.</p>
+                </div>
+                @forelse ($tickets as $ticket)
+                    <div wire:key="admin-ticket-{{ $ticket->id }}" class="admin-subcard px-4 py-3">
+                        <div class="flex items-start justify-between gap-3">
+                            <p class="min-w-0 text-sm font-semibold text-neutral-800 dark:text-neutral-200">{{ $ticket->title }}</p>
+                            <span class="shrink-0 text-xs text-neutral-500">{{ $ticket->status->label() }}</span>
+                        </div>
+                        <p class="mt-0.5 text-xs text-neutral-400">
+                            {{ $ticket->type->label() }} · {{ $ticket->created_at->format('d/m/Y') }}@if ($ticket->user) · {{ $ticket->user->name }}@endif
+                            @if ($ticket->linear_url)
+                                · <a href="{{ $ticket->linear_url }}" target="_blank" rel="noopener" class="font-mono text-[#FF420B] hover:underline">{{ $ticket->linear_identifier }}</a>
+                            @elseif ($linearConfigured)
+                                · <button type="button" wire:click="retryTicket({{ $ticket->id }})" class="cursor-pointer text-[#FF420B] hover:underline">Mandar a Linear</button>
+                            @endif
+                        </p>
+                    </div>
+                @empty
+                    <p class="text-xs text-neutral-400">Sin solicitudes.</p>
+                @endforelse
+            </div>
+
             {{-- Shared folders --}}
             <div class="space-y-4">
                 <div>

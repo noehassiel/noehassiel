@@ -7,6 +7,7 @@ use App\Enums\ProjectStatus;
 use App\Enums\ProposalEventType;
 use App\Enums\ProposalProjectType;
 use App\Enums\ProposalStatus;
+use App\Jobs\SyncProjectToLinear;
 use App\Mail\ProjectWelcomeMail;
 use App\Mail\ProposalResponseMail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -476,6 +477,7 @@ class Proposal extends Model
         if ($project->wasRecentlyCreated) {
             $this->notifyAdmin('paid');
             $this->sendProjectWelcome($project);
+            SyncProjectToLinear::dispatchAfterResponse($project);
         }
 
         return $project;
