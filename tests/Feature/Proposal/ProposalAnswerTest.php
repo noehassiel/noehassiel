@@ -63,7 +63,7 @@ test('accepting with an invoice adds IVA to the total and notifies the admin', f
         ->and((float) $this->proposal->total)->toBe(58000.0)
         ->and($this->proposal->depositAmount())->toBe(29000.0);
 
-    Mail::assertQueued(ProposalResponseMail::class, fn ($mail) => $mail->event === 'accepted' && $mail->hasTo('admin@noehassiel.com'));
+    Mail::assertSent(ProposalResponseMail::class, fn ($mail) => $mail->event === 'accepted' && $mail->hasTo('admin@noehassiel.com'));
 });
 
 test('an invoice does not add IVA twice when the admin already included it', function () {
@@ -94,7 +94,7 @@ test('requesting changes requires a description and emails it to the admin', fun
         ->status->toBe(ProposalStatus::ChangesRequested)
         ->client_response->toBe('Quitar el blog y arrancar en enero');
 
-    Mail::assertQueued(ProposalResponseMail::class, fn ($mail) => $mail->event === 'changes_requested');
+    Mail::assertSent(ProposalResponseMail::class, fn ($mail) => $mail->event === 'changes_requested');
 });
 
 test('cancelling notifies the admin', function () {
@@ -104,7 +104,7 @@ test('cancelling notifies the admin', function () {
         ->call('reject');
 
     expect($this->proposal->fresh()->status)->toBe(ProposalStatus::Rejected);
-    Mail::assertQueued(ProposalResponseMail::class, fn ($mail) => $mail->event === 'rejected');
+    Mail::assertSent(ProposalResponseMail::class, fn ($mail) => $mail->event === 'rejected');
 });
 
 test('a locked page cannot answer', function () {
@@ -133,7 +133,7 @@ test('choosing transfer shows the bank details and notifies the admin', function
         ->assertSee('012345678901234567');
 
     expect($this->proposal->fresh()->payment_method)->toBe(PaymentMethod::Transfer);
-    Mail::assertQueued(ProposalResponseMail::class, fn ($mail) => $mail->event === 'payment_method_chosen');
+    Mail::assertSent(ProposalResponseMail::class, fn ($mail) => $mail->event === 'payment_method_chosen');
 });
 
 test('paying by card passes the stripe fee on to the client', function () {
@@ -195,8 +195,8 @@ test('admin marking the deposit received creates the project and welcomes the cl
         ->and($project->client->email)->toBe('mariana@example.com')
         ->and($this->lead->fresh()->isConverted())->toBeTrue();
 
-    Mail::assertQueued(ProjectWelcomeMail::class, fn ($mail) => $mail->hasTo('mariana@example.com') && $mail->invitationToken !== null);
-    Mail::assertQueued(ProposalResponseMail::class, fn ($mail) => $mail->event === 'paid');
+    Mail::assertSent(ProjectWelcomeMail::class, fn ($mail) => $mail->hasTo('mariana@example.com') && $mail->invitationToken !== null);
+    Mail::assertSent(ProposalResponseMail::class, fn ($mail) => $mail->event === 'paid');
 });
 
 test('recording the deposit twice creates only one project', function () {
@@ -206,7 +206,7 @@ test('recording the deposit twice creates only one project', function () {
     $second = $this->proposal->fresh()->markDepositPaid(PaymentMethod::Cash, 25000);
 
     expect($second->is($first))->toBeTrue();
-    Mail::assertQueuedCount(3); // accepted, paid, welcome
+    Mail::assertSentCount(3); // accepted, paid, welcome
 });
 
 test('a client who already has portal access gets a login link instead of an invitation', function () {
@@ -217,7 +217,7 @@ test('a client who already has portal access gets a login link instead of an inv
 
     $this->proposal->markDepositPaid(PaymentMethod::Cash, 25000);
 
-    Mail::assertQueued(ProjectWelcomeMail::class, fn ($mail) => $mail->invitationToken === null);
+    Mail::assertSent(ProjectWelcomeMail::class, fn ($mail) => $mail->invitationToken === null);
 });
 
 // ─── Stripe webhook ───────────────────────────────────────────────────────────
@@ -270,7 +270,7 @@ test('choosing card shows the fee before paying', function () {
         ->assertSee('Comisión de Stripe')
         ->assertSee(number_format($charge['charge'], 2));
 
-    Mail::assertNotQueued(ProposalResponseMail::class, fn ($mail) => $mail->event === 'payment_method_chosen');
+    Mail::assertNotSent(ProposalResponseMail::class, fn ($mail) => $mail->event === 'payment_method_chosen');
 });
 
 test('the client sees the welcome state once the deposit is paid', function () {

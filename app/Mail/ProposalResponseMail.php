@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Models\Proposal;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -14,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 /**
  * Tells the admin what a client did on a proposal: accepted, asked for changes, cancelled, chose how to pay, or paid.
  */
-class ProposalResponseMail extends Mailable implements ShouldQueue
+class ProposalResponseMail extends Mailable
 {
     use Queueable, SerializesModels;
 

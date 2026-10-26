@@ -472,11 +472,11 @@ class Proposal extends Model
             [, $invitationToken] = ClientInvitation::issue($client, $email, $locale);
         }
 
-        Mail::to($email)->queue(new ProjectWelcomeMail($project, $invitationToken));
+        Mail::to($email)->send(new ProjectWelcomeMail($project, $invitationToken));
     }
 
     private function notifyAdmin(string $event): void
     {
-        Mail::to(config('services.proposals.notify_email'))->queue(new ProposalResponseMail($this, $event));
+        Mail::to(config('services.proposals.notify_email'))->send(new ProposalResponseMail($this, $event));
     }
 }

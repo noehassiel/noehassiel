@@ -38,7 +38,7 @@ class SendPortalReminders extends Command
                 $projects = $client->projects->filter(fn ($project) => $user->canSeeProject($project));
 
                 if ($projects->isNotEmpty()) {
-                    Mail::to($user)->queue(new PendingRequirementsMail($user, $projects->values()));
+                    Mail::to($user)->send(new PendingRequirementsMail($user, $projects->values()));
                 }
             }
 

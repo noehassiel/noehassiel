@@ -5,7 +5,6 @@ namespace App\Mail;
 use App\Models\ProjectRequirement;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
@@ -15,7 +14,7 @@ use Illuminate\Queue\SerializesModels;
 /**
  * Tells the admin a client says a deliverable is in their shared folder.
  */
-class RequirementUploadedMail extends Mailable implements ShouldQueue
+class RequirementUploadedMail extends Mailable
 {
     use Queueable, SerializesModels;
 

@@ -147,7 +147,7 @@ class PortalUsers extends Component
     {
         [$invitation, $token] = ClientInvitation::issue($this->client, $email, $locale, Auth::user(), array_filter($access, fn ($value) => $value !== null));
 
-        Mail::to($email)->queue(new ClientInvitationMail($invitation, $token));
+        Mail::to($email)->send(new ClientInvitationMail($invitation, $token));
     }
 
     public function render(): View

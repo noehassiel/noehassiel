@@ -72,7 +72,7 @@ class Team extends Component
             'project_ids' => $this->allProjects ? null : array_map('intval', $this->projectIds),
         ]);
 
-        Mail::to($this->email)->queue(new ClientInvitationMail($invitation, $token));
+        Mail::to($this->email)->send(new ClientInvitationMail($invitation, $token));
 
         $this->reset('email', 'allProjects', 'projectIds', 'viewInvoices');
         $this->dispatch('notify', type: 'success', content: __('portal.team.invited'));

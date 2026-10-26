@@ -5,14 +5,13 @@ namespace App\Mail;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class PendingRequirementsMail extends Mailable implements ShouldQueue
+class PendingRequirementsMail extends Mailable
 {
     use Queueable, SerializesModels;
 

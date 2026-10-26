@@ -118,7 +118,7 @@ it('stores a lead with phone and emails it', function () {
         ->and($lead->phone)->toBe('+52 222 123 4567')
         ->and($lead->language)->toBe('es');
 
-    Mail::assertQueued(NewLeadMail::class, fn (NewLeadMail $mail) => $mail->hasTo('hello@noehassiel.test') && $mail->lead->is($lead));
+    Mail::assertSent(NewLeadMail::class, fn (NewLeadMail $mail) => $mail->hasTo('hello@noehassiel.test') && $mail->lead->is($lead));
 });
 
 it('validates contact details in the visitor language', function () {
@@ -139,7 +139,7 @@ it('silently drops honeypot submissions', function () {
     fillBrief()->set('website', 'https://spam.example')->call('submit')->assertSet('sent', true);
 
     expect(Lead::query()->count())->toBe(0);
-    Mail::assertNothingQueued();
+    Mail::assertNothingSent();
 });
 
 it('rate limits brief submissions per visitor', function () {

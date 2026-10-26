@@ -55,7 +55,7 @@ test('an owner invites a member with access to selected projects only', function
         ->can_view_all_projects->toBeFalse()
         ->project_ids->toBe([$this->projectA->id]);
 
-    Mail::assertQueued(ClientInvitationMail::class);
+    Mail::assertSent(ClientInvitationMail::class);
 });
 
 test('choosing selected projects requires at least one', function () {

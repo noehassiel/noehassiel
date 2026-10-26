@@ -164,7 +164,7 @@ class ProjectForm extends Component
             'language' => $this->language,
         ]);
 
-        Mail::to(config('services.leads.email'))->queue(new NewLeadMail($lead));
+        Mail::to(config('services.leads.email'))->send(new NewLeadMail($lead));
 
         $this->reset('name', 'email', 'phone', 'company', 'projectType', 'budget', 'timeline', 'message');
         $this->step = 'intro';

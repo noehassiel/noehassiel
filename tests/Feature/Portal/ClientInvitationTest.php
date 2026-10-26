@@ -35,7 +35,7 @@ test('the admin can invite someone to a client\'s portal', function () {
     expect($invitation->email)->toBe('ana@acme.com')
         ->and($invitation->locale)->toBe('en');
 
-    Mail::assertQueued(ClientInvitationMail::class, fn (ClientInvitationMail $mail) => $mail->hasTo('ana@acme.com')
+    Mail::assertSent(ClientInvitationMail::class, fn (ClientInvitationMail $mail) => $mail->hasTo('ana@acme.com')
         && $mail->locale === 'en'
         && $invitation->token_hash === ClientInvitation::hashToken($mail->token));
 });
@@ -50,7 +50,7 @@ test('an email that already has an account can not be invited', function () {
         ->call('invite')
         ->assertHasErrors('email');
 
-    Mail::assertNothingQueued();
+    Mail::assertNothingSent();
 });
 
 test('resending an invitation invalidates the previous link', function () {
@@ -62,7 +62,7 @@ test('resending an invitation invalidates the previous link', function () {
 
     expect(ClientInvitation::findPendingByToken($oldToken))->toBeNull()
         ->and($this->client->invitations()->pending()->count())->toBe(1);
-    Mail::assertQueued(ClientInvitationMail::class);
+    Mail::assertSent(ClientInvitationMail::class);
 });
 
 test('accepting an invitation creates a client user and opens the portal', function () {

@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Models\Project;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -13,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 /**
  * Sent to the client once the deposit is in: their project exists and the portal is where it lives.
  */
-class ProjectWelcomeMail extends Mailable implements ShouldQueue
+class ProjectWelcomeMail extends Mailable
 {
     use Queueable, SerializesModels;
 

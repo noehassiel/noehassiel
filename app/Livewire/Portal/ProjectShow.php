@@ -77,7 +77,7 @@ class ProjectShow extends Component
 
         $requirement->markUploadedByClient();
 
-        Mail::to(config('app.admin_email'))->queue(new RequirementUploadedMail($requirement, Auth::user()));
+        Mail::to(config('app.admin_email'))->send(new RequirementUploadedMail($requirement, Auth::user()));
     }
 
     public function render(): View

@@ -41,11 +41,11 @@ test('each team member gets one reminder listing only pending items, in their la
 
     $this->artisan('portal:send-reminders')->assertSuccessful();
 
-    Mail::assertQueued(PendingRequirementsMail::class, 2);
-    Mail::assertQueued(PendingRequirementsMail::class, fn (PendingRequirementsMail $mail) => $mail->hasTo($user->email)
+    Mail::assertSent(PendingRequirementsMail::class, 2);
+    Mail::assertSent(PendingRequirementsMail::class, fn (PendingRequirementsMail $mail) => $mail->hasTo($user->email)
         && $mail->locale === 'en'
         && $mail->pendingCount() === 2);
-    Mail::assertQueued(PendingRequirementsMail::class, fn (PendingRequirementsMail $mail) => $mail->hasTo($teammate->email)
+    Mail::assertSent(PendingRequirementsMail::class, fn (PendingRequirementsMail $mail) => $mail->hasTo($teammate->email)
         && $mail->locale === 'es');
 
     expect($client->fresh()->reminded_at)->not->toBeNull();
@@ -59,12 +59,12 @@ test('a client is not reminded again until the interval has passed', function ()
     $this->travel(2)->days();
     $this->artisan('portal:send-reminders');
 
-    Mail::assertQueued(PendingRequirementsMail::class, 1);
+    Mail::assertSent(PendingRequirementsMail::class, 1);
 
     $this->travel(1)->days();
     $this->artisan('portal:send-reminders');
 
-    Mail::assertQueued(PendingRequirementsMail::class, 2);
+    Mail::assertSent(PendingRequirementsMail::class, 2);
 });
 
 test('no reminder goes out when nothing is pending, the project is paused or delivered, or nobody has access', function () {
@@ -77,7 +77,7 @@ test('no reminder goes out when nothing is pending, the project is paused or del
 
     $this->artisan('portal:send-reminders')->assertSuccessful();
 
-    Mail::assertNothingQueued();
+    Mail::assertNothingSent();
 });
 
 test('items the client already marked as uploaded are not reminded', function () {
@@ -86,7 +86,7 @@ test('items the client already marked as uploaded are not reminded', function ()
 
     $this->artisan('portal:send-reminders');
 
-    Mail::assertNothingQueued();
+    Mail::assertNothingSent();
 });
 
 test('the reminder email renders the pending items and a link to the portal', function () {
@@ -109,12 +109,12 @@ test('the admin is notified when a client marks an item as uploaded', function (
     $component = Livewire::test(ProjectShow::class, ['project' => $project])
         ->call('markUploaded', $requirement->id);
 
-    Mail::assertQueued(RequirementUploadedMail::class, fn (RequirementUploadedMail $mail) => $mail->hasTo(config('app.admin_email'))
+    Mail::assertSent(RequirementUploadedMail::class, fn (RequirementUploadedMail $mail) => $mail->hasTo(config('app.admin_email'))
         && $mail->requirement->is($requirement));
 
     $component->call('markUploaded', $requirement->id);
 
-    Mail::assertQueued(RequirementUploadedMail::class, 1);
+    Mail::assertSent(RequirementUploadedMail::class, 1);
 });
 
 test('the admin notification links to the project page', function () {
