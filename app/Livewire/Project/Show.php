@@ -137,7 +137,7 @@ class Show extends Component
     {
         return view('livewire.project.show', [
             'links' => $this->project->links()->get(),
-            'requirements' => $this->project->requirements()->get(),
+            'requirements' => $this->project->requirements()->with('files.uploader')->get(),
             'statuses' => ProjectStatus::cases(),
         ])->layout('components.layouts.app.main', ['title' => $this->project->name]);
     }

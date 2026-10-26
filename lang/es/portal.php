@@ -58,7 +58,7 @@ return [
         'starts' => 'Inicio',
         'due' => 'Entrega estimada',
         'checklist' => 'Lo que necesitamos de ti',
-        'checklist_hint' => 'Súbelo a tu carpeta compartida y márcalo aquí. Lo reviso y te confirmo.',
+        'checklist_hint' => 'Súbelo aquí mismo, o a tu carpeta compartida y márcalo. Lo reviso y te confirmo.',
         'checklist_empty' => 'Por ahora no necesitamos nada más de ti.',
         'all_received' => 'Recibimos todo. Gracias.',
         'mark_uploaded' => 'Ya lo subí',
@@ -77,6 +77,13 @@ return [
         'remove_folder_confirm' => '¿Quitar esta carpeta del proyecto? La carpeta no se borra, solo deja de aparecer aquí.',
         'added_by_you' => 'Agregada por ti',
         'open_folder' => 'Abrir',
+        'files' => 'Archivos',
+        'file' => 'archivo',
+        'upload' => 'Subir',
+        'uploading' => 'Subiendo…',
+        'upload_hint' => 'Hasta 10 archivos de 10 MB cada uno. Para algo más pesado, usa tu carpeta compartida.',
+        'remove_file' => 'Quitar',
+        'remove_file_confirm' => '¿Quitar este archivo?',
     ],
 
     'team' => [

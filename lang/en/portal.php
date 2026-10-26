@@ -58,7 +58,7 @@ return [
         'starts' => 'Start',
         'due' => 'Estimated delivery',
         'checklist' => 'What we need from you',
-        'checklist_hint' => 'Upload it to your shared folder and mark it here. I will check it and confirm.',
+        'checklist_hint' => 'Upload it right here, or to your shared folder and mark it. I will check it and confirm.',
         'checklist_empty' => 'We do not need anything else from you right now.',
         'all_received' => 'We have everything. Thank you.',
         'mark_uploaded' => 'I uploaded it',
@@ -77,6 +77,13 @@ return [
         'remove_folder_confirm' => 'Remove this folder from the project? The folder itself is not deleted.',
         'added_by_you' => 'Added by you',
         'open_folder' => 'Open',
+        'files' => 'Files',
+        'file' => 'file',
+        'upload' => 'Upload',
+        'uploading' => 'Uploading…',
+        'upload_hint' => 'Up to 10 files, 10 MB each. For anything heavier, use your shared folder.',
+        'remove_file' => 'Remove',
+        'remove_file_confirm' => 'Remove this file?',
     ],
 
     'team' => [

@@ -119,6 +119,45 @@
                                     {{ __('portal.project.mark_uploaded') }}
                                 </button>
                             @endif
+
+                            @if ($requirement->files->isNotEmpty() || $requirement->status !== RequirementStatus::Received)
+                                <div class="w-full space-y-3 border-t border-[#1C1C1C] pt-4">
+                                    @if ($requirement->files->isNotEmpty())
+                                        <ul class="space-y-2">
+                                            @foreach ($requirement->files as $file)
+                                                <li wire:key="file-{{ $file->id }}" class="flex items-center gap-3 text-sm">
+                                                    <a href="{{ route('requirement-files.download', $file) }}"
+                                                        class="min-w-0 flex-1 truncate underline decoration-[#3A3A3A] underline-offset-4 hover:decoration-[var(--ember)]">{{ $file->original_name }}</a>
+                                                    <span class="shrink-0 font-mono text-xs text-[var(--slate)]">{{ $file->humanSize() }}</span>
+                                                    @can('removeRequirementFile', [$project, $file])
+                                                        <button type="button" wire:click="removeFile({{ $file->id }})" wire:confirm="{{ __('portal.project.remove_file_confirm') }}"
+                                                            class="shrink-0 cursor-pointer font-mono text-xs text-[var(--slate)] hover:text-[var(--ember)]">{{ __('portal.project.remove_file') }}</button>
+                                                    @endcan
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+
+                                    @if ($requirement->status !== RequirementStatus::Received)
+                                        <form wire:submit="uploadFiles({{ $requirement->id }})" class="flex flex-wrap items-center gap-3">
+                                            <label class="min-w-0 flex-1 text-sm">
+                                                <span class="sr-only">{{ __('portal.project.files') }}</span>
+                                                <input type="file" multiple wire:model="uploads.{{ $requirement->id }}"
+                                                    class="block w-full cursor-pointer text-sm text-[var(--silver)] file:mr-3 file:cursor-pointer file:rounded-full file:border file:border-[#2A2A2A] file:bg-transparent file:px-4 file:py-2 file:font-mono file:text-xs file:uppercase file:tracking-[0.12em] file:text-[var(--stone)] hover:file:border-[var(--ember)]">
+                                            </label>
+                                            <button type="submit" wire:loading.attr="disabled" wire:target="uploads.{{ $requirement->id }}, uploadFiles"
+                                                @disabled(empty($uploads[$requirement->id]))
+                                                class="shrink-0 cursor-pointer rounded-full bg-[var(--ember)] px-4 py-2 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-[var(--ember-deep)] disabled:cursor-not-allowed disabled:opacity-60">
+                                                <span wire:loading.remove wire:target="uploads.{{ $requirement->id }}, uploadFiles">{{ __('portal.project.upload') }}</span>
+                                                <span wire:loading wire:target="uploads.{{ $requirement->id }}, uploadFiles">{{ __('portal.project.uploading') }}</span>
+                                            </button>
+                                        </form>
+                                        <p class="font-mono text-xs text-[var(--slate)]">{{ __('portal.project.upload_hint') }}</p>
+                                        @error("uploads.{$requirement->id}") <p class="text-sm text-[var(--ember)]">{{ $message }}</p> @enderror
+                                        @error("uploads.{$requirement->id}.*") <p class="text-sm text-[var(--ember)]">{{ $message }}</p> @enderror
+                                    @endif
+                                </div>
+                            @endif
                         </li>
                     @endforeach
                 </ul>

@@ -7,6 +7,7 @@ use Database\Factories\ProjectRequirementFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProjectRequirement extends Model
 {
@@ -32,9 +33,23 @@ class ProjectRequirement extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        // Row-by-row so each file also leaves storage; the FK cascade alone would orphan them
+        static::deleting(fn (ProjectRequirement $requirement) => $requirement->files->each->delete());
+    }
+
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    /**
+     * Files the client uploaded here instead of sharing a folder.
+     */
+    public function files(): HasMany
+    {
+        return $this->hasMany(RequirementFile::class)->latest()->latest('id');
     }
 
     /**

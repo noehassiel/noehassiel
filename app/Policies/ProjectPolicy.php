@@ -2,9 +2,11 @@
 
 namespace App\Policies;
 
+use App\Enums\RequirementStatus;
 use App\Models\Project;
 use App\Models\ProjectLink;
 use App\Models\ProjectRequirement;
+use App\Models\RequirementFile;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 
@@ -43,5 +45,16 @@ class ProjectPolicy
     {
         return $user->canSeeProject($project)
             && $requirement->project_id === $project->id;
+    }
+
+    /**
+     * A client user can only remove their own uploads, and only until the admin confirms receipt.
+     */
+    public function removeRequirementFile(User $user, Project $project, RequirementFile $file): bool
+    {
+        return $user->canSeeProject($project)
+            && $file->requirement->project_id === $project->id
+            && $file->uploaded_by === $user->id
+            && $file->requirement->status !== RequirementStatus::Received;
     }
 }

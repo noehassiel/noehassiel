@@ -103,6 +103,17 @@
                                             · El cliente lo marcó como subido {{ $requirement->client_marked_at->diffForHumans() }}
                                         @endif
                                     </p>
+                                    @if ($requirement->files->isNotEmpty())
+                                        <ul class="mt-3 space-y-1.5">
+                                            @foreach ($requirement->files as $file)
+                                                <li wire:key="file-{{ $file->id }}" class="flex items-center gap-2 text-sm">
+                                                    <x-ui.icon name="paper-clip" class="size-4 shrink-0 text-neutral-400" />
+                                                    <a href="{{ route('requirement-files.download', $file) }}" class="min-w-0 truncate underline underline-offset-4 hover:text-[#FF420B]">{{ $file->original_name }}</a>
+                                                    <span class="shrink-0 font-mono text-xs text-neutral-400">{{ $file->humanSize() }} · {{ $file->uploader?->name ?? 'Cliente' }} · {{ $file->created_at->diffForHumans() }}</span>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
                                 </div>
 
                                 <div class="flex shrink-0 items-center gap-1">

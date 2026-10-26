@@ -24,6 +24,7 @@ use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\Security;
 use App\Models\Invoice;
+use App\Models\RequirementFile;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -81,6 +82,15 @@ Route::get('invoices/{invoice}/download', function (Invoice $invoice) {
 
     return Invoice::disk()->download($invoice->zip_path, "factura-{$invoice->number}.zip");
 })->middleware(['signed', 'throttle:30,1'])->name('invoices.download');
+
+// Both the admin and the client team download what the client uploaded to a deliverable
+Route::get('requirement-files/{file}/download', function (RequirementFile $file) {
+    Gate::authorize('view', $file->requirement->project);
+
+    abort_unless(RequirementFile::disk()->exists($file->path), 404);
+
+    return RequirementFile::disk()->download($file->path, $file->original_name);
+})->middleware(['auth', 'throttle:60,1'])->name('requirement-files.download');
 
 Route::get('invitations/{token}', AcceptInvitation::class)
     ->middleware(['guest', 'throttle:20,1'])
