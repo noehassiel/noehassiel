@@ -331,7 +331,8 @@
                 <h2 class="mb-4 admin-eyebrow">Link para el cliente</h2>
 
                 @if ($proposal->isShared())
-                    <dl class="space-y-3 text-sm" x-data="{ copied: null, copy(value, key) { navigator.clipboard.writeText(value); this.copied = key; setTimeout(() => this.copied = null, 1500) } }">
+                    <div x-data="{ copied: null, copy(value, key) { navigator.clipboard.writeText(value); this.copied = key; setTimeout(() => this.copied = null, 1500) } }">
+                    <dl class="space-y-3 text-sm">
                         <div>
                             <dt class="text-xs font-medium text-neutral-400">URL</dt>
                             <dd class="mt-0.5 flex items-center gap-2">
@@ -360,14 +361,18 @@
                         </div>
                     </dl>
 
-                    <p class="mt-4 text-xs text-neutral-400">Manda el link y la contraseña por canales distintos (correo y WhatsApp).</p>
+                    <p class="mt-4 text-xs text-neutral-400">El mensaje lleva link y contraseña juntos, listo para WhatsApp, iMessage o correo. Si prefieres más seguridad, manda la contraseña por otro canal.</p>
 
                     <div class="mt-4 flex flex-wrap gap-2">
+                        <x-ui.button variant="primary" size="sm" icon="clipboard-document" @click="copy(@js($proposal->shareMessage()), 'message')">
+                            <span x-text="copied === 'message' ? 'Mensaje copiado' : 'Copiar mensaje'"></span>
+                        </x-ui.button>
                         <x-ui.button variant="outline" size="sm" wire:click="rotateAccessPassword"
                             wire:confirm="La contraseña actual dejará de funcionar. ¿Continuar?">Nueva contraseña</x-ui.button>
                         <x-ui.button variant="outline" size="sm" wire:click="disableSharing"
                             wire:confirm="El cliente ya no podrá abrir el link. ¿Desactivar?"
                             class="text-red-500 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-800">Desactivar</x-ui.button>
+                    </div>
                     </div>
                 @else
                     <p class="mb-4 text-sm text-neutral-500">Crea un link privado con contraseña para que el cliente vea la propuesta en línea.</p>

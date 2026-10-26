@@ -199,6 +199,35 @@ class Proposal extends Model
         return $this->isShared() ? route('quotes.show', $this->public_token) : null;
     }
 
+    /**
+     * Ready-to-paste message with the link and password, plain text so it reads well in WhatsApp, iMessage or email.
+     */
+    public function shareMessage(): ?string
+    {
+        if (! $this->isShared()) {
+            return null;
+        }
+
+        $recipient = $this->recipient();
+        $firstName = Str::of($recipient?->contact_name ?: $recipient?->name ?? '')->trim()->before(' ')->title();
+
+        $lines = [
+            $firstName->isNotEmpty() ? "Hola {$firstName}," : 'Hola,',
+            '',
+            "Te comparto la propuesta «{$this->title}» ({$this->number}). La puedes ver aquí:",
+            $this->publicUrl(),
+            '',
+            "Contraseña: {$this->access_password}",
+            '',
+            'Ahí mismo puedes aceptarla o pedirme cambios.'.($this->valid_until ? ' Está vigente hasta el '.$this->valid_until->translatedFormat('j \d\e F').'.' : ''),
+            'Cualquier duda, me escribes.',
+            '',
+            'Hassiel · noehassiel',
+        ];
+
+        return implode("\n", $lines);
+    }
+
     /** Case-insensitive and tolerant of surrounding spaces, since clients type it by hand. */
     public function checkAccessPassword(string $password): bool
     {

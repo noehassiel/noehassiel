@@ -22,6 +22,22 @@ beforeEach(function () {
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 
+test('the share message carries the link, password and the contact first name', function () {
+    $this->proposal->client->update(['contact_name' => 'beto ramírez']);
+
+    $message = $this->proposal->fresh()->shareMessage();
+
+    expect($message)
+        ->toStartWith('Hola Beto,')
+        ->toContain('«Rediseño confidencial»')
+        ->toContain($this->proposal->publicUrl())
+        ->toContain("Contraseña: {$this->proposal->access_password}");
+});
+
+test('there is no share message without a private link', function () {
+    expect(Proposal::factory()->create()->shareMessage())->toBeNull();
+});
+
 test('admin can create a private link for a proposal', function () {
     $proposal = Proposal::factory()->create();
 
