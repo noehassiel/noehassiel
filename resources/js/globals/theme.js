@@ -11,8 +11,8 @@ document.addEventListener('alpine:init', () => {
         storedTheme: null,
 
         init() {
-            // Check localStorage for stored theme preference
-            this.storedTheme = localStorage.getItem('theme') ?? 'system';
+            // The brand is dark-only, so ignore any stored or system preference
+            this.storedTheme = 'dark';
 
             // Resolve the configured theme to be only [light, dark]
             this.currentTheme = computeTheme(this.storedTheme);

@@ -13,17 +13,7 @@
 {{-- app.js bundles Livewire + Alpine; this stops Livewire injecting a second copy --}}
 @livewireScriptConfig
 
-{{-- Anti-FOUC: apply theme from localStorage before render --}}
+{{-- The brand is dark-only: force dark before render, whatever the OS or a stale saved preference says --}}
 <script>
-    (function () {
-        try {
-            var stored = localStorage.getItem('theme');
-            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (stored === 'dark' || (!stored || stored === 'system') && prefersDark) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        } catch (e) {}
-    })();
+    document.documentElement.classList.add('dark');
 </script>
