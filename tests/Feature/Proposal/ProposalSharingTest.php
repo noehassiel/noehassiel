@@ -34,6 +34,13 @@ test('the share message carries the link, password and the contact first name', 
         ->toContain("Contraseña: {$this->proposal->access_password}");
 });
 
+test('the copy message button carries the message to the clipboard handler', function () {
+    Livewire::actingAs(User::factory()->admin()->create())
+        ->test(ProposalShow::class, ['proposal' => $this->proposal])
+        ->assertSeeHtml('x-on:click="copy(')
+        ->assertDontSeeHtml('@js(');
+});
+
 test('there is no share message without a private link', function () {
     expect(Proposal::factory()->create()->shareMessage())->toBeNull();
 });

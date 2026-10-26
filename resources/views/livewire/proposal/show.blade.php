@@ -364,7 +364,7 @@
                     <p class="mt-4 text-xs text-neutral-400">El mensaje lleva link y contraseña juntos, listo para WhatsApp, iMessage o correo. Si prefieres más seguridad, manda la contraseña por otro canal.</p>
 
                     <div class="mt-4 flex flex-wrap gap-2">
-                        <x-ui.button variant="primary" size="sm" icon="clipboard-document" @click="copy(@js($proposal->shareMessage()), 'message')">
+                        <x-ui.button variant="primary" size="sm" icon="clipboard-document" x-on:click="copy({{ \Illuminate\Support\Js::from($proposal->shareMessage()) }}, 'message')">
                             <span x-text="copied === 'message' ? 'Mensaje copiado' : 'Copiar mensaje'"></span>
                         </x-ui.button>
                         <x-ui.button variant="outline" size="sm" wire:click="rotateAccessPassword"
