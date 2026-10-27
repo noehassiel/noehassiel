@@ -115,9 +115,11 @@
                                     <x-ui.button variant="ghost" size="sm" :href="route('proposals.show', $proposal)" wire:navigate>
                                         <x-ui.icon name="eye" class="size-4" />
                                     </x-ui.button>
-                                    <x-ui.button variant="ghost" size="sm" :href="route('proposals.edit', $proposal)" wire:navigate>
-                                        <x-ui.icon name="pencil-square" class="size-4" />
-                                    </x-ui.button>
+                                    @unless ($proposal->isLocked())
+                                        <x-ui.button variant="ghost" size="sm" :href="route('proposals.edit', $proposal)" wire:navigate>
+                                            <x-ui.icon name="pencil-square" class="size-4" />
+                                        </x-ui.button>
+                                    @endunless
                                     <x-ui.button variant="ghost" size="sm"
                                         wire:click="confirmDelete({{ $proposal->id }})"
                                         class="text-red-500 hover:text-red-600">

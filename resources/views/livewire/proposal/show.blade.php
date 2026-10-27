@@ -62,9 +62,11 @@
                 Descargar PDF
             </x-ui.button>
 
-            <x-ui.button variant="outline" size="sm" :href="route('proposals.edit', $proposal)" wire:navigate icon="pencil-square">
-                Editar
-            </x-ui.button>
+            @unless ($proposal->isLocked())
+                <x-ui.button variant="outline" size="sm" :href="route('proposals.edit', $proposal)" wire:navigate icon="pencil-square">
+                    Editar
+                </x-ui.button>
+            @endunless
         </x-slot:actions>
     </x-admin.page-header>
 

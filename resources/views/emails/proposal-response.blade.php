@@ -7,6 +7,8 @@
         'rejected' => 'Canceló la propuesta',
         'payment_method_chosen' => 'Eligió cómo pagar',
         'paid' => 'Pagó el anticipo',
+        'balance_method_chosen' => 'Eligió cómo pagar la liquidación',
+        'balance_paid' => 'Liquidó el proyecto',
     ][$event];
 @endphp
 <!DOCTYPE html>
@@ -40,8 +42,13 @@
                         'Total' => $money($proposal->total),
                         'Factura' => $proposal->requires_invoice ? 'Sí, requiere factura' : 'No',
                         'Anticipo 50%' => in_array($event, ['accepted', 'payment_method_chosen'], true) ? $money($proposal->depositAmount()) : null,
-                        'Forma de pago' => $proposal->payment_method?->label(),
-                        'Pagado' => $event === 'paid' ? $money($proposal->deposit_paid_amount) : null,
+                        'Liquidación 50%' => $event === 'balance_method_chosen' ? $money($proposal->balanceAmount()) : null,
+                        'Forma de pago' => in_array($event, ['balance_method_chosen', 'balance_paid'], true) ? $proposal->balance_payment_method?->label() : $proposal->payment_method?->label(),
+                        'Pagado' => match ($event) {
+                            'paid' => $money($proposal->deposit_paid_amount),
+                            'balance_paid' => $money($proposal->balance_paid_amount),
+                            default => null,
+                        },
                     ]) as $label => $value)
                         <tr>
                             <td style="padding:4px 16px 4px 0;font-family:'Courier New',monospace;font-size:12px;color:#B0B0B0;white-space:nowrap;vertical-align:top;">{{ $label }}</td>
@@ -63,9 +70,9 @@
         @endif
         <tr>
             <td style="padding:24px 0;">
-                <a href="{{ $event === 'paid' && $proposal->project_id ? route('projects.show', $proposal->project_id) : route('proposals.show', $proposal) }}"
+                <a href="{{ in_array($event, ['paid', 'balance_method_chosen', 'balance_paid'], true) && $proposal->project_id ? route('projects.show', $proposal->project_id) : route('proposals.show', $proposal) }}"
                     style="display:inline-block;background:#FF420B;color:#0A0A0A;font-weight:700;padding:12px 20px;border-radius:8px;text-decoration:none;">
-                    {{ $event === 'paid' ? 'Ver el proyecto' : 'Abrir la propuesta' }}
+                    {{ in_array($event, ['paid', 'balance_method_chosen', 'balance_paid'], true) ? 'Ver el proyecto' : 'Abrir la propuesta' }}
                 </a>
             </td>
         </tr>

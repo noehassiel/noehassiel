@@ -57,4 +57,12 @@ class ProjectPolicy
             && $file->uploaded_by === $user->id
             && $file->requirement->status !== RequirementStatus::Received;
     }
+
+    /**
+     * Paying is a money decision, so only client users who can see invoices get to do it.
+     */
+    public function payBalance(User $user, Project $project): bool
+    {
+        return $user->canSeeProject($project) && $user->canSeeInvoices();
+    }
 }

@@ -62,6 +62,8 @@ class Edit extends Component
 
     public function mount(Proposal $proposal): void
     {
+        abort_if($proposal->isLocked(), 403);
+
         $this->proposal = $proposal->load(['stages', 'items']);
 
         $this->recipient = $proposal->lead_id ? "lead:{$proposal->lead_id}" : "client:{$proposal->client_id}";
@@ -271,6 +273,8 @@ class Edit extends Component
 
     public function save(): void
     {
+        abort_if($this->proposal->fresh()->isLocked(), 403);
+
         $this->validate([
             ...$this->recipientRules(),
             'title' => 'required|string|max:255',

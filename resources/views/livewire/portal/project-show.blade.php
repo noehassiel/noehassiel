@@ -62,6 +62,80 @@
         @endif
     </section>
 
+    @if ($proposal?->balance_paid_at)
+        <section class="portal-card border-[var(--brass)] p-6 sm:p-8" aria-labelledby="balance-heading">
+            <p class="portal-eyebrow text-[var(--brass)]">{{ __('portal.balance.eyebrow') }}</p>
+            <h2 id="balance-heading" class="mt-2 text-2xl font-bold tracking-tight">{{ __('portal.balance.paid') }}</h2>
+            <p class="mt-2 text-[var(--silver)]">{{ __('portal.balance.paid_hint', ['date' => $proposal->balance_paid_at->translatedFormat('j M Y')]) }}</p>
+        </section>
+    @elseif ($balanceCharge && $paymentReturn === 'listo')
+        <div role="status" wire:poll.4s class="portal-card p-6">
+            <p class="font-bold">{{ __('portal.balance.confirming') }}</p>
+            <p class="mt-1 text-sm text-[var(--silver)]">{{ __('portal.balance.confirming_hint') }}</p>
+        </div>
+    @elseif ($balanceCharge)
+        @php($money = fn ($amount) => '$'.number_format((float) $amount, 2).' '.$proposal->currency)
+        <section class="portal-card border-[var(--ember)] p-6 sm:p-8" aria-labelledby="balance-heading">
+            <p class="portal-eyebrow text-[var(--ember)]">{{ __('portal.balance.eyebrow') }}</p>
+            <h2 id="balance-heading" class="mt-2 text-3xl font-extrabold tracking-tight">{{ __('portal.balance.title') }}</h2>
+            <p class="mt-2 text-[var(--silver)]">
+                {{ __('portal.balance.intro') }}
+                <span class="font-mono text-[var(--stone)]">{{ $money($balanceCharge['amount']) }}</span>
+            </p>
+
+            @if ($canPay)
+                @php($chosen = $proposal->balance_payment_method)
+                <div class="mt-6 grid gap-3 sm:grid-cols-3" role="radiogroup" aria-label="{{ __('portal.balance.method') }}">
+                    @foreach (\App\Enums\PaymentMethod::cases() as $method)
+                        <button type="button" role="radio" aria-checked="{{ $chosen === $method ? 'true' : 'false' }}"
+                            wire:click="chooseBalancePaymentMethod('{{ $method->value }}')"
+                            @class([
+                                'cursor-pointer rounded-xl border p-4 text-left transition-colors',
+                                'border-[var(--ember)]' => $chosen === $method,
+                                'border-[#2A2A2A] hover:border-[var(--silver)]' => $chosen !== $method,
+                            ])>
+                            <span class="font-bold">{{ __("portal.balance.methods.{$method->value}") }}</span>
+                            <span class="mt-0.5 block text-xs text-[var(--silver)]">
+                                {{ $method === \App\Enums\PaymentMethod::Card
+                                    ? __('portal.balance.card_fee', ['fee' => $money($balanceCharge['fee'])])
+                                    : __("portal.balance.hints.{$method->value}") }}
+                            </span>
+                        </button>
+                    @endforeach
+                </div>
+
+                @if ($chosen === \App\Enums\PaymentMethod::Card)
+                    <dl class="mt-6 flex flex-col gap-2 rounded-xl bg-[#0D0D0D] p-5 text-sm">
+                        <div class="flex justify-between gap-4 text-[var(--silver)]"><dt>{{ __('portal.balance.balance') }}</dt><dd class="font-mono">{{ $money($balanceCharge['amount']) }}</dd></div>
+                        <div class="flex justify-between gap-4 text-[var(--silver)]"><dt>{{ __('portal.balance.fee') }}</dt><dd class="font-mono">{{ $money($balanceCharge['fee']) }}</dd></div>
+                        <div class="flex justify-between gap-4 font-bold"><dt>{{ __('portal.balance.total') }}</dt><dd class="font-mono">{{ $money($balanceCharge['charge']) }}</dd></div>
+                    </dl>
+                    @if ($allowsInstallments)
+                        <p class="mt-3 text-sm text-[var(--silver)]">{{ __('portal.balance.installments') }}</p>
+                    @endif
+                    <button type="button" wire:click="payBalanceWithCard" wire:loading.attr="disabled"
+                        class="mt-4 w-full cursor-pointer rounded-xl bg-[var(--ember)] px-6 py-3 font-bold text-[var(--obsidian)] transition-opacity hover:opacity-90 disabled:opacity-60 sm:w-auto">
+                        <span wire:loading.remove wire:target="payBalanceWithCard">{{ __('portal.balance.pay') }}</span>
+                        <span wire:loading wire:target="payBalanceWithCard">{{ __('portal.balance.opening') }}</span>
+                    </button>
+                @elseif ($chosen === \App\Enums\PaymentMethod::Transfer)
+                    <dl class="mt-6 grid gap-3 rounded-xl bg-[#0D0D0D] p-5 text-sm sm:grid-cols-2">
+                        <div><dt class="portal-eyebrow">{{ __('portal.balance.bank') }}</dt><dd class="mt-1">{{ $bank['name'] ?? '—' }}</dd></div>
+                        <div><dt class="portal-eyebrow">{{ __('portal.balance.beneficiary') }}</dt><dd class="mt-1">{{ $bank['beneficiary'] ?? '—' }}</dd></div>
+                        <div><dt class="portal-eyebrow">{{ __('portal.balance.clabe') }}</dt><dd class="mt-1 font-mono">{{ $bank['clabe'] ?? '—' }}</dd></div>
+                        <div><dt class="portal-eyebrow">{{ __('portal.balance.concept') }}</dt><dd class="mt-1 font-mono">{{ $proposal->number }}</dd></div>
+                        <div class="sm:col-span-2"><dt class="portal-eyebrow">{{ __('portal.balance.amount') }}</dt><dd class="mt-1 font-mono text-lg">{{ $money($balanceCharge['amount']) }}</dd></div>
+                    </dl>
+                    <p class="mt-3 text-sm text-[var(--silver)]">{{ __('portal.balance.transfer_hint') }}</p>
+                @elseif ($chosen === \App\Enums\PaymentMethod::Cash)
+                    <p class="mt-6 text-sm text-[var(--silver)]">{{ __('portal.balance.cash_hint', ['amount' => $money($balanceCharge['amount'])]) }}</p>
+                @endif
+            @else
+                <p class="mt-4 text-sm text-[var(--silver)]">{{ __('portal.balance.owner_only') }}</p>
+            @endif
+        </section>
+    @endif
+
     <div class="grid gap-10 lg:grid-cols-5">
         {{-- Checklist --}}
         <section class="min-w-0 space-y-5 lg:col-span-3" aria-labelledby="checklist-heading">

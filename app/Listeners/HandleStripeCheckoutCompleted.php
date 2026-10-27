@@ -6,7 +6,7 @@ use App\Models\Proposal;
 use Laravel\Cashier\Events\WebhookReceived;
 
 /**
- * A proposal deposit paid by card: record it and turn the proposal into a project.
+ * A proposal deposit or balance paid by card: record it (a deposit also turns the proposal into a project).
  */
 class HandleStripeCheckoutCompleted
 {
@@ -19,13 +19,16 @@ class HandleStripeCheckoutCompleted
         }
 
         $sessionId = $event->payload['data']['object']['id'] ?? null;
-        $proposal = $sessionId ? Proposal::query()->where('stripe_checkout_session_id', $sessionId)->first() : null;
 
-        if (! $proposal || $proposal->isDepositPaid()) {
+        if (! $sessionId) {
             return;
         }
 
         // Re-checks with Stripe instead of trusting the payload, so a forged webhook can't mark anything paid
-        $proposal->syncStripeCheckout();
+        if ($proposal = Proposal::query()->where('stripe_checkout_session_id', $sessionId)->first()) {
+            $proposal->syncStripeCheckout();
+        } elseif ($proposal = Proposal::query()->where('stripe_balance_checkout_session_id', $sessionId)->first()) {
+            $proposal->syncStripeBalanceCheckout();
+        }
     }
 }

@@ -23,10 +23,12 @@ class ProposalResponseMail extends Mailable
         'rejected' => 'canceló la propuesta',
         'payment_method_chosen' => 'eligió cómo pagar el anticipo',
         'paid' => 'pagó el anticipo',
+        'balance_method_chosen' => 'eligió cómo pagar la liquidación',
+        'balance_paid' => 'liquidó el proyecto',
     ];
 
     /**
-     * @param  'accepted'|'changes_requested'|'rejected'|'payment_method_chosen'|'paid'  $event
+     * @param  'accepted'|'changes_requested'|'rejected'|'payment_method_chosen'|'paid'|'balance_method_chosen'|'balance_paid'  $event
      */
     public function __construct(public Proposal $proposal, public string $event) {}
 

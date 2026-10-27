@@ -7,6 +7,7 @@ use App\Enums\ProjectStatus;
 use App\Enums\ProposalEventType;
 use App\Enums\ProposalProjectType;
 use App\Enums\ProposalStatus;
+use App\Events\BalancePaid;
 use App\Jobs\SyncProjectToLinear;
 use App\Mail\ProjectWelcomeMail;
 use App\Mail\ProposalResponseMail;
@@ -398,18 +399,79 @@ class Proposal extends Model
         return $this->paymentSchedule()[1]['amount'];
     }
 
-    /** The final payment, confirmed by the admin once the project is delivered. */
+    /** The client can pay the balance once the deposit is in and the project reached review. */
+    public function isBalanceDue(): bool
+    {
+        return $this->isDepositPaid()
+            && ! $this->balance_paid_at
+            && in_array($this->project?->status, [ProjectStatus::Review, ProjectStatus::Delivered], true);
+    }
+
+    /** Once the client accepted, the proposal is what they agreed to; it can no longer be edited. */
+    public function isLocked(): bool
+    {
+        return in_array($this->status, [ProposalStatus::Accepted, ProposalStatus::Paid], true);
+    }
+
+    /** The client picked how to pay the balance; transfer and cash then wait for the admin to confirm. */
+    public function chooseBalancePaymentMethod(PaymentMethod $method): void
+    {
+        $this->forceFill(['balance_payment_method' => $method])->save();
+
+        if ($method !== PaymentMethod::Card) {
+            $this->notifyAdmin('balance_method_chosen');
+        }
+    }
+
+    /**
+     * The final payment, by card or confirmed by the admin. Safe to call twice (webhook retries, the return page).
+     */
     public function markBalancePaid(PaymentMethod $method, float $amount): void
     {
-        if ($this->balance_paid_at || ! $this->isDepositPaid()) {
-            return;
+        $recorded = DB::transaction(function () use ($method, $amount): bool {
+            $proposal = self::query()->lockForUpdate()->findOrFail($this->id);
+
+            if ($proposal->balance_paid_at || ! $proposal->isDepositPaid()) {
+                return false;
+            }
+
+            $proposal->forceFill([
+                'balance_payment_method' => $method,
+                'balance_paid_amount' => $amount,
+                'balance_paid_at' => now(),
+            ])->save();
+
+            $this->setRawAttributes($proposal->getAttributes(), true);
+
+            return true;
+        });
+
+        if ($recorded) {
+            $this->notifyAdmin('balance_paid');
+            BalancePaid::dispatch($this);
+        }
+    }
+
+    /** Like the deposit: ask Stripe whether the balance checkout was paid and, if so, record it. */
+    public function syncStripeBalanceCheckout(): bool
+    {
+        if ($this->balance_paid_at) {
+            return true;
         }
 
-        $this->forceFill([
-            'balance_payment_method' => $method,
-            'balance_paid_amount' => $amount,
-            'balance_paid_at' => now(),
-        ])->save();
+        if (! $this->stripe_balance_checkout_session_id) {
+            return false;
+        }
+
+        $session = Cashier::stripe()->checkout->sessions->retrieve($this->stripe_balance_checkout_session_id);
+
+        if ($session->payment_status !== 'paid' || (string) ($session->metadata['proposal_id'] ?? '') !== (string) $this->id) {
+            return false;
+        }
+
+        $this->markBalancePaid(PaymentMethod::Card, $session->amount_total / 100);
+
+        return true;
     }
 
     /**

@@ -5,10 +5,11 @@ namespace Database\Factories;
 use App\Enums\ProposalProjectType;
 use App\Enums\ProposalStatus;
 use App\Models\Client;
+use App\Models\Proposal;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Proposal>
+ * @extends Factory<Proposal>
  */
 class ProposalFactory extends Factory
 {
@@ -44,7 +45,7 @@ class ProposalFactory extends Factory
                 'Redacción de textos',
             ], 2),
             'notes' => fake()->paragraph(2),
-            'status' => fake()->randomElement(ProposalStatus::cases())->value,
+            'status' => fake()->randomElement([ProposalStatus::Draft, ProposalStatus::Sent, ProposalStatus::ChangesRequested, ProposalStatus::Rejected, ProposalStatus::Expired])->value,
             'currency' => 'MXN',
             'subtotal' => $subtotal,
             'discount' => $discount,
