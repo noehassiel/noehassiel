@@ -28,6 +28,12 @@ class Show extends Component
 
     public ?string $dueOn = null;
 
+    public string $previewUrl = '';
+
+    public int $revisionRounds = 2;
+
+    public string $selfServiceNotes = '';
+
     public string $linkLabel = '';
 
     public string $linkUrl = '';
@@ -49,6 +55,9 @@ class Show extends Component
             'progressNote' => (string) $project->progress_note,
             'startsOn' => $project->starts_on?->toDateString(),
             'dueOn' => $project->due_on?->toDateString(),
+            'previewUrl' => (string) $project->preview_url,
+            'revisionRounds' => $project->revision_rounds,
+            'selfServiceNotes' => (string) $project->self_service_notes,
         ]);
     }
 
@@ -61,6 +70,9 @@ class Show extends Component
             'progressNote' => ['nullable', 'string', 'max:2000'],
             'startsOn' => ['nullable', 'date'],
             'dueOn' => ['nullable', 'date', 'after_or_equal:startsOn'],
+            'previewUrl' => ['nullable', 'url:https', 'max:255'],
+            'revisionRounds' => ['required', 'integer', 'min:0', 'max:10'],
+            'selfServiceNotes' => ['nullable', 'string', 'max:2000'],
         ]);
 
         $this->project->update([
@@ -70,9 +82,20 @@ class Show extends Component
             'progress_note' => $validated['progressNote'] ?: null,
             'starts_on' => $validated['startsOn'] ?: null,
             'due_on' => $validated['dueOn'] ?: null,
+            'preview_url' => $validated['previewUrl'] ?: null,
+            'revision_rounds' => $validated['revisionRounds'],
+            'self_service_notes' => $validated['selfServiceNotes'] ?: null,
         ]);
 
         $this->dispatch('project-saved');
+    }
+
+    /** A new version of the preview is up with the requested changes: what the client asks next is the next round. */
+    public function startNextRound(): void
+    {
+        abort_unless($this->project->isInPreview(), 403);
+
+        $this->project->startNextRound();
     }
 
     public function addLink(): void

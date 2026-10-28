@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ChangeCategory;
 use App\Enums\TicketStatus;
 use App\Enums\TicketType;
 use Database\Factories\TicketFactory;
@@ -20,12 +21,18 @@ class Ticket extends Model
         'type',
         'title',
         'description',
+        'page_url',
+        'category',
+        'in_scope',
+        'round',
     ];
 
     protected function casts(): array
     {
         return [
             'type' => TicketType::class,
+            'category' => ChangeCategory::class,
+            'in_scope' => 'boolean',
             'status' => TicketStatus::class,
             'resolved_at' => 'datetime',
         ];

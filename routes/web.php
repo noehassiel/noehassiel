@@ -12,6 +12,7 @@ use App\Livewire\Lead\Show as LeadShow;
 use App\Livewire\Portal\AcceptInvitation;
 use App\Livewire\Portal\Home as PortalHome;
 use App\Livewire\Portal\Invoices as PortalInvoices;
+use App\Livewire\Portal\ProjectPreview as PortalProjectPreview;
 use App\Livewire\Portal\ProjectShow as PortalProjectShow;
 use App\Livewire\Portal\Security as PortalSecurity;
 use App\Livewire\Portal\Team as PortalTeam;
@@ -109,6 +110,7 @@ Route::get('q/{token}', QuoteShow::class)
 Route::prefix('portal')->name('portal.')->middleware(['auth', 'can:access-portal', UseUserLocale::class])->group(function () {
     Route::get('/', PortalHome::class)->name('home');
     Route::get('projects/{project}', PortalProjectShow::class)->name('projects.show');
+    Route::get('projects/{project}/preview', PortalProjectPreview::class)->name('projects.preview');
     Route::get('invoices', PortalInvoices::class)->middleware('can:view-portal-invoices')->name('invoices');
     Route::get('team', PortalTeam::class)->middleware('can:manage-portal-team')->name('team');
     Route::get('security', PortalSecurity::class)->middleware('password.confirm')->name('security');

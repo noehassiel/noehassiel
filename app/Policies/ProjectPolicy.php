@@ -65,4 +65,12 @@ class ProjectPolicy
     {
         return $user->canSeeProject($project) && $user->canSeeInvoices();
     }
+
+    /**
+     * Approving the preview opens the balance payment, so it's for the same people who can pay.
+     */
+    public function approve(User $user, Project $project): bool
+    {
+        return $this->payBalance($user, $project) && $project->isInPreview();
+    }
 }

@@ -54,10 +54,42 @@
                     </x-ui.field>
                 </div>
 
+                <x-ui.field>
+                    <x-ui.label>Vista previa <span class="text-neutral-400">(URL del sitio en tu servidor de previews)</span></x-ui.label>
+                    <x-ui.input wire:model="previewUrl" type="url" placeholder="https://cliente.preview.noehassiel.com" />
+                    <x-ui.error name="previewUrl" />
+                </x-ui.field>
+
+                <x-ui.field>
+                    <x-ui.label>Rondas de cambios incluidas</x-ui.label>
+                    <x-ui.input wire:model="revisionRounds" type="number" min="0" max="10" />
+                    <x-ui.error name="revisionRounds" />
+                </x-ui.field>
+
+                <x-ui.field>
+                    <x-ui.label>Lo que el cliente edita solo <span class="text-neutral-400">(la IA se lo explica en vez de abrir un issue)</span></x-ui.label>
+                    <x-ui.textarea wire:model="selfServiceNotes" rows="3" placeholder="Banners del inicio y eventos, desde /admin." />
+                    <x-ui.error name="selfServiceNotes" />
+                </x-ui.field>
+
                 <div class="flex items-center gap-3">
                     <x-ui.button type="submit" variant="primary" size="sm">Guardar</x-ui.button>
                     <x-action-message on="project-saved">Guardado.</x-action-message>
                 </div>
+
+                @if ($project->preview_url)
+                    <div class="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-800 pt-4 text-sm">
+                        @if ($project->approved_at)
+                            <span class="text-neutral-400">Aprobado el {{ $project->approved_at->format('d/m/Y') }} por {{ $project->approver?->name }}</span>
+                        @else
+                            <span class="text-neutral-400">Ronda {{ $project->current_round }} de {{ $project->revision_rounds }}</span>
+                            <x-ui.button type="button" variant="outline" size="sm" wire:click="startNextRound"
+                                wire:confirm="¿Publicaste una nueva versión de la preview? Lo que pida el cliente desde ahora cuenta como la siguiente ronda.">
+                                Nueva versión publicada
+                            </x-ui.button>
+                        @endif
+                    </div>
+                @endif
             </form>
 
             <x-ui.button variant="ghost" size="sm" icon="trash" class="text-red-500"

@@ -62,6 +62,17 @@
         @endif
     </section>
 
+    @if ($project->isInPreview())
+        <a href="{{ route('portal.projects.preview', $project) }}" class="portal-card flex flex-wrap items-center justify-between gap-6 border-[color-mix(in_srgb,var(--ember)_40%,transparent)] p-6 sm:p-8">
+            <div class="max-w-2xl">
+                <p class="portal-eyebrow text-[var(--ember)]">{{ __('portal.preview.card_eyebrow') }}</p>
+                <h2 class="mt-2 text-2xl font-bold tracking-tight">{{ __('portal.preview.card_title') }}</h2>
+                <p class="mt-2 text-[var(--silver)]">{{ __('portal.preview.card_body') }}</p>
+            </div>
+            <span class="rounded-xl bg-[var(--ember)] px-5 py-2.5 font-bold text-[var(--obsidian)]">{{ __('portal.preview.card_cta') }} →</span>
+        </a>
+    @endif
+
     @if ($proposal?->balance_paid_at)
         <section class="portal-card border-[var(--brass)] p-6 sm:p-8" aria-labelledby="balance-heading">
             <p class="portal-eyebrow text-[var(--brass)]">{{ __('portal.balance.eyebrow') }}</p>

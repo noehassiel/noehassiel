@@ -18,6 +18,12 @@ class Project extends Model
     /** @use HasFactory<ProjectFactory> */
     use HasFactory;
 
+    /** Mirrors the column defaults so a freshly created project has them before it's reloaded. */
+    protected $attributes = [
+        'revision_rounds' => 2,
+        'current_round' => 1,
+    ];
+
     protected $fillable = [
         'client_id',
         'name',
@@ -26,6 +32,9 @@ class Project extends Model
         'progress_note',
         'starts_on',
         'due_on',
+        'preview_url',
+        'self_service_notes',
+        'revision_rounds',
     ];
 
     protected function casts(): array
@@ -34,6 +43,7 @@ class Project extends Model
             'status' => ProjectStatus::class,
             'starts_on' => 'date',
             'due_on' => 'date',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -98,5 +108,50 @@ class Project extends Model
     public function scopeActive(Builder $query): void
     {
         $query->where('status', '!=', ProjectStatus::Delivered);
+    }
+
+    /** The review chat on the preview, oldest first. */
+    public function previewMessages(): HasMany
+    {
+        return $this->hasMany(PreviewMessage::class)->oldest('id');
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    /** The client can review a preview while the project isn't approved yet. */
+    public function isInPreview(): bool
+    {
+        return $this->preview_url !== null && $this->approved_at === null;
+    }
+
+    /** Whether the client still has included revision rounds left for content changes. */
+    public function hasRoundsLeft(): bool
+    {
+        return $this->current_round <= $this->revision_rounds;
+    }
+
+    /** The admin published a new version of the preview with the requested changes. */
+    public function startNextRound(): void
+    {
+        $this->increment('current_round');
+    }
+
+    /**
+     * The client approved the preview: the project moves to review, which opens the balance payment.
+     */
+    public function approve(User $user): void
+    {
+        if ($this->approved_at) {
+            return;
+        }
+
+        $this->forceFill([
+            'approved_at' => now(),
+            'approved_by' => $user->id,
+            'status' => ProjectStatus::Review,
+        ])->save();
     }
 }
