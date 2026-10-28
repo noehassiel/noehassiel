@@ -67,6 +67,14 @@ class ProjectPolicy
     }
 
     /**
+     * Only the client team asks for changes on the preview: each request uses their rounds and opens a ticket.
+     */
+    public function requestChanges(User $user, Project $project): bool
+    {
+        return $user->canSeeProject($project) && $project->isInPreview();
+    }
+
+    /**
      * Approving the preview opens the balance payment, so it's for the same people who can pay.
      */
     public function approve(User $user, Project $project): bool

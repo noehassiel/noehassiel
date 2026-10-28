@@ -107,10 +107,14 @@ Route::get('q/{token}', QuoteShow::class)
     ->middleware('throttle:60,1')
     ->name('quotes.show');
 
+// The admin reviews the same preview as the client, so access is left to the project policy
+Route::get('portal/projects/{project}/preview', PortalProjectPreview::class)
+    ->middleware(['auth', UseUserLocale::class])
+    ->name('portal.projects.preview');
+
 Route::prefix('portal')->name('portal.')->middleware(['auth', 'can:access-portal', UseUserLocale::class])->group(function () {
     Route::get('/', PortalHome::class)->name('home');
     Route::get('projects/{project}', PortalProjectShow::class)->name('projects.show');
-    Route::get('projects/{project}/preview', PortalProjectPreview::class)->name('projects.preview');
     Route::get('invoices', PortalInvoices::class)->middleware('can:view-portal-invoices')->name('invoices');
     Route::get('team', PortalTeam::class)->middleware('can:manage-portal-team')->name('team');
     Route::get('security', PortalSecurity::class)->middleware('password.confirm')->name('security');

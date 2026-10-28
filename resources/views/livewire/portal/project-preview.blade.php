@@ -42,7 +42,7 @@
         aria-label="{{ __('portal.preview.panel') }}">
 
         <header class="flex items-center justify-between gap-3 px-4 pt-4">
-            <a href="{{ route('portal.projects.show', $project) }}" wire:navigate class="flex min-w-0 items-center gap-2.5">
+            <a href="{{ $backUrl }}" wire:navigate class="flex min-w-0 items-center gap-2.5">
                 <img src="{{ asset('logo/isotipo_dark_ember.svg') }}" alt="noehassiel" class="size-6 shrink-0">
                 <span class="truncate text-sm font-bold">{{ $project->name }}</span>
             </a>
@@ -104,7 +104,7 @@
                     <p class="text-sm text-[var(--slate)]">{{ __('portal.preview.thinking') }}</p>
                 </div>
 
-                @if ($pendingQuote)
+                @if ($pendingQuote && $canRequestChanges)
                     <div class="flex flex-wrap gap-2">
                         <button type="button" wire:click="confirmQuote" class="cursor-pointer rounded-lg bg-[var(--ember)] px-3 py-1.5 text-xs font-bold text-[var(--obsidian)] transition-opacity hover:opacity-90">{{ __('portal.preview.quote_yes') }}</button>
                         <button type="button" wire:click="declineQuote" class="cursor-pointer rounded-lg border border-[#2A2A2A] px-3 py-1.5 text-xs text-[var(--silver)] transition-colors hover:border-[var(--silver)] hover:text-[var(--stone)]">{{ __('portal.preview.quote_no') }}</button>
@@ -112,7 +112,7 @@
                 @endif
             </div>
 
-            @if ($project->isInPreview())
+            @if ($canRequestChanges)
                 <form wire:submit="send" class="p-3">
                     <div class="rounded-2xl border border-[#2A2A2A] bg-[#0D0D0D] transition-colors focus-within:border-[var(--slate)]">
                         <label for="preview-message" class="sr-only">{{ __('portal.preview.message') }}</label>
@@ -168,7 +168,7 @@
     {{-- Preview --}}
     <main class="flex min-w-0 flex-1 flex-col gap-2">
         <div class="flex items-center gap-1.5">
-            <a href="{{ route('portal.projects.show', $project) }}" wire:navigate
+            <a href="{{ $backUrl }}" wire:navigate
                 class="rounded-lg p-2 text-[var(--slate)] transition-colors hover:bg-[#1C1C1C] hover:text-[var(--stone)]" aria-label="{{ __('portal.project.back') }}">
                 <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
             </a>

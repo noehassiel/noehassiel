@@ -70,6 +70,19 @@ test('another client can not open the preview', function () {
         ->assertForbidden();
 });
 
+test('the admin opens the preview read-only', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->get(route('portal.projects.preview', $this->project))
+        ->assertOk()
+        ->assertSee('https://acme.preview.noehassiel.com')
+        ->assertDontSee('wire:submit="send"', false);
+
+    previewAs($admin, $this->project)->set('message', 'Cambia la imagen')->call('send')->assertForbidden();
+    previewAs($admin, $this->project)->call('approve')->assertForbidden();
+});
+
 test('an in-scope request becomes a ticket for linear on the current round', function () {
     ChangeRequestTriage::fake([triage()]);
 

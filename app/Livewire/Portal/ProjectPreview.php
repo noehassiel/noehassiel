@@ -41,8 +41,7 @@ class ProjectPreview extends Component
 
     public function send(): void
     {
-        $this->authorize('view', $this->project);
-        abort_unless($this->project->isInPreview(), 403);
+        $this->authorize('requestChanges', $this->project);
 
         $validated = $this->validate(
             ['message' => ['required', 'string', 'max:5000']],
@@ -88,9 +87,9 @@ class ProjectPreview extends Component
     /** The client wants the out-of-scope change anyway: it goes to Linear to be quoted. */
     public function confirmQuote(): void
     {
-        $this->authorize('view', $this->project);
+        $this->authorize('requestChanges', $this->project);
         $quote = $this->pendingQuote();
-        abort_unless($quote && $this->project->isInPreview(), 403);
+        abort_unless($quote, 403);
 
         $this->openTicket(
             ChangeCategory::from($quote->pending_quote['category']),
@@ -104,7 +103,7 @@ class ProjectPreview extends Component
 
     public function declineQuote(): void
     {
-        $this->authorize('view', $this->project);
+        $this->authorize('requestChanges', $this->project);
         abort_unless($this->pendingQuote(), 403);
 
         $this->resolvePendingQuote(__('portal.preview.quote_declined'));
@@ -169,7 +168,9 @@ class ProjectPreview extends Component
             'messages' => $this->project->previewMessages()->with('user')->get(),
             'pendingQuote' => $this->pendingQuote(),
             'tickets' => $this->project->tickets()->whereNotNull('category')->latest()->get(),
+            'canRequestChanges' => Auth::user()->can('requestChanges', $this->project),
             'canApprove' => Auth::user()->can('approve', $this->project),
+            'backUrl' => Auth::user()->can('access-admin') ? route('projects.show', $this->project) : route('portal.projects.show', $this->project),
             'previewOrigin' => parse_url($this->project->preview_url, PHP_URL_SCHEME).'://'.parse_url($this->project->preview_url, PHP_URL_HOST).(parse_url($this->project->preview_url, PHP_URL_PORT) ? ':'.parse_url($this->project->preview_url, PHP_URL_PORT) : ''),
         ])->title(__('portal.preview.title', ['project' => $this->project->name]));
     }

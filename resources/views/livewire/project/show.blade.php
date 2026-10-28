@@ -79,6 +79,7 @@
 
                 @if ($project->preview_url)
                     <div class="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-800 pt-4 text-sm">
+                        <x-ui.button :href="route('portal.projects.preview', $project)" target="_blank" variant="ghost" size="sm">Ver preview</x-ui.button>
                         @if ($project->approved_at)
                             <span class="text-neutral-400">Aprobado el {{ $project->approved_at->format('d/m/Y') }} por {{ $project->approver?->name }}</span>
                         @else
