@@ -1,0 +1,11 @@
+services:
+  web:
+    command: >-
+      php artisan optimize:clear &&
+      APP_URL="$PUBLIC_URL" ASSET_URL="$PUBLIC_URL"
+      php artisan serve --host=0.0.0.0 --port="$PORT"
+    env:
+      TRUSTED_PROXIES: "*"
+    health: /up
+    portal:
+      title: noehassiel

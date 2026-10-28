@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Signed-in users who hit a guest page go to their own home (admin or portal)
         $middleware->redirectUsersTo('/home');
 
+        // Unset by default; Amp orb portals set it so URLs keep the forwarded https scheme
+        $middleware->trustProxies(at: env('TRUSTED_PROXIES'));
+
         // Stripe can't send a CSRF token; Cashier verifies the webhook signature instead
         $middleware->validateCsrfTokens(except: ['stripe/*', 'linear/webhook']);
     })
