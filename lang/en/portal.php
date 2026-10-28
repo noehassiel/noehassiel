@@ -120,6 +120,7 @@ return [
     ],
 
     'preview' => [
+        'resize' => 'Resize the panel',
         'title' => 'Preview · :project',
         'card_eyebrow' => 'Preview',
         'card_title' => 'Your project is live for review',

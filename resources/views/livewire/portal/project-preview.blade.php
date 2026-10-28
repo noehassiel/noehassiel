@@ -13,6 +13,40 @@
 <div
     x-data="{
         open: (() => { try { return localStorage.getItem('nh-preview-panel') !== 'closed' } catch (e) { return true } })(),
+        // Resizable panel: dragging past the minimum collapses it on release
+        minWidth: 320,
+        maxWidth: 600,
+        defaultWidth: 380,
+        collapseBelow: 260,
+        width: (() => { try { return Number(localStorage.getItem('nh-preview-width')) || 380 } catch (e) { return 380 } })(),
+        dragging: false,
+        collapsing: false,
+        dragFrom: { x: 0, width: 0 },
+        setWidth(value) {
+            this.width = Math.min(this.maxWidth, Math.max(this.minWidth, Math.round(value)))
+            try { localStorage.setItem('nh-preview-width', this.width) } catch (e) {}
+        },
+        startDrag(event) {
+            // Capturing the pointer keeps the drag alive over the iframe, which would otherwise swallow the events
+            event.target.setPointerCapture(event.pointerId)
+            this.dragging = true
+            this.dragFrom = { x: event.clientX, width: this.width }
+        },
+        drag(event) {
+            if (! this.dragging) return
+            const next = this.dragFrom.width + event.clientX - this.dragFrom.x
+            this.collapsing = next < this.collapseBelow
+            this.setWidth(next)
+        },
+        endDrag() {
+            if (! this.dragging) return
+            this.dragging = false
+            if (this.collapsing) {
+                this.collapsing = false
+                this.setWidth(this.dragFrom.width)
+                this.toggle()
+            }
+        },
         tab: 'chat',
         device: 'desktop',
         path: '/',
@@ -32,13 +66,16 @@
     }"
     @message.window="onMessage($event)"
     @keydown.escape.window="open && toggle()"
-    class="relative z-10 flex h-svh gap-2 p-2"
+    :class="dragging && 'cursor-col-resize select-none'"
+    class="relative z-10 flex h-svh p-2"
 >
     {{-- Chat panel --}}
     <aside x-show="open" x-cloak
         x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 -translate-x-4" x-transition:enter-end="opacity-100 translate-x-0"
         x-transition:leave="transition ease-out duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0 -translate-x-4"
-        class="fixed inset-2 z-20 flex flex-col overflow-hidden rounded-2xl border border-[#1C1C1C] bg-[#111111] sm:static sm:inset-auto sm:w-[380px] sm:shrink-0"
+        :style="`--panel-width: ${width}px`"
+        :class="collapsing && 'opacity-40'"
+        class="fixed inset-2 z-20 flex flex-col overflow-hidden rounded-2xl border border-[#1C1C1C] bg-[#111111] transition-opacity duration-200 sm:static sm:inset-auto sm:w-(--panel-width) sm:shrink-0"
         aria-label="{{ __('portal.preview.panel') }}">
 
         <header class="flex items-center justify-between gap-3 px-4 pt-4">
@@ -164,6 +201,19 @@
             <p class="border-t border-[#1C1C1C] p-4 text-sm text-[var(--brass)]">{{ __('portal.preview.approved', ['date' => $project->approved_at->translatedFormat('j M Y')]) }}</p>
         @endif
     </aside>
+
+    {{-- Resize handle: drag, arrow keys, or double-click to reset --}}
+    <div x-show="open" x-cloak
+        role="separator" aria-orientation="vertical" tabindex="0"
+        aria-label="{{ __('portal.preview.resize') }}"
+        :aria-valuenow="width" :aria-valuemin="minWidth" :aria-valuemax="maxWidth"
+        @pointerdown.prevent="startDrag($event)" @pointermove="drag($event)" @pointerup="endDrag()" @pointercancel="endDrag()"
+        @dblclick="setWidth(defaultWidth)"
+        @keydown.left.prevent="setWidth(width - 16)" @keydown.right.prevent="setWidth(width + 16)"
+        class="group hidden w-2 shrink-0 cursor-col-resize touch-none items-center justify-center focus-visible:outline-none sm:flex">
+        <span :class="dragging ? 'h-16 bg-[var(--silver)]' : 'h-10 bg-transparent group-hover:bg-[var(--slate)] group-focus-visible:bg-[var(--ember)]'"
+            class="w-1 rounded-full transition-all duration-200 ease-out"></span>
+    </div>
 
     {{-- Preview --}}
     <main class="flex min-w-0 flex-1 flex-col gap-2">

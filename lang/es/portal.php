@@ -120,6 +120,7 @@ return [
     ],
 
     'preview' => [
+        'resize' => 'Cambiar el ancho del panel',
         'title' => 'Vista previa · :project',
         'card_eyebrow' => 'Vista previa',
         'card_title' => 'Tu proyecto ya está en línea para revisarlo',
