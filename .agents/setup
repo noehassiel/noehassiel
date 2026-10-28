@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# Prepares a fresh Amp orb (Debian 12) with PHP 8.4, Composer, and this app's dependencies.
+# Must stay idempotent: Amp reruns it on top of stale snapshots.
+set -euo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+step() {
+  local label="$1"
+  shift
+  local started=$SECONDS
+  echo "==> ${label}"
+  "$@"
+  echo "    ${label} took $((SECONDS - started))s"
+}
+
+PHP_VERSION=8.4
+PHP_PACKAGES=(
+  "php${PHP_VERSION}-cli" "php${PHP_VERSION}-bcmath" "php${PHP_VERSION}-curl" "php${PHP_VERSION}-gd"
+  "php${PHP_VERSION}-intl" "php${PHP_VERSION}-mbstring" "php${PHP_VERSION}-sqlite3" "php${PHP_VERSION}-xml"
+  "php${PHP_VERSION}-zip"
+)
+
+install_php() {
+  # Skip apt entirely when every package is already present (warm snapshot).
+  if ! dpkg -s unzip "${PHP_PACKAGES[@]}" >/dev/null 2>&1; then
+    if [ ! -f /etc/apt/sources.list.d/php-sury.list ]; then
+      sudo apt-get update -qq
+      sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq ca-certificates curl lsb-release unzip
+      sudo curl -fsSLo /usr/share/keyrings/php-sury.gpg https://packages.sury.org/php/apt.gpg
+      echo "deb [signed-by=/usr/share/keyrings/php-sury.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" \
+        | sudo tee /etc/apt/sources.list.d/php-sury.list >/dev/null
+    fi
+    sudo apt-get update -qq
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends unzip "${PHP_PACKAGES[@]}"
+  fi
+  php -v | head -1
+}
+
+install_composer() {
+  if ! command -v composer >/dev/null 2>&1; then
+    local installer
+    installer="$(mktemp)"
+    curl -fsSL https://getcomposer.org/installer -o "$installer"
+    sudo php "$installer" --quiet --install-dir=/usr/local/bin --filename=composer
+    rm -f "$installer"
+  fi
+  composer --version
+}
+
+prepare_env() {
+  if [ ! -f .env ]; then
+    cp -- .env.example .env
+  fi
+  if ! grep -q '^APP_KEY=base64:' .env; then
+    php artisan key:generate --ansi --no-interaction
+  fi
+  if [ ! -f database/database.sqlite ]; then
+    touch database/database.sqlite
+  fi
+  php artisan migrate --force --graceful --no-interaction
+}
+
+step "PHP ${PHP_VERSION}" install_php
+step "Composer" install_composer
+step "composer install" composer install --no-interaction --no-progress --prefer-dist
+step "npm ci" npm ci --no-audit --no-fund
+step "Environment and database" prepare_env
+# Feature tests render Blade views that need the Vite manifest.
+step "npm run build" npm run build
