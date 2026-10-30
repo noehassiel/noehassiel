@@ -103,25 +103,38 @@
                     x-data="{
                         dragging: false,
                         fileName: null,
+                        status: null,
+                        progress: 0,
+                        upload(file) {
+                            if (! file) { return; }
+                            this.fileName = file.name;
+                            this.status = 'uploading';
+                            this.progress = 0;
+                            $wire.upload('zip', file,
+                                () => { this.status = 'done'; },
+                                () => { this.status = 'error'; },
+                                (e) => { this.progress = e.detail.progress; },
+                            );
+                        },
                         handleDrop(e) {
                             this.dragging = false;
-                            const file = e.dataTransfer.files[0];
-                            if (file) {
-                                this.fileName = file.name;
-                                $wire.upload('zip', file);
-                            }
+                            this.upload(e.dataTransfer.files[0]);
                         },
                         handleChange(e) {
-                            const file = e.target.files[0];
-                            if (file) { this.fileName = file.name; }
+                            this.upload(e.target.files[0]);
+                            e.target.value = '';
                         }
                     }"
                     x-on:dragover.prevent="dragging = true"
                     x-on:dragleave.prevent="dragging = false"
                     x-on:drop.prevent="handleDrop($event)"
+                    x-on:click="$refs.zipInput.click()"
                     :class="dragging ? 'border-[#FF420B] bg-[#FF420B]/5' : 'border-neutral-200 dark:border-neutral-700'"
                     class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-4 py-6 transition-colors"
                 >
+                    {{-- Uploaded through $wire.upload so the modal (teleported outside the component) still gets callbacks --}}
+                    <input type="file" x-ref="zipInput" accept=".zip" class="sr-only" x-on:click.stop x-on:change="handleChange($event)" />
+
                     <x-ui.icon name="archive-box" class="mb-2 size-8 text-neutral-400" />
 
                     <template x-if="fileName">
@@ -131,16 +144,13 @@
                     <template x-if="!fileName">
                         <div class="text-center">
                             <p class="text-sm text-neutral-500">Arrastra el ZIP aquí o</p>
-                            <label class="mt-1 cursor-pointer text-sm font-medium text-[#FF420B] hover:underline">
-                                selecciona un archivo
-                                <input type="file" wire:model="zip" accept=".zip" class="sr-only" x-on:change="handleChange($event)" />
-                            </label>
+                            <span class="mt-1 text-sm font-medium text-[#FF420B] hover:underline">selecciona un archivo</span>
                         </div>
                     </template>
 
-                    <div wire:loading wire:target="zip" class="mt-2 text-xs text-neutral-400">
-                        Subiendo...
-                    </div>
+                    <p x-show="status === 'uploading'" x-cloak class="mt-2 text-xs text-neutral-400" x-text="`Subiendo… ${progress}%`"></p>
+                    <p x-show="status === 'done'" x-cloak class="mt-2 text-xs font-medium text-emerald-500">Archivo listo ✓</p>
+                    <p x-show="status === 'error'" x-cloak class="mt-2 text-xs font-medium text-red-500">No se pudo subir el archivo. Revisa que sea un ZIP de máximo 20 MB.</p>
                 </div>
                 <x-ui.error name="zip" />
             </x-ui.field>
@@ -153,13 +163,12 @@
             </x-ui.button>
             <x-ui.button
                 variant="primary"
-                wire:click="sendInvoice"
-                wire:loading.attr="disabled"
-                wire:target="sendInvoice"
+                x-data="{ sending: false }"
+                x-on:click="sending = true; $wire.sendInvoice().finally(() => sending = false)"
+                x-bind:disabled="sending"
                 icon="paper-airplane"
             >
-                <span wire:loading.remove wire:target="sendInvoice">Enviar factura</span>
-                <span wire:loading wire:target="sendInvoice">Enviando...</span>
+                <span x-text="sending ? 'Enviando…' : 'Enviar factura'">Enviar factura</span>
             </x-ui.button>
         </x-slot:footer>
 
