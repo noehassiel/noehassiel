@@ -209,6 +209,7 @@
                 <header class="section-header">
                     <p class="section-label mono">003 / <x-t key="process.label" /></p>
                     <h2 class="section-title" id="process-title"><x-t key="process.title" /></h2>
+                    <p class="section-lead"><x-t key="process.lead" /></p>
                 </header>
 
                 <ol class="process-list">
@@ -220,6 +221,16 @@
                         </li>
                     @endforeach
                 </ol>
+
+                {{-- The commitments a business owner can hold me to --}}
+                <div class="process-promises">
+                    <p class="process-promises-label mono"><x-t key="promises.label" /></p>
+                    <ul>
+                        @foreach (['price', 'preview', 'installments', 'bugs'] as $promise)
+                            <li><x-t key="promises.items.{{ $promise }}" /></li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
         </section>
 
@@ -247,7 +258,7 @@
                     <p class="about-body"><x-t key="about.body_3" :html="true" /></p>
 
                     <dl class="about-facts">
-                        @foreach (['based', 'speaks', 'stack'] as $fact)
+                        @foreach (['based', 'speaks', 'clients'] as $fact)
                             <div>
                                 <dt class="mono"><x-t key="about.facts.{{ $fact }}" /></dt>
                                 <dd><x-t key="about.facts.{{ $fact }}_value" /></dd>
@@ -272,11 +283,53 @@
         </section>
     </main>
 
+    @php($publicEmail = config('app.public_email'))
+    @php([$emailUser, $emailDomain] = explode('@', $publicEmail, 2))
+
+    {{-- Footer: the dark contact section glows through ember into stone, with the portrait standing over the address --}}
     <footer class="site-footer">
-        <div class="container footer-grid">
-            <p class="footer-tagline"><x-t key="footer.tagline" /></p>
-            <p class="footer-artisan mono" aria-hidden="true">$ php artisan make:something --with-intention</p>
-            <p class="footer-meta mono">© {{ now()->year }} noehassiel · <x-t key="footer.rights" /></p>
+        <div class="footer-stage">
+            <div class="footer-side">
+                <nav class="footer-links" aria-label="{{ __('landing.footer.contact', locale: 'en') }}">
+                    <p class="footer-links-title"><x-t key="footer.contact" /></p>
+                    <ul>
+                        <li><a href="mailto:{{ $publicEmail }}"><x-t key="footer.email" /></a></li>
+                        <li><a href="#contact"><x-t key="footer.start" /></a></li>
+                    </ul>
+                </nav>
+
+                <nav class="footer-links" aria-label="{{ __('landing.footer.socials', locale: 'en') }}">
+                    <p class="footer-links-title"><x-t key="footer.socials" /></p>
+                    <ul>
+                        <li><a href="https://github.com/{{ config('services.github.username') }}" target="_blank" rel="noopener">GitHub</a></li>
+                    </ul>
+                </nav>
+
+                <div class="footer-invite">
+                    <p class="footer-ask"><x-t key="footer.ask" /></p>
+                    <p class="footer-invite-line"><x-t key="footer.invite" /></p>
+                </div>
+            </div>
+
+            <div class="footer-belief">
+                <p class="footer-belief-lead"><x-t key="footer.belief" /></p>
+                <p><x-t key="footer.belief_body" /></p>
+            </div>
+
+            <figure class="footer-portrait" aria-hidden="true">
+                <img src="{{ asset('images/me/footer-portrait-900.webp') }}"
+                    srcset="{{ asset('images/me/footer-portrait-900.webp') }} 413w, {{ asset('images/me/footer-portrait-1800.webp') }} 826w"
+                    sizes="(max-width: 900px) 60vw, 28vw" width="413" height="900" alt="" loading="lazy" decoding="async">
+            </figure>
+
+            <a class="footer-email" href="mailto:{{ $publicEmail }}">
+                <span class="sr-only"><x-t key="footer.write" /> </span>{{ $emailUser }}<span class="footer-email-at">@</span>{{ $emailDomain }}
+            </a>
+
+            <div class="footer-meta mono">
+                <p aria-hidden="true">$ php artisan make:something --with-intention</p>
+                <p>© {{ now()->year }} noehassiel · <x-t key="footer.rights" /></p>
+            </div>
         </div>
     </footer>
 

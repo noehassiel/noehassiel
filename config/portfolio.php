@@ -14,8 +14,8 @@ return [
             'year' => '2023 —',
             'disciplines' => ['en' => 'Lead Software Developer', 'es' => 'Líder de desarrollo'],
             'summary' => [
-                'en' => 'A web and mobile compliance platform that turns OSHA PSM paperwork into scheduled maintenance, training and audit-ready reports.',
-                'es' => 'Plataforma web y móvil de cumplimiento que convierte el papeleo de OSHA PSM en mantenimiento programado, capacitación y reportes listos para auditoría.',
+                'en' => 'A compliance platform on the web and in a native iOS and Android app that turns OSHA PSM paperwork into scheduled maintenance, training and audit-ready reports, right from the plant floor.',
+                'es' => 'Plataforma de cumplimiento en web y en app nativa para iOS y Android que convierte el papeleo de OSHA PSM en mantenimiento programado, capacitación y reportes listos para auditoría, desde la misma planta.',
             ],
             'url' => 'https://console.clauger.app/',
             'image' => 'images/work/console.jpg',

@@ -97,6 +97,14 @@ it('lets the visitor correct answers on the review step', function () {
         ->assertSet('budget', 'over_150k');
 });
 
+it('accepts a mobile app as the project type', function () {
+    fillBrief()
+        ->call('choose', 'projectType', 'mobile_app')
+        ->assertHasNoErrors()
+        ->assertSet('projectType', 'mobile_app')
+        ->assertSee(__('landing.form.types.mobile_app', locale: 'en'));
+});
+
 it('rejects unknown choice fields', function () {
     Livewire::test(ProjectForm::class)
         ->call('choose', 'email', 'x')
@@ -151,4 +159,12 @@ it('rate limits brief submissions per visitor', function () {
     fillBrief()->call('submit')->assertHasErrors('message');
 
     expect(Lead::query()->count())->toBe(3);
+});
+
+it('shows the public email in the footer', function () {
+    config(['app.public_email' => 'hello@noehassiel.test']);
+
+    $this->get('/')
+        ->assertSee('href="mailto:hello@noehassiel.test"', false)
+        ->assertSee('<span class="footer-email-at">@</span>noehassiel.test', false);
 });

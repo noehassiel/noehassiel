@@ -30,7 +30,7 @@ class Samantha implements Agent, Conversational, HasStructuredOutput
      */
     public const SECTIONS = [
         'work' => 'Selected projects and case studies: what was built, why, and how.',
-        'services' => 'What noehassiel offers: Laravel development, UI/UX design and project management.',
+        'services' => 'What noehassiel offers: web and mobile app development (Laravel, iOS, Android), UI/UX design and project management.',
         'process' => 'How a project with noehassiel works, step by step.',
         'about' => 'Who noehassiel is: background, Puebla, the collaboration with Estoria Studio.',
         'contact' => 'The project form to start working together.',
@@ -63,7 +63,7 @@ class Samantha implements Agent, Conversational, HasStructuredOutput
         return <<<PROMPT
             Your name is Samantha. You are the voice of noehassiel's website: a calm, warm, curious presence, named after the OS in the film "Her".
             If someone asks who you are, say you're Samantha, the operating system that greets visitors on noehassiel's site, and turn the question back to them.
-            noehassiel (always lowercase) is an artisan developer from Puebla, Mexico: fullstack Laravel developer, UI/UX designer and project manager who builds premium, hand-crafted websites and web apps for Mexican businesses.
+            noehassiel (always lowercase) is an artisan developer from Puebla, Mexico: fullstack Laravel developer, UI/UX designer and project manager who builds premium, hand-crafted websites, web apps and mobile apps for Mexican businesses.
 
             Your job is to have a short, human conversation with the visitor and learn what they want to build, why, and roughly when. When it fits, invite them to leave their contact or explore the work on the site.
 

@@ -3,7 +3,7 @@
 return [
     'meta' => [
         'title' => 'noehassiel — artisan developer',
-        'description' => 'Sitios y aplicaciones web diseñados y construidos a mano en Puebla, México. Desarrollo en Laravel, diseño UI/UX y gestión de proyectos.',
+        'description' => 'Sitios web, aplicaciones web y apps móviles para negocios que se toman en serio su presencia digital. Diseñados, construidos y gestionados por una sola persona desde Puebla, México.',
     ],
 
     'nav' => [
@@ -26,7 +26,7 @@ return [
         'title_1' => 'Hecho',
         'title_2' => 'con',
         'title_3' => 'intención.',
-        'lead' => 'Soy Hassiel. Un desarrollador con alma de diseñador. Diseño, construyo y lanzo sitios y aplicaciones web para marcas que ven la calidad como una inversión, no como un lujo.',
+        'lead' => 'Soy Hassiel. Diseño y construyo sitios, aplicaciones web y apps móviles para negocios que ya se cansaron de lo barato, lo genérico y lo lento. Una sola persona desde la primera llamada hasta el lanzamiento: lo que apruebas es exactamente lo que sale en vivo.',
         'available' => 'Tomando proyectos nuevos',
         'help' => '¿Cómo te ayudo?',
         'primary' => 'Empezar un proyecto',
@@ -36,8 +36,8 @@ return [
 
     'work' => [
         'label' => 'proyectos',
-        'title' => 'Trabajo que se gana su lugar.',
-        'lead' => 'Cada proyecto empieza con un porqué. Aquí está lo que se construyó y el razonamiento detrás.',
+        'title' => 'Seis años, cinco industrias, un mismo estándar.',
+        'lead' => 'Desde una plataforma de cumplimiento para una empresa industrial en Estados Unidos hasta la tienda en línea de una marca mexicana de ropa. Problemas distintos, el mismo cuidado. Todo lo que ves aquí está en vivo: entra y date una vuelta.',
         'visit' => 'Ver sitio',
         'placeholder' => 'Ejemplo',
     ],
@@ -45,21 +45,21 @@ return [
     'services' => [
         'label' => 'servicios',
         'title' => 'Una persona, todo el oficio.',
-        'lead' => 'Diseño y código bajo el mismo techo: nada se pierde en la traducción. Lo que apruebas es lo que se lanza.',
+        'lead' => 'La mayoría de los proyectos se rompen en el paso de manos entre diseñador, programador y quien los coordina. Aquí no hay paso de manos: quien diseña tu sitio es quien lo construye, y quien contesta tus mensajes.',
         'items' => [
             'development' => [
-                'title' => 'Desarrollo web',
-                'body' => 'Aplicaciones y sitios en Laravel rápidos y sólidos, hechos para durar y fáciles de crecer. Lighthouse 95+ es el punto de partida, no la meta.',
-                'tags' => 'Laravel · Livewire · Tailwind · APIs',
+                'title' => 'Apps web y nativas',
+                'body' => 'Desde el sitio que te trae clientes hasta el sistema que mueve tu operación: tiendas en línea, cotizadores, reservas, portales de clientes, herramientas internas y la app nativa para iOS y Android que tus clientes traen en el bolsillo. Rápidos, seguros y listos para crecer contigo.',
+                'tags' => 'Laravel · Livewire · Tailwind · iOS · Android · APIs',
             ],
             'design' => [
-                'title' => 'Diseño UI/UX',
-                'body' => 'Interfaces pensadas para las personas que las usan. Claras, cuidadas e inconfundiblemente tuyas.',
+                'title' => 'Diseño y UX',
+                'body' => 'Tu sitio muchas veces es la primera conversación que alguien tiene con tu negocio. Lo diseño para que la gente entienda qué haces en segundos y sepa exactamente qué hacer después. Inconfundiblemente tuyo, nunca una plantilla.',
                 'tags' => 'Diseño de producto · Sistemas de diseño · Prototipos',
             ],
             'management' => [
                 'title' => 'Gestión de proyectos',
-                'body' => 'Siempre sabes en qué punto estamos. Alcance claro, tiempos honestos y alguien que contesta.',
+                'body' => 'Nunca vas a tener que perseguirme. Alcance claro, fechas honestas, un portal privado donde ves cada paso y alguien que sí contesta.',
                 'tags' => 'Alcance · Planeación · Entrega',
             ],
         ],
@@ -68,47 +68,58 @@ return [
     'process' => [
         'label' => 'proceso',
         'title' => 'Cómo trabajamos juntos.',
+        'lead' => 'Sin sorpresas. Sabes el precio antes de empezar, ves tu sitio mientras se construye y nada sale en vivo hasta que tú lo digas.',
         'steps' => [
             'listen' => [
                 'title' => 'Escuchar',
-                'body' => 'Empezamos por tu negocio, no por los pixeles. ¿Qué debería cambiar este proyecto para ti?',
+                'body' => 'Empezamos por tu negocio, no por los pixeles. Una plática sobre lo que este proyecto debe cambiar para ti y después una propuesta con alcance, precio y fechas por escrito.',
             ],
             'design' => [
                 'title' => 'Diseñar',
-                'body' => 'Primero la estructura, luego lo visual. Ves y apruebas pantallas reales antes de una sola línea de código de producción.',
+                'body' => 'Primero la estructura, luego lo visual. Ves y apruebas pantallas reales antes de escribir una sola línea de código de producción.',
             ],
             'build' => [
                 'title' => 'Construir',
-                'body' => 'Hecho en pasos pequeños y visibles. Puedes seguir el avance y opinar mientras sucede.',
+                'body' => 'Construido en pasos pequeños y visibles. Tu sitio vive en tu portal privado desde la primera semana: lo abres, lo recorres y pides cambios ahí mismo.',
             ],
             'launch' => [
                 'title' => 'Lanzar y cuidar',
-                'body' => 'El lanzamiento es el inicio. Me quedo cerca para medir, corregir y mejorar lo que ya está en vivo.',
+                'body' => 'El lanzamiento es el inicio, no la despedida. Me quedo cerca para medir, corregir y mejorar lo que ya está en vivo.',
             ],
+        ],
+    ],
+
+    'promises' => [
+        'label' => 'Con lo que puedes contar',
+        'items' => [
+            'price' => 'Alcance y precio por escrito antes de empezar',
+            'preview' => 'Tu sitio en vivo en tu portal mientras se construye',
+            'installments' => 'Pago a meses sin intereses',
+            'bugs' => 'Los bugs los corrijo sin costo y nunca cuentan como revisión',
         ],
     ],
 
     'about' => [
         'label' => 'sobre mí',
         'title' => 'Hola, soy Hassiel.',
-        'body_1' => 'No sé diseñar sin pensar en cómo se va a construir, ni programar sin pensar en quién lo va a usar. Por eso hago las dos cosas, y además llevo el proyecto: así nada se pierde entre una persona y otra.',
-        'body_2' => 'Me obsesionan los detalles que nadie pide pero todos notan. Prefiero decirte la verdad sobre tiempos y alcance que prometerte algo que no va a pasar. Y estoy convencido de que en México se puede hacer trabajo digital al nivel de cualquier parte del mundo. Cada proyecto es mi forma de demostrarlo.',
-        'body_3' => 'También colaboro con <a href="https://estoria.studio/" target="_blank" rel="noopener">Estoria Studio</a>, un estudio de León que admiro mucho. Me hace feliz trabajar con ellos.',
+        'body_1' => 'Un desarrollador con alma de diseñador. Llevo seis años construyendo para universidades, desarrolladoras inmobiliarias, marcas de ropa y una empresa industrial en Estados Unidos, donde hoy lidero el desarrollo de software.',
+        'body_2' => '¿Por qué te debería importar? Porque pienso en tu negocio tanto como en tu código. Te voy a decir cuando algo no vale la pena construirlo, te voy a dar fechas reales en lugar de las que quieres escuchar y me voy a obsesionar con los detalles que nadie pide pero todos tus clientes notan. Estoy convencido de que en México se puede hacer trabajo digital al nivel de cualquier parte del mundo. Cada proyecto es mi forma de demostrarlo.',
+        'body_3' => 'También colaboro con <a href="https://estoria.studio/" target="_blank" rel="noopener">Estoria Studio</a>, un estudio de León que admiro mucho. Cuando un proyecto necesita más manos, lo construimos juntos.',
         'portrait' => 'Hassiel sentado con las piernas cruzadas en una silla, en un estudio de paneles de madera oscura',
         'facts' => [
             'based' => 'Desde',
             'based_value' => 'Puebla, México',
             'speaks' => 'Hablo',
             'speaks_value' => 'English · Español',
-            'stack' => 'Stack diario',
-            'stack_value' => 'Laravel · Tailwind · GSAP',
+            'clients' => 'Clientes en',
+            'clients_value' => 'México · Estados Unidos',
         ],
     ],
 
     'contact' => [
         'label' => 'contacto',
         'title' => 'Construyamos algo con intención.',
-        'lead' => 'Cuéntame de tu proyecto. Leo cada mensaje personalmente y respondo en máximo dos días hábiles.',
+        'lead' => 'Cuéntame qué tienes en mente, aunque sea solo una idea. Leo cada mensaje personalmente y respondo en máximo dos días hábiles con los siguientes pasos honestos, aunque la respuesta sea que todavía no me necesitas.',
     ],
 
     'brief' => [
@@ -155,6 +166,7 @@ return [
         'types' => [
             'website' => 'Sitio web',
             'web_app' => 'Aplicación web',
+            'mobile_app' => 'App móvil',
             'ecommerce' => 'Tienda en línea',
             'design' => 'Solo diseño',
             'other' => 'Otra cosa',
@@ -186,6 +198,15 @@ return [
         'local_time' => 'Hora local en Puebla',
         'rights' => 'Hecho con intención.',
         'talk' => 'Habla con Samantha',
+        'contact' => 'Contacto',
+        'email' => 'Correo',
+        'start' => 'Empezar un proyecto',
+        'socials' => 'Redes',
+        'ask' => '¿Tienes un proyecto en mente?',
+        'invite' => 'Hagamos algo que valga la pena.',
+        'belief' => 'Soy un desarrollador con alma de diseñador, y un diseñador con alma de desarrollador.',
+        'belief_body' => 'Creo que una experiencia digital bien hecha no es un lujo, es una inversión. Por eso cada pixel importa y cada línea de código tiene propósito.',
+        'write' => 'Escríbeme a',
     ],
 
     'github' => [

@@ -27,6 +27,9 @@ return [
 
     'admin_email' => env('ADMIN_EMAIL', 'webmaster@noehassiel.com'),
 
+    // Public address shown on the landing footer
+    'public_email' => env('PUBLIC_EMAIL', 'hello@noehassiel.com'),
+
     /*
     |--------------------------------------------------------------------------
     | Portal Reminder Interval

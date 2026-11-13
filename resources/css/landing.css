@@ -54,7 +54,6 @@ body.landing {
     font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    padding-bottom: calc(var(--dock-height) + 48px);
 }
 
 /* Subtle grain for artisanal warmth */
@@ -871,6 +870,45 @@ html.hero-pinned .site-header.is-hidden {
     color: var(--charcoal);
 }
 
+/* Process promises */
+.process-promises {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(10, 10, 10, 0.12);
+}
+
+.process-promises-label {
+    margin: 0;
+    font-size: 12px;
+    color: var(--slate);
+}
+
+.process-promises ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px 24px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.process-promises li {
+    position: relative;
+    padding-left: 20px;
+    font-weight: 500;
+    color: var(--charcoal);
+    text-wrap: pretty;
+}
+
+/* Ember slash as the bullet, echoing the n/h isotipo */
+.process-promises li::before {
+    content: "/";
+    position: absolute;
+    left: 0;
+    font-family: var(--font-mono, "Geist Mono", monospace);
+    color: var(--ember);
+}
+
 /* Contact form */
 .contact-grid {
     display: grid;
@@ -1247,31 +1285,266 @@ html.brief-no-mic .field-voice textarea {
     margin-top: 8px;
 }
 
-/* Footer */
+/*
+ * Footer: picks up the obsidian of the contact section, glows through ember and settles into stone.
+ * The portrait stands in front of the address; the text columns sit in front of both.
+ */
 .site-footer {
+    /* Where the text starts; the gradient is pinned to it so copy never lands on the dark band */
+    --footer-top: clamp(140px, 24svh, 280px);
+
     position: relative;
     z-index: 2;
-    padding: 64px 0 32px;
+    overflow: hidden;
+    color: var(--obsidian);
+    /* Full ember is reached well above the first line of text: dark copy on ember holds ~5.7:1 */
+    background:
+        linear-gradient(to bottom,
+            var(--obsidian) 0%,
+            #2A0B02 calc(var(--footer-top) * 0.25),
+            #8F2304 calc(var(--footer-top) * 0.48),
+            var(--ember) calc(var(--footer-top) * 0.7),
+            #FF7A55 calc(var(--footer-top) + 18%),
+            #FFB39A calc(var(--footer-top) + 32%),
+            var(--sand) calc(var(--footer-top) + 48%),
+            var(--stone) calc(var(--footer-top) + 60%));
 }
 
-.footer-grid {
+/* Its own grain: keeps the long gradient from banding */
+.site-footer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.09;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.footer-stage {
+    position: relative;
+    z-index: 1;
     display: grid;
-    gap: 16px;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 4fr) minmax(0, 5fr);
+    grid-template-areas:
+        "side . belief"
+        "email email email"
+        "meta meta meta";
+    align-items: start;
+    min-height: max(100svh, 820px);
+    padding: var(--footer-top) var(--gutter) 0;
+    box-sizing: border-box;
+    container-type: inline-size;
 }
 
-.footer-tagline {
+.footer-side {
+    grid-area: side;
+    position: relative;
+    z-index: 3;
+    display: grid;
+    gap: 40px;
+    max-width: 300px;
+}
+
+.footer-links ul {
+    display: grid;
+    gap: 6px;
     margin: 0;
-    font-size: clamp(24px, 3vw, 36px);
+    padding: 0;
+    list-style: none;
+}
+
+.footer-links-title {
+    margin: 0 0 12px;
+    font-size: 15px;
     font-weight: 700;
+}
+
+.footer-links a {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--obsidian);
+    text-decoration: underline;
+    text-decoration-color: rgba(10, 10, 10, 0.25);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 0.2s ease;
+}
+
+.footer-links a:hover {
+    text-decoration-color: currentColor;
+}
+
+.footer-invite {
+    padding-top: 32px;
+    border-top: 1px solid rgba(10, 10, 10, 0.14);
+}
+
+.footer-ask {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: var(--charcoal);
+}
+
+.footer-invite-line {
+    margin: 0;
+    font-size: clamp(28px, 2.6vw, 40px);
+    font-weight: 500;
+    line-height: 1.1;
     letter-spacing: -0.02em;
+    text-wrap: balance;
+}
+
+.footer-belief {
+    grid-area: belief;
+    position: relative;
+    z-index: 3;
+    max-width: 30ch;
+    justify-self: end;
+    font-size: clamp(22px, 2.3vw, 34px);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    text-wrap: pretty;
+}
+
+.footer-belief p {
+    margin: 0;
+}
+
+.footer-belief-lead {
+    margin-bottom: 1em !important;
+}
+
+/* The figure stands left of center and is cut by the bottom edge, like the hero's floor */
+.footer-portrait {
+    position: absolute;
+    z-index: 2;
+    left: 27%;
+    bottom: 0;
+    height: min(78%, 980px);
+    margin: 0;
+    pointer-events: none;
+}
+
+.footer-portrait img {
+    display: block;
+    width: auto;
+    height: 100%;
+}
+
+/* The address, sized so the whole line fits the stage width */
+.footer-email {
+    grid-area: email;
+    position: relative;
+    z-index: 1;
+    align-self: end;
+    margin: clamp(48px, 8svh, 96px) calc(var(--gutter) * -0.4) 0;
+    font-size: 11.6cqi;
+    font-weight: 500;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+    white-space: nowrap;
+    color: var(--charcoal);
+    text-decoration: none;
+    transition: color 0.4s var(--ease-out);
+}
+
+.footer-email:hover {
     color: var(--obsidian);
 }
 
-.footer-artisan,
+.footer-email-at {
+    color: var(--ember);
+}
+
+/* Meta sits under the address and leaves room for the floating dock */
 .footer-meta {
-    margin: 0;
+    grid-area: meta;
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding: 24px 0 calc(var(--dock-height) + 48px);
     font-size: 12px;
-    color: var(--silver);
+    /* Darkened from Slate so it holds contrast where it lands on orange */
+    color: rgba(10, 10, 10, 0.7);
+}
+
+.footer-meta p {
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .site-footer {
+        --footer-top: clamp(160px, 26svh, 240px);
+    }
+
+    .footer-stage {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "belief"
+            "side"
+            "meta"
+            "email";
+        row-gap: 56px;
+        min-height: 0;
+        padding-top: var(--footer-top);
+    }
+
+    .footer-belief {
+        justify-self: start;
+    }
+
+    .footer-side {
+        max-width: none;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .footer-invite {
+        grid-column: 1 / -1;
+    }
+
+    .footer-meta {
+        flex-direction: column;
+        padding-bottom: 0;
+    }
+
+    /* On narrow screens the figure stands on the bottom edge and the address reads in front of it */
+    .footer-email {
+        z-index: 3;
+        margin-top: min(96vw, 560px);
+        padding-bottom: calc(var(--dock-height) + 56px);
+    }
+
+    .footer-portrait {
+        left: auto;
+        right: 0;
+        height: min(128vw, 720px);
+    }
+}
+
+/* The figure eases up as the footer comes into view */
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .footer-portrait {
+            animation: footer-rise linear both;
+            animation-timeline: view();
+            animation-range: entry 0% cover 45%;
+        }
+    }
+}
+
+@keyframes footer-rise {
+    from {
+        translate: 0 8%;
+    }
+    to {
+        translate: 0 0;
+    }
 }
 
 /* Dock */

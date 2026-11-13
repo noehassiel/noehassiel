@@ -16,7 +16,7 @@ class Lead extends Model
     /** @use HasFactory<LeadFactory> */
     use HasFactory;
 
-    public const PROJECT_TYPES = ['website', 'web_app', 'ecommerce', 'design', 'other'];
+    public const PROJECT_TYPES = ['website', 'web_app', 'mobile_app', 'ecommerce', 'design', 'other'];
 
     public const BUDGETS = ['under_30k', '30k_80k', '80k_150k', 'over_150k', 'unsure'];
 
