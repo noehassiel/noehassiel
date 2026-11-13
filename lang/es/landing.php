@@ -17,13 +17,21 @@ return [
     ],
 
     'hero' => [
-        'eyebrow' => 'artisan developer · Puebla, MX',
-        'title_1' => 'Experiencias digitales,',
-        'title_2' => 'hechas a mano.',
+        'greeting' => [
+            'morning' => 'Buenos días desde Puebla',
+            'afternoon' => 'Buenas tardes desde Puebla',
+            'evening' => 'Buenas noches desde Puebla',
+        ],
+        'intro' => '¡Hola! Soy',
+        'title_1' => 'Hecho',
+        'title_2' => 'con',
+        'title_3' => 'intención.',
         'lead' => 'Soy Hassiel. Un desarrollador con alma de diseñador. Diseño, construyo y lanzo sitios y aplicaciones web para marcas que ven la calidad como una inversión, no como un lujo.',
         'available' => 'Tomando proyectos nuevos',
+        'help' => '¿Cómo te ayudo?',
         'primary' => 'Empezar un proyecto',
         'secondary' => 'Ver proyectos',
+        'photo_alt' => 'Hassiel inclinado hacia adelante en una silla, en un estudio de paneles de madera oscura con luz naranja cálida, mirando a la cámara',
     ],
 
     'work' => [
@@ -86,7 +94,7 @@ return [
         'body_1' => 'No sé diseñar sin pensar en cómo se va a construir, ni programar sin pensar en quién lo va a usar. Por eso hago las dos cosas, y además llevo el proyecto: así nada se pierde entre una persona y otra.',
         'body_2' => 'Me obsesionan los detalles que nadie pide pero todos notan. Prefiero decirte la verdad sobre tiempos y alcance que prometerte algo que no va a pasar. Y estoy convencido de que en México se puede hacer trabajo digital al nivel de cualquier parte del mundo. Cada proyecto es mi forma de demostrarlo.',
         'body_3' => 'También colaboro con <a href="https://estoria.studio/" target="_blank" rel="noopener">Estoria Studio</a>, un estudio de León que admiro mucho. Me hace feliz trabajar con ellos.',
-        'portrait' => 'Retrato de Hassiel',
+        'portrait' => 'Hassiel sentado con las piernas cruzadas en una silla, en un estudio de paneles de madera oscura',
         'facts' => [
             'based' => 'Desde',
             'based_value' => 'Puebla, México',

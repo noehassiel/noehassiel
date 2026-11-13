@@ -61,32 +61,79 @@
             <span class="brand-mark" aria-hidden="true" data-brand-mark><span data-brand-text>n<span class="brand-slash">/</span>h</span><span class="brand-cursor"></span></span>
             <span class="brand-name">noehassiel</span>
         </a>
-        <a href="#contact" class="button button-small button-dark"><x-t key="nav.cta" /></a>
+        @php
+            // Greet in Puebla time, like a friend saying hi from the studio
+            $pueblaHour = now('America/Mexico_City')->hour;
+            $greetingKey = match (true) {
+                $pueblaHour < 12 => 'morning',
+                $pueblaHour < 19 => 'afternoon',
+                default => 'evening',
+            };
+        @endphp
+        <p class="header-greeting mono"><x-t key="hero.greeting.{{ $greetingKey }}" /></p>
+        <a href="#contact" class="button button-small button-light"><x-t key="nav.cta" /></a>
     </header>
 
     <main id="main">
         {{-- Hero --}}
         <section class="hero" id="top">
-            <div class="container">
-                <p class="eyebrow">
-                    <span class="status-dot" aria-hidden="true"></span>
-                    <x-t key="hero.available" />
-                </p>
+            <div class="hero-photo" data-hero-photo>
+                {{-- One scene, art-directed: the wide shot on desktop, a tall crop around the subject on phones --}}
+                <picture class="hero-figure">
+                    <source media="(max-width: 940px)" srcset="{{ asset('images/me/hero-mobile.webp') }}" width="1100" height="1536">
+                    <img
+                        src="{{ asset('images/me/hero-2560.webp') }}"
+                        srcset="{{ asset('images/me/hero-1600.webp') }} 1600w, {{ asset('images/me/hero-2560.webp') }} 2560w"
+                        sizes="100vw"
+                        width="2560"
+                        height="1429"
+                        alt="{{ __('landing.hero.photo_alt', locale: 'en') }}"
+                        fetchpriority="high"
+                        decoding="async"
+                    >
+                </picture>
+            </div>
+            <div class="hero-shade" data-hero-shade aria-hidden="true"></div>
 
-                <h1 class="hero-title">
-                    <x-t key="hero.title_1" class="hero-title-line" />
-                    <x-t key="hero.title_2" class="hero-title-line hero-title-accent" />
-                </h1>
+            <div class="hero-inner" data-hero-copy>
+                <div class="hero-side hero-side-top">
+                    <p class="eyebrow">
+                        <span class="status-dot" aria-hidden="true"></span>
+                        <x-t key="hero.available" />
+                    </p>
 
-                <div class="hero-footer">
-                    <p class="hero-lead"><x-t key="hero.lead" /></p>
-                    <div class="hero-actions">
-                        <a href="#contact" class="button button-primary"><x-t key="hero.primary" /></a>
-                        <a href="#work" class="button button-ghost"><x-t key="hero.secondary" /></a>
-                    </div>
+                    <ul class="hero-services mono">
+                        <li><x-t key="services.items.development.title" /></li>
+                        <li><x-t key="services.items.design.title" /></li>
+                        <li><x-t key="services.items.management.title" /></li>
+                    </ul>
+
+                    <a href="#services" class="hero-help">
+                        <x-t key="hero.help" />
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 11 11 3M5 3h6v6" /></svg>
+                    </a>
                 </div>
 
-                <p class="hero-meta mono"><x-t key="hero.eyebrow" /></p>
+                <div class="hero-main">
+                    <p class="hero-intro">
+                        <x-t key="hero.intro" />
+                        <span class="hero-name">noe<span>hassiel</span></span>
+                    </p>
+
+                    <h1 class="hero-title">
+                        <span class="hero-title-line" style="--line: 0"><span><x-t key="hero.title_1" /></span></span>
+                        <span class="hero-title-line" style="--line: 1"><span><x-t key="hero.title_2" /></span></span>
+                        <span class="hero-title-line hero-title-accent" style="--line: 2"><span><x-t key="hero.title_3" /></span></span>
+                    </h1>
+                </div>
+
+                <div class="hero-side hero-side-bottom">
+                    <p class="hero-lead"><x-t key="hero.lead" /></p>
+                    <div class="hero-actions">
+                        <a href="#contact" class="button button-small button-primary"><x-t key="hero.primary" /></a>
+                        <a href="#work" class="hero-link"><x-t key="hero.secondary" /></a>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -180,11 +227,16 @@
         <section class="section" id="about" aria-labelledby="about-title">
             <div class="container about-grid">
                 <div class="about-portrait">
-                    @if (file_exists(public_path('images/hassiel.jpg')))
-                        <img src="{{ asset('images/hassiel.jpg') }}" alt="{{ __('landing.about.portrait', locale: 'en') }}" width="960" height="1200" loading="lazy">
-                    @else
-                        <span class="about-portrait-empty mono" aria-hidden="true">n/h</span>
-                    @endif
+                    <img
+                        src="{{ asset('images/me/about-960.webp') }}"
+                        srcset="{{ asset('images/me/about-640.webp') }} 640w, {{ asset('images/me/about-960.webp') }} 960w"
+                        sizes="(min-width: 900px) 40vw, 100vw"
+                        alt="{{ __('landing.about.portrait', locale: 'en') }}"
+                        width="960"
+                        height="1200"
+                        loading="lazy"
+                        decoding="async"
+                    >
                 </div>
 
                 <div class="about-copy">

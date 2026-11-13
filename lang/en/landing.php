@@ -17,13 +17,21 @@ return [
     ],
 
     'hero' => [
-        'eyebrow' => 'artisan developer · Puebla, MX',
-        'title_1' => 'Digital experiences,',
-        'title_2' => 'crafted by hand.',
+        'greeting' => [
+            'morning' => 'Good morning from Puebla',
+            'afternoon' => 'Good afternoon from Puebla',
+            'evening' => 'Good evening from Puebla',
+        ],
+        'intro' => 'Hi there! This is',
+        'title_1' => 'Crafted',
+        'title_2' => 'with',
+        'title_3' => 'intention.',
         'lead' => "I'm Hassiel. A developer with the soul of a designer. I design, build and ship websites and web apps for brands that see quality as an investment, not a luxury.",
         'available' => 'Taking new projects',
+        'help' => 'How can I help?',
         'primary' => 'Start a project',
         'secondary' => 'See the work',
+        'photo_alt' => 'Hassiel leaning forward on a chair in a dark wood-paneled studio, lit by warm orange light, looking at the camera',
     ],
 
     'work' => [
@@ -86,7 +94,7 @@ return [
         'body_1' => 'I can\'t design without thinking about how it\'ll be built, or code without thinking about who\'ll use it. So I do both, and I run the project too: nothing gets lost between one person and the next.',
         'body_2' => 'I obsess over the details nobody asks for but everyone notices. I\'d rather tell you the truth about timelines and scope than promise something that won\'t happen. And I\'m convinced Mexico can produce digital work on par with anywhere in the world. Every project is my way of proving it.',
         'body_3' => 'I also collaborate with <a href="https://estoria.studio/" target="_blank" rel="noopener">Estoria Studio</a>, a studio from León I really admire. I\'m genuinely happy to work with them.',
-        'portrait' => 'Portrait of Hassiel',
+        'portrait' => 'Hassiel sitting cross-legged on a chair in a dark wood-paneled studio',
         'facts' => [
             'based' => 'Based in',
             'based_value' => 'Puebla, Mexico',
