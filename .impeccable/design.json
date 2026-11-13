@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-13T00:00:00Z",
+  "title": "Design System: noehassiel",
+  "extensions": {
+    "colorMeta": {
+      "tech-ember": { "role": "primary", "displayName": "Tech Ember", "tonalRamp": ["#5C1300", "#991F00", "#CC3509", "#FF420B", "#FF7A55", "#FFB39A", "#FFD3C4", "#FFE8E0"] },
+      "ember-deep": { "role": "primary", "displayName": "Ember Deep", "tonalRamp": ["#3D0D00", "#661700", "#991F00", "#CC3509", "#E8572A", "#FF8A66", "#FFC2AD", "#FFE8E0"] },
+      "ember-soft": { "role": "primary", "displayName": "Ember Soft (error)", "tonalRamp": ["#5C1300", "#991F00", "#CC3509", "#FF420B", "#FF7A55", "#FFB39A", "#FFD3C4", "#FFE8E0"] },
+      "artisan-brass": { "role": "secondary", "displayName": "Artisan Brass", "tonalRamp": ["#4A3A24", "#7A5F3C", "#9E7E54", "#C8A87C", "#D4BC94", "#E8D5B5", "#F0E3CD", "#F5EDE3"] },
+      "obsidian": { "role": "neutral", "displayName": "Obsidian", "tonalRamp": ["#0A0A0A", "#111111", "#191919", "#222222", "#2D2D2D", "#6B6B6B", "#B0B0B0", "#FAFAF9"] },
+      "warm-stone": { "role": "neutral", "displayName": "Warm Stone", "tonalRamp": ["#2D2D2D", "#6B6B6B", "#B0B0B0", "#D9D5CE", "#E8E3DB", "#F0EBE3", "#F5F3F0", "#FAFAF9"] },
+      "sand": { "role": "neutral", "displayName": "Sand", "tonalRamp": ["#4D4840", "#7A7366", "#A39B8C", "#C9C0B0", "#DDD5C7", "#F0EBE3", "#F6F2EC", "#FAFAF9"] },
+      "charcoal": { "role": "neutral", "displayName": "Charcoal" },
+      "slate": { "role": "neutral", "displayName": "Slate" },
+      "silver": { "role": "neutral", "displayName": "Silver" },
+      "sidebar-black": { "role": "neutral", "displayName": "Sidebar Black" },
+      "card-black": { "role": "neutral", "displayName": "Card Black (portal)" },
+      "surface": { "role": "neutral", "displayName": "Shell Surface (admin)" },
+      "inset": { "role": "neutral", "displayName": "Inset Panel" },
+      "tertiary": { "role": "neutral", "displayName": "Raised Control" },
+      "hairline": { "role": "neutral", "displayName": "Hairline" },
+      "field-edge": { "role": "neutral", "displayName": "Field Edge" },
+      "heading-ink": { "role": "neutral", "displayName": "Heading Ink" },
+      "body-ink": { "role": "neutral", "displayName": "Body Ink" },
+      "muted-ink": { "role": "neutral", "displayName": "Muted Ink" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Landing hero headline only; uppercase, masked line-by-line rise." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles." },
+      "title": { "displayName": "Title", "purpose": "Work item names; service titles at a smaller clamp." },
+      "subtitle": { "displayName": "Subtitle", "purpose": "Process steps and card titles." },
+      "body-lead": { "displayName": "Body Lead", "purpose": "Section leads." },
+      "body": { "displayName": "Body", "purpose": "Running copy and inputs." },
+      "label": { "displayName": "Label (mono)", "purpose": "Buttons, links, section labels, numbers." },
+      "caption": { "displayName": "Caption (mono)", "purpose": "Meta, field labels, tags." },
+      "eyebrow": { "displayName": "Eyebrow (mono)", "purpose": "Uppercase portal/admin section eyebrows and nav group labels." }
+    },
+    "shadows": [
+      { "name": "dock-float", "value": "0 20px 50px -20px rgba(10,10,10,0.5)", "purpose": "Floating dock, with blur(16px) backdrop on rgba(10,10,10,0.92)." },
+      { "name": "modal-float", "value": "0 24px 80px rgba(0,0,0,0.6)", "purpose": "Admin modals over a rgba(0,0,0,0.6) scrim." },
+      { "name": "samantha-window", "value": "0 30px 60px -20px rgba(90,30,10,0.5)", "purpose": "Docked Samantha voice window; the only warm shadow." },
+      { "name": "shell-ring", "value": "0 0 0 6px var(--surface), 0 0 0 7px var(--border)", "purpose": "Drawn nested-shell ring around admin cards; not elevation." },
+      { "name": "focus-halo", "value": "0 0 0 3px color-mix(in srgb, var(--ember) 18%, transparent)", "purpose": "Admin field focus." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The only easing curve; smooth, never bouncy." },
+      { "name": "state", "value": "200ms", "purpose": "Color, border, background state changes." },
+      { "name": "press", "value": "scale(0.98)", "purpose": "Button :active." },
+      { "name": "surface", "value": "400-600ms", "purpose": "Card hovers, dock and header slides." },
+      { "name": "entrance", "value": "1.1s, 90ms stagger per line", "purpose": "Hero headline rise; reduced-motion gated." },
+      { "name": "caret-blink", "value": "1.1s steps(1) infinite", "purpose": "n/h_ cursor." }
+    ],
+    "breakpoints": [
+      { "name": "work-split", "value": "900px" },
+      { "name": "header-greeting", "value": "940px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one ember CTA per view: mono label in a pill that presses.",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Empecemos</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 24px; border: 1.5px solid transparent; border-radius: 999px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .2s cubic-bezier(0.16,1,0.3,1); } .ds-btn:active { transform: scale(0.98); } .ds-btn:focus-visible { outline: 2px solid #FF420B; outline-offset: 3px; } .ds-btn-primary { background: #FF420B; color: #fff; } .ds-btn-primary:hover { background: #CC3509; }"
+    },
+    {
+      "name": "Dark Button",
+      "kind": "button",
+      "refersTo": "button-dark",
+      "description": "Secondary action on light sections.",
+      "html": "<button class=\"ds-btn-dark\">Ver proyectos</button>",
+      "css": ".ds-btn-dark { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border: 1.5px solid transparent; border-radius: 999px; background: #0A0A0A; color: #FAFAF9; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color .2s ease, transform .2s cubic-bezier(0.16,1,0.3,1); } .ds-btn-dark:hover { background: #2D2D2D; } .ds-btn-dark:active { transform: scale(0.98); } .ds-btn-dark:focus-visible { outline: 2px solid #FF420B; outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Outline pill in currentColor for tertiary actions.",
+      "html": "<button class=\"ds-btn-ghost\">Hablar con Samantha</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border: 1.5px solid currentColor; border-radius: 999px; background: transparent; color: #0A0A0A; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color .2s ease, transform .2s cubic-bezier(0.16,1,0.3,1); } .ds-btn-ghost:hover { background: rgba(10,10,10,0.05); } .ds-btn-ghost:active { transform: scale(0.98); } .ds-btn-ghost:focus-visible { outline: 2px solid #FF420B; outline-offset: 3px; }"
+    },
+    {
+      "name": "Text Field (dark)",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Landing contact field on obsidian: hairline border, ember focus.",
+      "html": "<label class=\"ds-field\"><span>Tu nombre</span><input placeholder=\"Hassiel\"></label>",
+      "css": ".ds-field { display: grid; gap: 8px; padding: 24px; background: #0A0A0A; } .ds-field span { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #B0B0B0; } .ds-field input { padding: 14px 16px; border: 1px solid rgba(250,250,249,0.16); border-radius: 10px; background: rgba(250,250,249,0.04); color: #FAFAF9; font-family: 'CabinetGrotesk-Variable', system-ui, sans-serif; font-size: 16px; transition: border-color .2s ease; } .ds-field input:focus { border-color: #FF420B; outline: none; }"
+    },
+    {
+      "name": "Choice Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Selectable pill; ember fill when chosen.",
+      "html": "<div class=\"ds-chips\"><span class=\"ds-chip\">Sitio web</span><span class=\"ds-chip ds-chip-on\">App móvil</span></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; padding: 24px; background: #0A0A0A; } .ds-chip { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border: 1px solid rgba(250,250,249,0.16); border-radius: 999px; font-size: 14px; color: #FAFAF9; cursor: pointer; transition: background-color .2s ease, border-color .2s ease; } .ds-chip:hover { border-color: rgba(250,250,249,0.32); } .ds-chip-on { border-color: #FF420B; background: #FF420B; color: #fff; }"
+    },
+    {
+      "name": "Admin Widget (nested shell)",
+      "kind": "card",
+      "refersTo": "admin-widget",
+      "description": "Outer surface shell wrapping an inset panel; concentric 22/16 corners.",
+      "html": "<div class=\"ds-widget\"><div class=\"ds-widget-head\"><span class=\"ds-eyebrow\">Leads</span></div><div class=\"ds-inset\"><strong>12</strong><span>this month</span></div></div>",
+      "css": ".ds-widget { display: flex; flex-direction: column; padding: 6px; border: 1px solid rgba(255,255,255,0.07); border-radius: 22px; background: #121212; width: 280px; } .ds-widget-head { padding: 12px 14px; } .ds-eyebrow { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #7E7E7B; } .ds-inset { display: grid; gap: 4px; padding: 20px; border-radius: 16px; background: #191919; color: #A6A6A3; } .ds-inset strong { font-size: 32px; font-weight: 800; color: #EDEDEC; letter-spacing: -0.02em; }"
+    },
+    {
+      "name": "Portal Card",
+      "kind": "card",
+      "refersTo": "portal-card",
+      "description": "Linked project card; ember-tinted border on hover, no shadow.",
+      "html": "<a class=\"ds-portal-card\" href=\"#\"><span class=\"ds-portal-eyebrow\">Proyecto</span><strong>Sitio IICC</strong><div class=\"ds-steps\"><i data-s=\"done\"></i><i data-s=\"current\"></i><i></i></div></a>",
+      "css": ".ds-portal-card { display: grid; gap: 12px; width: 280px; padding: 24px; border: 1px solid #1C1C1C; border-radius: 16px; background: #111111; color: #FAFAF9; text-decoration: none; transition: border-color .4s cubic-bezier(0.16,1,0.3,1), background-color .4s cubic-bezier(0.16,1,0.3,1); } .ds-portal-card:hover, .ds-portal-card:focus-visible { border-color: color-mix(in srgb, #FF420B 45%, transparent); background: #141414; outline: none; } .ds-portal-eyebrow { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #6B6B6B; } .ds-portal-card strong { font-size: 22px; font-weight: 700; } .ds-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; } .ds-steps i { height: 3px; border-radius: 999px; background: #222; } .ds-steps i[data-s=done] { background: #B0B0B0; } .ds-steps i[data-s=current] { background: #FF420B; }"
+    },
+    {
+      "name": "Dock",
+      "kind": "nav",
+      "refersTo": "dock",
+      "description": "Floating blurred navigation: brand tile, numbered section apps, language switch.",
+      "html": "<nav class=\"ds-dock\"><div class=\"ds-dock-tile ds-mark\">n<span>/</span>h<i></i></div><div class=\"ds-dock-tile ds-apps\"><a aria-current=\"true\"><b>01</b>Trabajo</a><a><b>02</b>Servicios</a><a><b>03</b>Proceso</a></div></nav>",
+      "css": ".ds-dock { display: inline-flex; gap: 6px; padding: 6px; border: 1px solid rgba(250,250,249,0.1); border-radius: 24px; background: rgba(10,10,10,0.92); backdrop-filter: blur(16px); box-shadow: 0 20px 50px -20px rgba(10,10,10,0.5); } .ds-dock-tile { display: flex; align-items: center; min-height: 72px; padding: 0 16px; border: 1px solid rgba(250,250,249,0.06); border-radius: 18px; background: rgba(250,250,249,0.04); color: #FAFAF9; } .ds-mark { font-family: 'CabinetGrotesk-Variable', system-ui, sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; } .ds-mark span { color: #FF420B; } .ds-mark i { display: inline-block; width: 2px; height: .9em; margin-left: 3px; background: currentColor; animation: ds-blink 1.1s steps(1) infinite; } @keyframes ds-blink { 50% { opacity: 0; } } .ds-apps { gap: 4px; padding: 0 6px; } .ds-apps a { display: flex; flex-direction: column; justify-content: center; gap: 2px; min-height: 56px; padding: 0 12px; border-radius: 12px; font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #B0B0B0; cursor: pointer; transition: background-color .2s ease, color .2s ease; } .ds-apps a:hover, .ds-apps a[aria-current=true] { background: rgba(250,250,249,0.08); color: #FAFAF9; } .ds-apps b { font-size: 10px; font-weight: 400; color: #FF420B; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Artisan's Terminal",
+    "overview": "The whole system grows from the isotipo `n/h_`: an ember slash and a blinking caret. Every surface is a terminal session run by a craftsman. The room is obsidian, metadata is set in Geist Mono like command output, and one ember accent marks the line that matters right now. The precision is human. Cabinet Grotesk carries the voice in big, confident and slightly heavy cuts, while the mono layer stays quiet and exact. A 4% film grain sits over everything so the screen never looks sterile.\n\nThe same world runs at three intensities. The landing page is a performance: a full-bleed portrait in an obsidian room, a low ember light rising from the floor, giant uppercase headlines that rise line by line, and sections that switch between obsidian, warm stone and sand. The portal and admin are the same terminal at working volume. They are dark only, built from stepped near-black layers, with mono eyebrows, ember used for focus and for the current state, and nothing ornamental that slows a task. A floating dock (brand mark, section apps, language switch, live widgets) and the Samantha voice window are the system's signature: a small personal OS wrapped around the content.\n\nComponents are precise and tactile: pills that press, nested shells, hairline edges. They are confident but never loud. Motion follows one long ease-out curve, intentional and never bouncy.",
+    "keyCharacteristics": [
+      "Obsidian base with one ember accent per view. Brass is a rare, warm whisper.",
+      "Cabinet Grotesk for voice, Geist Mono for metadata, labels, buttons and numbers.",
+      "The `n/h_` caret and slash recur as motif: blinking cursor, ember slash bullets, typed brand messages.",
+      "Depth comes from tonal layers and hairlines. Shadows only for things that float.",
+      "A 4% grain overlay on every branded surface.",
+      "Fully bilingual: both languages render and `html[data-lang]` shows one."
+    ],
+    "rules": [
+      { "name": "The One Ember Rule", "body": "Each view has one ember destination (one primary CTA or one current state). Everything else is neutral. Ember is about 10% of the palette budget at most, and its scarcity is what makes it read as \"click here\" or \"you are here\".", "section": "colors" },
+      { "name": "The Brass Whisper Rule", "body": "Brass appears only in text, numbers, initials or 1px outlines. It is never a fill, never a button, never more than 5% of a screen.", "section": "colors" },
+      { "name": "The Warm Ink Rule", "body": "Text on dark is never `#FFFFFF`. Use Warm Stone or `heading-ink`. The only pure white is the label inside an ember fill.", "section": "colors" },
+      { "name": "The Mono Annotates Rule", "body": "Geist Mono is reserved for what a terminal would print: labels, numbers, meta, buttons, timestamps and the tagline `artisan developer`. Headlines and prose are always Cabinet Grotesk.", "section": "typography" },
+      { "name": "The Lowercase Name Rule", "body": "`noehassiel` and `artisan developer` are always lowercase, even inside uppercase display settings.", "section": "typography" },
+      { "name": "The Tonal Ladder Rule", "body": "Surfaces never lift with shadows. A card that needs emphasis moves one step up the ladder (`inset` → `tertiary`) and takes an ember-tinted border (35–45% ember mix) on hover. Cast shadows are reserved for the dock, modals and the Samantha window.", "section": "elevation" },
+      { "name": "The Grain Rule", "body": "Every branded body (landing, portal, admin) carries the fixed fractal-noise overlay at 4% opacity. It sits above the background and below the content, and never captures pointer events.", "section": "elevation" },
+      { "name": "The Concentric Corners Rule", "body": "A nested container's radius equals its parent's radius minus the padding between them (22 → 16 at 6px, 24 → 18 at 6px). Never put the same radius on a parent and its child.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do keep one ember destination per view (The One Ember Rule) and use `ember-deep` only for hover and pressed states.",
+      "Do set every button, label, number and piece of metadata in Geist Mono, and every headline and paragraph in Cabinet Grotesk.",
+      "Do move emphasis up the tonal ladder (`obsidian` → `card-black`/`surface` → `inset` → `tertiary`) with 1px hairlines instead of adding shadows.",
+      "Do keep nested radii concentric (22 → 16, 24 → 18 → 12).",
+      "Do animate with `cubic-bezier(0.16, 1, 0.3, 1)`: 200ms for state, 0.4–0.6s for surfaces, 1.1s for hero entrances. Wrap entrances in `prefers-reduced-motion: no-preference`.",
+      "Do use an ember 2px outline with a 2–3px offset for `:focus-visible` everywhere.",
+      "Do reserve the dock's height at the bottom of every landing layout.",
+      "Do render both languages and let `html[data-lang]` choose. Never hard-code a single-language string on a branded surface."
+    ],
+    "donts": [
+      "Don't write the name or tagline in anything but lowercase (`noehassiel`, `artisan developer`).",
+      "Don't use brass as a fill, button or background.",
+      "Don't use pure `#FFFFFF` for text on dark surfaces. Use Warm Stone or `heading-ink`.",
+      "Don't add drop shadows to cards. Cast shadows belong only to the dock, modals and the Samantha window.",
+      "Don't ship the starter kit's Instrument Sans or neutral-800 primary on a branded surface. Scope pages under `body.landing`, `body.portal` or `body.admin` so the brand tokens apply.",
+      "Don't use bouncy, elastic or spring-overshoot motion.",
+      "Don't offer a light mode for the portal or admin. They are dark by commitment.",
+      "Don't let the Samantha amber and red palette leak outside the Samantha component."
+    ]
+  }
+}
