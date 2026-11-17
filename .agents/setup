@@ -48,6 +48,25 @@ install_composer() {
   composer --version
 }
 
+CLOUD_CLI_DIR="$HOME/.local/share/laravel-cloud-cli"
+
+install_cloud_cli() {
+  # Kept outside composer.json so the app's dependencies stay untouched.
+  if [ ! -x "$CLOUD_CLI_DIR/vendor/bin/cloud" ]; then
+    mkdir -p "$CLOUD_CLI_DIR"
+    composer require --working-dir="$CLOUD_CLI_DIR" --no-interaction --no-progress --prefer-dist laravel/cloud-cli
+  fi
+  # The CLI reads LARAVEL_CLOUD_TOKEN; Amp stores the secret as LARAVEL_CLOUD_API_TOKEN.
+  # Map it per call, because exports from this script never reach thread shells.
+  sudo tee /usr/local/bin/cloud >/dev/null <<EOF
+#!/usr/bin/env bash
+export LARAVEL_CLOUD_TOKEN="\${LARAVEL_CLOUD_TOKEN:-\${LARAVEL_CLOUD_API_TOKEN:-}}"
+exec "$CLOUD_CLI_DIR/vendor/bin/cloud" "\$@"
+EOF
+  sudo chmod +x /usr/local/bin/cloud
+  cloud --version
+}
+
 prepare_env() {
   if [ ! -f .env ]; then
     cp -- .env.example .env
@@ -63,6 +82,7 @@ prepare_env() {
 
 step "PHP ${PHP_VERSION}" install_php
 step "Composer" install_composer
+step "Laravel Cloud CLI" install_cloud_cli
 step "composer install" composer install --no-interaction --no-progress --prefer-dist
 step "npm ci" npm ci --no-audit --no-fund
 step "Environment and database" prepare_env
