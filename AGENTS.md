@@ -14,7 +14,7 @@ This repository deploys to Laravel Cloud, in the personal organization "Noé Ban
 
 ### Using the CLI in orbs
 
-`.agents/setup` installs the official CLI (`laravel/cloud-cli`) outside the app's `composer.json` and puts a `cloud` wrapper on `PATH`. The wrapper sets `LARAVEL_CLOUD_TOKEN`, which the CLI reads, from the `LARAVEL_CLOUD_API_TOKEN` project secret. Run `cloud`, not `./vendor/bin/cloud`, and never print the token. Add `-n` to every command, and `--json` to reads.
+`.agents/setup` installs the official CLI (`laravel/cloud-cli`) outside the app's `composer.json` and puts a `cloud` wrapper on `PATH`. The wrapper sets `LARAVEL_CLOUD_TOKEN`, which the CLI reads, from the `LARAVEL_CLOUD_API_TOKEN` project secret. It also runs `cloud repo:config`, which writes the gitignored `.cloud/config.json` so `noehassiel` is the default application. Run `cloud`, not `./vendor/bin/cloud`, and never print the token. Add `-n` to every command, and `--json` to reads.
 
 ```shell
 cloud environment:get env-a1ec8c8c-18e4-40d7-997d-cbab3ae28585 --json -n

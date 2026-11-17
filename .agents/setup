@@ -65,6 +65,11 @@ exec "$CLOUD_CLI_DIR/vendor/bin/cloud" "\$@"
 EOF
   sudo chmod +x /usr/local/bin/cloud
   cloud --version
+  # Default this repo to https://cloud.laravel.com/noe-bandala/noehassiel/master.
+  # .cloud/ is gitignored, so each orb writes it; skip when the token isn't available.
+  if [ ! -f .cloud/config.json ] && [ -n "${LARAVEL_CLOUD_API_TOKEN:-}${LARAVEL_CLOUD_TOKEN:-}" ]; then
+    cloud repo:config noehassiel --organization=noe-bandala -n
+  fi
 }
 
 prepare_env() {
