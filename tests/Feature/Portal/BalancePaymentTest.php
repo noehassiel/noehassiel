@@ -13,6 +13,7 @@ use App\Models\ProposalItem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Laravel\Cashier\Events\WebhookReceived;
 use Livewire\Livewire;
@@ -155,4 +156,51 @@ test('an accepted proposal can no longer be edited', function () {
     $this->actingAs(User::factory()->admin()->create())
         ->get(route('proposals.edit', $this->proposal))
         ->assertForbidden();
+});
+
+test('paying the balance brings the client site up once', function () {
+    Http::fake(['https://cliente.test/*' => Http::response(['status' => 'up'])]);
+    $this->project->forceFill(['launch_url' => 'https://cliente.test', 'launch_token' => 'secret-ops-token'])->save();
+
+    $this->proposal->markBalancePaid(PaymentMethod::Transfer, 25000);
+    $this->proposal->markBalancePaid(PaymentMethod::Transfer, 25000);
+    app()->terminate();
+
+    Http::assertSentCount(1);
+    Http::assertSent(fn ($request) => $request->url() === 'https://cliente.test/_ops/maintenance'
+        && $request->hasHeader('Authorization', 'Bearer secret-ops-token')
+        && $request['action'] === 'up');
+    expect($this->project->fresh()->launched_at)->not->toBeNull();
+});
+
+test('the site stays down until the balance is paid', function () {
+    Http::fake();
+    $this->project->forceFill(['launch_url' => 'https://cliente.test', 'launch_token' => 'secret-ops-token'])->save();
+
+    // The deposit is already in; only the balance may launch
+    $this->project->update(['status' => ProjectStatus::Review]);
+    $this->proposal->chooseBalancePaymentMethod(PaymentMethod::Transfer);
+    app()->terminate();
+
+    Http::assertNothingSent();
+    expect($this->project->fresh()->launched_at)->toBeNull();
+});
+
+test('a failed launch is recorded for the admin', function () {
+    Http::fake(['https://cliente.test/*' => Http::response('nope', 401)]);
+    $this->project->forceFill(['launch_url' => 'https://cliente.test', 'launch_token' => 'wrong'])->save();
+
+    $this->proposal->markBalancePaid(PaymentMethod::Transfer, 25000);
+    app()->terminate();
+
+    expect($this->project->fresh())->launched_at->toBeNull()->launch_error->not->toBeNull();
+});
+
+test('projects without a launch url make no call when paid', function () {
+    Http::fake();
+
+    $this->proposal->markBalancePaid(PaymentMethod::Transfer, 25000);
+    app()->terminate();
+
+    Http::assertNothingSent();
 });

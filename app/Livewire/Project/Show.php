@@ -3,6 +3,7 @@
 namespace App\Livewire\Project;
 
 use App\Enums\ProjectStatus;
+use App\Jobs\BringSiteUp;
 use App\Jobs\CreateLinearIssueForTicket;
 use App\Jobs\SyncProjectToLinear;
 use App\Models\Project;
@@ -38,6 +39,10 @@ class Show extends Component
 
     public string $linkUrl = '';
 
+    public string $launchUrl = '';
+
+    public string $launchToken = '';
+
     public string $requirementTitle = '';
 
     public string $requirementDescription = '';
@@ -58,6 +63,7 @@ class Show extends Component
             'previewUrl' => (string) $project->preview_url,
             'revisionRounds' => $project->revision_rounds,
             'selfServiceNotes' => (string) $project->self_service_notes,
+            'launchUrl' => (string) $project->launch_url,
         ]);
     }
 
@@ -73,6 +79,8 @@ class Show extends Component
             'previewUrl' => ['nullable', 'url:https', 'max:255'],
             'revisionRounds' => ['required', 'integer', 'min:0', 'max:10'],
             'selfServiceNotes' => ['nullable', 'string', 'max:2000'],
+            'launchUrl' => ['nullable', 'url:https', 'max:255'],
+            'launchToken' => ['nullable', 'string', 'max:255'],
         ]);
 
         $this->project->update([
@@ -85,9 +93,24 @@ class Show extends Component
             'preview_url' => $validated['previewUrl'] ?: null,
             'revision_rounds' => $validated['revisionRounds'],
             'self_service_notes' => $validated['selfServiceNotes'] ?: null,
+            'launch_url' => $validated['launchUrl'] ?: null,
+            // The token is never shown again; leaving the field empty keeps the saved one
+            ...($validated['launchToken'] ? ['launch_token' => $validated['launchToken']] : []),
         ]);
 
+        $this->launchToken = '';
+
         $this->dispatch('project-saved');
+    }
+
+    /** The balance is paid but the site didn't come up (not deployed yet, wrong token): try the call again. */
+    public function retryLaunch(): void
+    {
+        abort_unless($this->project->proposal?->balance_paid_at && $this->project->launch_url && ! $this->project->launched_at, 403);
+
+        BringSiteUp::dispatchSync($this->project);
+
+        $this->project->refresh();
     }
 
     /** A new version of the preview is up with the requested changes: what the client asks next is the next round. */

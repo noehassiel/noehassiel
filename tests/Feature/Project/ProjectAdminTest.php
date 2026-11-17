@@ -8,9 +8,11 @@ use App\Models\Client;
 use App\Models\Project;
 use App\Models\ProjectLink;
 use App\Models\ProjectRequirement;
+use App\Models\Proposal;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -190,4 +192,32 @@ test('deleting a project removes its checklist and folders and returns to the cl
     expect(Project::find($project->id))->toBeNull()
         ->and(ProjectRequirement::count())->toBe(0)
         ->and(ProjectLink::count())->toBe(0);
+});
+
+test('a failed launch can be retried once the balance is paid', function () {
+    $proposal = Proposal::factory()->create(['balance_paid_at' => now()]);
+    $project = Project::factory()->for($proposal->client)->create([
+        'launch_url' => 'https://cliente.test',
+        'launch_token' => 'token',
+        'launch_error' => 'Request failed',
+    ]);
+    $proposal->forceFill(['project_id' => $project->id])->save();
+    Http::fake(['https://cliente.test/*' => Http::response(['status' => 'up'])]);
+
+    Livewire::test(Show::class, ['project' => $project])
+        ->assertSee('Reintentar lanzamiento')
+        ->call('retryLaunch')
+        ->assertSee('Sitio publicado')
+        ->assertDontSee('Reintentar lanzamiento');
+
+    expect($project->fresh())->launched_at->not->toBeNull()->launch_error->toBeNull();
+});
+
+test('the launch can not be retried before the balance is paid', function () {
+    $project = Project::factory()->create(['launch_url' => 'https://cliente.test', 'launch_token' => 'token']);
+
+    Livewire::test(Show::class, ['project' => $project])
+        ->assertDontSee('Reintentar lanzamiento')
+        ->call('retryLaunch')
+        ->assertForbidden();
 });

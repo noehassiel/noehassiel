@@ -35,7 +35,11 @@ class Project extends Model
         'preview_url',
         'self_service_notes',
         'revision_rounds',
+        'launch_url',
+        'launch_token',
     ];
+
+    protected $hidden = ['launch_token'];
 
     protected function casts(): array
     {
@@ -44,6 +48,8 @@ class Project extends Model
             'starts_on' => 'date',
             'due_on' => 'date',
             'approved_at' => 'datetime',
+            'launch_token' => 'encrypted',
+            'launched_at' => 'datetime',
         ];
     }
 

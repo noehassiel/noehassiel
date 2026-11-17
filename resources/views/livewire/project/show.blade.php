@@ -61,6 +61,24 @@
                 </x-ui.field>
 
                 <x-ui.field>
+                    <x-ui.label>Lanzamiento <span class="text-neutral-400">(sitio en mantenimiento; se activa solo al registrar la liquidación)</span></x-ui.label>
+                    <x-ui.input wire:model="launchUrl" type="url" placeholder="https://cliente.com" />
+                    <x-ui.error name="launchUrl" />
+                    <x-ui.input wire:model="launchToken" type="password" autocomplete="off" :placeholder="$project->launch_token ? 'Token guardado (deja vacío para conservarlo)' : 'OPS_TOKEN del sitio'" class="mt-2" />
+                    <x-ui.error name="launchToken" />
+                    @if ($project->launched_at)
+                        <p class="mt-1 text-sm text-green-600">Sitio publicado el {{ $project->launched_at->translatedFormat('j M Y, H:i') }}</p>
+                    @elseif ($project->launch_error)
+                        <p class="mt-1 text-sm text-red-600">El lanzamiento falló: {{ $project->launch_error }}</p>
+                    @endif
+                    @if (! $project->launched_at && $project->launch_url && $project->proposal?->balance_paid_at)
+                        <x-ui.button type="button" variant="outline" size="sm" class="mt-2" wire:click="retryLaunch" wire:loading.attr="disabled" wire:target="retryLaunch">
+                            Reintentar lanzamiento
+                        </x-ui.button>
+                    @endif
+                </x-ui.field>
+
+                <x-ui.field>
                     <x-ui.label>Rondas de cambios incluidas</x-ui.label>
                     <x-ui.input wire:model="revisionRounds" type="number" min="0" max="10" />
                     <x-ui.error name="revisionRounds" />
