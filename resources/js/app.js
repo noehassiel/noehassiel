@@ -5,6 +5,7 @@ import './sam.js';
 import './dock.js';
 import './brand-mark.js';
 import './hero.js';
+import './footer-horizon.js';
 import './brief.js';
 import './os1-conversation.js';
 

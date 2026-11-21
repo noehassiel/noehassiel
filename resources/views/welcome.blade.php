@@ -286,10 +286,10 @@
     @php($publicEmail = config('app.public_email'))
     @php([$emailUser, $emailDomain] = explode('@', $publicEmail, 2))
 
-    {{-- Footer: the dark contact section glows through ember into stone, with the portrait standing over the address --}}
-    <footer class="site-footer">
+    {{-- Footer: the dark contact section becomes a planet and the footer is its sunrise (footer-horizon.js), with the portrait standing over the address --}}
+    <footer class="site-footer" data-footer-horizon>
         <div class="footer-stage">
-            <div class="footer-side">
+            <div class="footer-side" data-horizon-reveal>
                 <nav class="footer-links" aria-label="{{ __('landing.footer.contact', locale: 'en') }}">
                     <p class="footer-links-title"><x-t key="footer.contact" /></p>
                     <ul>
@@ -311,7 +311,7 @@
                 </div>
             </div>
 
-            <div class="footer-belief">
+            <div class="footer-belief" data-horizon-reveal>
                 <p class="footer-belief-lead"><x-t key="footer.belief" /></p>
                 <p><x-t key="footer.belief_body" /></p>
             </div>

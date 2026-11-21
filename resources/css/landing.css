@@ -1310,12 +1310,28 @@ html.brief-no-mic .field-voice textarea {
             var(--stone) calc(var(--footer-top) + 60%));
 }
 
+/* Once footer-horizon.js draws the planet and its glow, the gradient above is only the no-JS fallback */
+.site-footer.has-horizon {
+    background: var(--stone);
+}
+
+.footer-horizon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    display: block;
+    width: 100%;
+    height: 100svh;
+    pointer-events: none;
+}
+
 /* Its own grain: keeps the long gradient from banding */
 .site-footer::before {
     content: '';
     position: absolute;
     inset: 0;
-    z-index: 0;
+    z-index: 1;
     pointer-events: none;
     opacity: 0.09;
     mix-blend-mode: overlay;
@@ -1324,7 +1340,7 @@ html.brief-no-mic .field-voice textarea {
 
 .footer-stage {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     display: grid;
     grid-template-columns: minmax(0, 3fr) minmax(0, 4fr) minmax(0, 5fr);
     grid-template-areas:
